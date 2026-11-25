@@ -65,7 +65,7 @@ breath-word/
 - **Node `v24.19.0`** — native TS type-stripping and `node:sqlite` (`DatabaseSync`) work unflagged.
 - **pnpm 9+** with Turborepo. `.npmrc`: `auto-install-peers=true`, `strict-peer-dependencies=false`.
 - Rust stable (MSVC Build Tools) for Tauri v2 · Android SDK/emulator for `apps/mobile`.
-- **No git repository is initialized yet** (no `.git`). Track changes manually / ask before assuming VCS.
+- **Git:** repository initialized; `origin` = <https://github.com/MacMbizo/breath-word.git>, default branch `main`. Run the gate (`pnpm turbo lint typecheck test`) before pushing.
 - `tools/pack-builder` needs **`tsx`** to run its CLI (`pack:sample`) because `core` emits
   extensionless relative imports that bare `node` cannot resolve.
 
