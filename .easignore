@@ -1,0 +1,13 @@
+# EAS Build upload exclusions.
+# EAS compiles the app on its own Linux builders and runs `pnpm install`
+# there, so no dependency or build-artifact directory should be uploaded.
+# This mirrors .gitignore and additionally keeps the in-repo pnpm store out
+# of the (multi-GB) cloud upload.
+node_modules/
+.pnpm-store/
+dist/
+build/
+.turbo/
+apps/desktop/src-tauri/target/
+tools/pack-builder/out/
+*.log

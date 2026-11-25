@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# pnpm content-addressable store (kept in-repo on Windows where the global
+# store path is not writable; see pnpm-workspace.yaml `storeDir`).
+.pnpm-store/
+
+# Build output
+dist/
+build/
+.turbo/
+
+# Environment / secrets (E1 hard rule: never commit real credentials)
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Tauri
+apps/desktop/src-tauri/target/
+# Tauri generates these capability schemas at build time.
+apps/desktop/src-tauri/gen/schemas/
+
+# Content pack ETL output
+tools/pack-builder/out/
+
+# Expo
+.expo/
+
+# Local tooling / agent state
+.devin/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

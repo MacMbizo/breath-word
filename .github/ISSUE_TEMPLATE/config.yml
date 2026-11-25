@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/MacMbizo/breath-word/security/policy
+    about: Please report security issues privately — do not open a public issue.
+  - name: Documentation & specification
+    url: https://github.com/MacMbizo/breath-word/blob/main/docs/G1-index.md
+    about: Read the authoritative specification suite before filing.

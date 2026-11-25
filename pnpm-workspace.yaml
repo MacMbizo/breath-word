@@ -1,0 +1,27 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+  - 'tools/*'
+
+# Allow native/tooling postinstall scripts required by the test/build toolchain.
+allowBuilds:
+  esbuild: true
+
+minimumReleaseAgeExclude:
+  - '@types/react@19.3.1'
+
+patchedDependencies:
+  react-native-track-player@4.1.2: patches/react-native-track-player@4.1.2.patch
+
+# Keep the pnpm content-addressable store inside the workspace. The global
+# store (C:\Users\<user>\AppData\Local\pnpm\store) is not writable on this
+# machine, which makes any fresh install fail with EACCES. A relative path is
+# resolved from the workspace root. This directory is git-ignored.
+storeDir: .pnpm-store
+
+# Windows: use a flat node_modules. The default isolated layout nests every
+# package under node_modules/.pnpm/_<32-char-hash>/node_modules/<pkg>, and
+# CMake/Ninja mirror that full absolute path into each native module's build
+# tree, overflowing the 260-char MAX_PATH limit. Hoisting removes the
+# .pnpm/<hash>/node_modules segment (~52 chars) so all native modules build.
+nodeLinker: hoisted

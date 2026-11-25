@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint · Typecheck · Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.9.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Enforce the pure-TypeScript core boundary
+        run: |
+          set -euo pipefail
+          if grep -rnE "(from|require\()\s*['\"](react-native|expo-|expo/|@tauri-apps)" packages/core/src; then
+            echo "::error::packages/core must not import react-native, expo-*, or @tauri-apps (AGENTS.md rule 1)"
+            exit 1
+          fi
+          if grep -rnE "\b(window|document)\b" packages/core/src; then
+            echo "::error::packages/core must not reference window/document (AGENTS.md rule 1)"
+            exit 1
+          fi
+
+      - name: Lint · Typecheck · Test
+        run: pnpm turbo lint typecheck test
+
+  desktop-rust:
+    name: Desktop · cargo check
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.9.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build desktop frontend
+        run: pnpm --filter @breath-and-word/desktop build
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+
+      - name: cargo check
+        working-directory: apps/desktop/src-tauri
+        run: cargo check --locked

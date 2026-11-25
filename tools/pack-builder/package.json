@@ -1,0 +1,23 @@
+{
+  "name": "@breath-and-word/pack-builder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "pack-builder": "./src/build-pack.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "pack:sample": "tsx src/build-pack.ts --sample --out out",
+    "serve:packs": "node scripts/serve-packs.mjs"
+  },
+  "dependencies": {
+    "@breath-and-word/core": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6",
+    "vitest": "^2.1.4"
+  }
+}
