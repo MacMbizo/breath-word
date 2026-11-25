@@ -20,7 +20,7 @@ tauri = { version = "2", features = [] }
 # Pack file I/O (B3 §4.1 `pack_io.rs`): gzip decompression + native SHA-256 for the FR-105
 # atomic attach/update protocol. All three are already in the Tauri dependency tree.
 flate2 = "1"
-sha2 = "0.10"
+sha2 = "0.11"
 hex = "0.4"
 
 # The B4 §4.6 2x-free-space headroom check needs a platform disk-space query.
