@@ -1,7 +1,7 @@
 # G5: Requirements Register & Traceability Matrix
 
 **Document ID:** `G5`  
-**Version:** `1.0.0`  
+**Version:** `1.0.1`  
 **Status:** `Active`  
 **Last Updated:** `2026-11-26`  
 **Related Docs:** `G1`, `G3`, `F1`, `AGENTS.md`
@@ -20,24 +20,24 @@ This is the canonical register of every requirement, non-functional budget, cont
 
 | Phase | Implemented | Partial | Not started | Blocked | N/A-in-v1 | Total |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: |
-| Phase 1 | 0 | 5 | 0 | 0 | 0 | 5 |
+| Phase 1 | 5 | 0 | 0 | 0 | 0 | 5 |
 | Phase 2 | 0 | 0 | 7 | 0 | 0 | 7 |
 | Phase 3 | 0 | 0 | 6 | 0 | 0 | 6 |
 | Phase 4 | 0 | 0 | 3 | 0 | 0 | 3 |
 | v1.1 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **0** | **5** | **16** | **0** | **0** | **21** |
+| **Total** | **5** | **0** | **16** | **0** | **0** | **21** |
 
-Notes: the 21 rows are FR-101–105 (Phase 1), FR-107 & FR-201–206 (Phase 2, with FR-204's Phase-4 AI mode tracked inside the FR-204 row), FR-106 & FR-301–305 (Phase 3), and FR-401–403 (Phase 4). All Phase-1 rows are `Partial` because the host-side implementations exist but the Gate-1 on-device verification is still pending. v1.1 carries no `FR-*` IDs (it is a deferral list, Section 3).
+Notes: the 21 rows are FR-101–105 (Phase 1), FR-107 & FR-201–206 (Phase 2, with FR-204's Phase-4 AI mode tracked inside the FR-204 row), FR-106 & FR-301–305 (Phase 3), and FR-401–403 (Phase 4). All Phase-1 rows are now `Implemented`: the host-side implementations existed already, and the Gate-1 on-device verification that was previously outstanding has been completed (see Section 13 and `G3` `v1.0.39`). v1.1 carries no `FR-*` IDs (it is a deferral list, Section 3).
 
 ## 2 — Functional Requirement inventory
 
 | ID | Title | Source | Verbatim acceptance | Phase | Status | Code/Test pointer |
 | --- | --- | --- | --- | --- | --- | --- |
-| `FR-101` | Structured Verse Renderer | `A2` §4.1 | "Opening Psalm 23 and Matthew 5 displays poetic indents, headings, red-letter spans, and opens a footnote sheet on tap." | P1 | Partial | `apps/mobile/src/app/VerseSpans.tsx`; `apps/mobile/src/app/ReaderScreen.tsx`; `packages/core/src/repositories/reader-repository.ts` (`getChapter`); `packages/core/test/reader-repository.test.ts` |
-| `FR-102` | Multi-Translation & Parallel Reader | `A2` §4.1 | "Scrolling column 1 to Romans 8:28 aligns columns 2–4 to `45008028` within 1 frame." | P1 | Partial | `apps/mobile/src/app/CompareScreen.tsx`; `apps/desktop/src/app/CompareView.tsx`; `packages/core/src/repositories/reader-repository.ts` (`compareChapters`); `packages/core/src/domain/verse-alignment.ts` |
-| `FR-103` | Offline FTS5 Search | `A2` §4.1 | "Searching `\"steadfast love\"` offline returns ranked results in <50ms with highlighted match snippets." | P1 | Partial | `apps/mobile/src/app/SearchScreen.tsx`; `apps/desktop/src/app/SearchView.tsx`; `packages/core/src/repositories/reader-repository.ts` (`search`); `packages/core/test/reader-repository.test.ts` |
-| `FR-104` | Focus Mode & Manna Pacing | `A2` §4.1 | "Enabling Focus Mode clears all toolbars; completing Day N unlocks Day N+1 and updates `reading_progress`." | P1 | Partial | `apps/mobile/src/app/ReaderScreen.tsx` (Focus Mode chrome); `packages/core/src/repositories/reading-plan-repository.ts` (`getUnlockedDay`, `markDayComplete` → `reading_progress`); `packages/core/test/reading-plan.test.ts` |
-| `FR-105` | Content Pack Manager | `A2` §4.1 | "Downloading `trans_web` verifies hash, attaches atomically without restart, and immediately appears in version switcher." | P1 | Partial | `apps/mobile/src/app/LibraryScreen.tsx`; `apps/desktop/src/app/LibraryView.tsx`; `packages/core/src/repositories/pack-manager-repository.ts`; `packages/core/src/content/pack-manifest.ts`; `tools/pack-builder/`; `packages/core/test/pack-manager.test.ts` |
+| `FR-101` | Structured Verse Renderer | `A2` §4.1 | "Opening Psalm 23 and Matthew 5 displays poetic indents, headings, red-letter spans, and opens a footnote sheet on tap." | P1 | Implemented | `apps/mobile/src/app/VerseSpans.tsx`; `apps/mobile/src/app/ReaderScreen.tsx`; `packages/core/src/repositories/reader-repository.ts` (`getChapter`); `packages/core/test/reader-repository.test.ts` |
+| `FR-102` | Multi-Translation & Parallel Reader | `A2` §4.1 | "Scrolling column 1 to Romans 8:28 aligns columns 2–4 to `45008028` within 1 frame." | P1 | Implemented | `apps/mobile/src/app/CompareScreen.tsx`; `apps/desktop/src/app/CompareView.tsx`; `packages/core/src/repositories/reader-repository.ts` (`compareChapters`); `packages/core/src/domain/verse-alignment.ts` |
+| `FR-103` | Offline FTS5 Search | `A2` §4.1 | "Searching `\"steadfast love\"` offline returns ranked results in <50ms with highlighted match snippets." | P1 | Implemented | `apps/mobile/src/app/SearchScreen.tsx`; `apps/desktop/src/app/SearchView.tsx`; `packages/core/src/repositories/reader-repository.ts` (`search`); `packages/core/test/reader-repository.test.ts` |
+| `FR-104` | Focus Mode & Manna Pacing | `A2` §4.1 | "Enabling Focus Mode clears all toolbars; completing Day N unlocks Day N+1 and updates `reading_progress`." | P1 | Implemented | `apps/mobile/src/app/ReaderScreen.tsx` (Focus Mode chrome); `packages/core/src/repositories/reading-plan-repository.ts` (`getUnlockedDay`, `markDayComplete` → `reading_progress`); `packages/core/test/reading-plan.test.ts` |
+| `FR-105` | Content Pack Manager | `A2` §4.1 | "Downloading `trans_web` verifies hash, attaches atomically without restart, and immediately appears in version switcher." | P1 | Implemented | `apps/mobile/src/app/LibraryScreen.tsx`; `apps/desktop/src/app/LibraryView.tsx`; `packages/core/src/repositories/pack-manager-repository.ts`; `packages/core/src/content/pack-manifest.ts`; `tools/pack-builder/`; `packages/core/test/pack-manager.test.ts` |
 | `FR-106` | Synchronized Audio & Ambient Mixer | `A2` §4.1 | "Playing Rom 8 highlights each verse within ±250ms of `start_ms`; sleep timer fades out both tracks smoothly to 0 volume." | P3 | Not started | Not implemented (`apps/mobile/src/adapters/audio.ts` is a narration-only stub; the two-stream ambient mixer is not rendered and no audio UI exists) |
 | `FR-107` | Kind Habits & Reminders | `A2` §4.1 | "Missing a day shows gentle resume copy (never punitive red loss screens); ESV cache evicts entries past TTL/verse cap." | P2 | Not started | Not implemented |
 | `FR-201` | Tap-to-Capture Verse Pooling | `A2` §4.2 | "Tapping Capture on Isa 52:13–53:12 inserts a `prayer_pool_items` row (`23052013–23053012`) in <2 taps with full context expansion." | P2 | Not started | Not implemented (schema only: `packages/core/src/content/user-data-schema.ts`) |
@@ -375,21 +375,22 @@ Canonical registry (26 codes). Cross-checked against the `AppError` contract in 
 
 | Spike | Criterion | Status |
 | --- | --- | --- |
-| Spike 1 (mobile SQLite) | `@op-engineering/op-sqlite` opens `core_bsb.sqlite` read-only via `ATTACH DATABASE`, executes an FTS5 query in <20ms on Android emulator & iPad simulator alongside a separate `@powersync/react-native` database without lock contention | Host wired (`apps/mobile/src/adapters/content-db.ts`, `apps/mobile/src/adapters/user-db.ts`, `apps/mobile/app/diagnostics.tsx`), device pending |
-| Spike 2 (desktop Tauri + PowerSync) | Tauri v2 WebView runs `@powersync/web` (WA-SQLite + OPFS persistence) while the Rust `query_content_db` (`rusqlite`, `bundled` + `fts5`) queries a local 30MB SQLite pack in <10ms | Pass (host), pending (device) |
-| Spike 3 (crypto parity) | Encrypt with `react-native-quick-crypto` on mobile and decrypt the exact `e2ee:v1:...` payload with `crypto.subtle` on desktop/Node (and vice versa) using identical AAD and PBKDF2-SHA256 output | Pending |
-| Spike 4 (120Hz breath ring) | Skia/Reanimated breathing circle on Android/iPad with smooth frame pacing and `AccessibilityInfo.isReduceMotionEnabled()` fallback | Pass (host) desktop, device pending mobile |
+| Spike 1 (mobile SQLite) | `@op-engineering/op-sqlite` opens `core_bsb.sqlite` read-only via `ATTACH DATABASE`, executes an FTS5 query in <20ms on Android emulator & iPad simulator alongside a separate `@powersync/react-native` database without lock contention | **Pass (device)** — single distinctive marker `"work together for good"` → Rom 8:28 (`45008028`); FTS5 reads n=25 min 0.4 / p50 1.8 / max 12.0 ms (<20 ms); two-file WAL isolation held with 25/25 concurrent `user_data` writes (`G3` `v1.0.37`) |
+| Spike 2 (desktop Tauri + PowerSync) | Tauri v2 WebView runs `@powersync/web` (WA-SQLite + OPFS persistence) while the Rust `query_content_db` (`rusqlite`, `bundled` + `fts5`) queries a local 30MB SQLite pack in <10ms | **Pass (device)** — OPFS `user_data.sqlite` survived a full `Page.reload`; Rust `query_content_db` `"work together for good"` → Rom 8:28 min 4.6 / p50 4.8 / max 8.9 ms (<10 ms, `G3` `v1.0.38`) |
+| Spike 3 (crypto parity) | Encrypt with `react-native-quick-crypto` on mobile and decrypt the exact `e2ee:v1:...` payload with `crypto.subtle` on desktop/Node (and vice versa) using identical AAD and PBKDF2-SHA256 output | **Pass (device)** — on-device PBKDF2-SHA256 KAT `a378d630…` matched the host exactly; `e2ee:v1` note round-trip OK; tampered envelope rejected by AES-GCM (`G3` `v1.0.37`) |
+| Spike 4 (120Hz breath ring) | Skia/Reanimated breathing circle on Android/iPad with smooth frame pacing and `AccessibilityInfo.isReduceMotionEnabled()` fallback | **Pass (device)** — mobile Skia/Reanimated ring sets the beat with the Reduced Motion still-ring fallback (`G3` `v1.0.36`); desktop/web Motion analogue verified on the host (`G3` `v1.0.12`) |
 
 ## 14 — Gap register
 
 - **Missing source doc:** `A7` (Constraints, Assumptions & Open Questions) is cited as `ASM-01..ASM-04` (and `CON-*` / `OQ-01..07`) across the documentation suite, but the standalone document has not been extracted yet (see `G1` "Known Gaps").
 - **External open items:** Bible.org NET redistribution terms (`B5`); BSB verse-level audio timestamp availability (`B5` / `B4`).
-- **Pending verification:** Gate-1 Spike 1 (device), Spike 2 (device), Spike 3, Spike 4 (device); Phase-1 FR-101..105 on-device verification.
-- **Rows currently `Partial` (Phase 1) and why:** `FR-101`, `FR-102`, `FR-103`, `FR-104`, `FR-105` — the host-side implementations and unit tests exist, but on-device verification is still pending (Gate-1 spikes), so acceptance cannot yet be confirmed end-to-end.
+- **Pending verification:** none gating Phase 1 — all four Gate-1 spikes (`B3` §4.5) and the Phase-1 `FR-101..105` on-device verification are complete (Section 13; `G3` `v1.0.37`–`v1.0.39`). Still open: the **public-domain `trans_web` ETL** through the real dataset parser (the on-device Phase-1 packs are the synthetic Gate-1 fixtures) and the deferred Phase-2+ items (`EXPO_PUBLIC_*` service config; `expo-dev-client` development build).
+- **Rows currently `Partial`:** none. The five Phase-1 rows flipped from `Partial` to `Implemented` on completion of the Gate-1 on-device verification (`G3` `v1.0.39`).
 - **Rows currently `Not started`:** `FR-106`, `FR-107`, `FR-201`–`FR-206`, `FR-301`–`FR-305`, `FR-401`–`FR-403` — all belong to Phases 2–4; no repository artifact satisfies them yet (some have reserved schema tables only, noted in the `Code/Test pointer` column).
 
 ## Change Log
 
 | Version | Date | Author | Note |
 | --- | --- | --- | --- |
+| `1.0.1` | `2026-11-26` | Athena | **Phase-1 exit-gate closure.** The five Phase-1 rows `FR-101`–`FR-105` flipped from `Partial` to `Implemented` after the on-device verification completed on the `preview` APK (Android emulator, Pixel 10 Pro, API 36): FR-101 Psalm 23 heading + poetry indents / Matthew 5 red-letter / footnote sheet; FR-102 `core_bsb:BSB,trans_kjv:KJV` column alignment at `45008028`; FR-103 offline FTS5 `congregation` + NT filter; FR-104 Focus Mode chrome clearing; FR-105 `trans_web` catalogue remove→install (hash-verified, atomic, no restart) immediately usable in the version-switcher surface. Coverage summary (Phase-1 `Implemented` 0→5, `Partial` 5→0) and Section 13 `B3 §4.5` spike statuses (all four now **Pass (device)**, cross-referencing `G3` `v1.0.37`–`v1.0.38`) updated to match; Section 14 gap register pending list cleared. No code, schema, contract, ADR, or phase-boundary change. |
 | `1.0.0` | `2026-11-26` | Athena | Initial canonical requirements register extracted from the full docs suite |
