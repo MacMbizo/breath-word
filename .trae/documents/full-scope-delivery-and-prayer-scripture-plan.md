@@ -56,16 +56,16 @@ The **code and tests exist** for all Phase-1 features; what is missing is the **
 
 This restates the authoritative phase matrix from `A3 §4.1`, anchored to the `G5` requirement IDs and their current status. **No requirement is added, moved, or re-scoped.** The single sequencing rule from `A3` acceptance applies: **no Phase N+1 task starts until the Phase N exit gate passes all acceptance checks.**
 
-### Phase 1 — Core Local Reader MVP (IN PROGRESS — exit gate near)
+### Phase 1 — Core Local Reader MVP (EXIT GATE PASSED)
 
 | FR | Title | Status | Remaining work to reach the exit gate |
 | --- | --- | --- | --- |
-| `FR-101` | Structured Verse Renderer | Partial | Verify on-device: Psalm 23 poetry/heading indents, Matthew 5 red-letter, footnote sheet on tap |
-| `FR-102` | Multi-Translation & Parallel Reader | Partial | Verify on-device: 2–4 columns align to `45008028` within 1 frame |
-| `FR-103` | Offline FTS5 Search | Partial | Verify on-device: `"steadfast love"` ranked <50 ms with highlighted snippets; testament/book filter |
-| `FR-104` | Focus Mode & Manna Pacing | Partial | Focus chrome present; Manna Pacing UI data source (`study_refs` pack) is Phase 3, so full pacing is legitimately deferred — confirm the Focus-Mode half on-device |
-| `FR-105` | Content Pack Manager | Partial | Verify on-device: install sample pack → hash verify → atomic attach without restart → appears in switcher |
-| — | `tools/pack-builder` ETL (`core_bsb`, `trans_web`, `trans_kjv`) | Partial | All three packs build & verify; `trans_web` production source still to be built through the real ETL |
+| `FR-101` | Structured Verse Renderer | ✅ Verified on-device | Psalm 23 poetry/heading indents, Matthew 5 red-letter, footnote sheet on tap — confirmed on `preview` APK |
+| `FR-102` | Multi-Translation & Parallel Reader | ✅ Verified on-device | `core_bsb:BSB,trans_kjv:KJV` rows align to `45008028` in one shared scroll surface |
+| `FR-103` | Offline FTS5 Search | ✅ Verified on-device | Offline FTS5 `congregation` → ranked highlighted snippets; OT/NT filter |
+| `FR-104` | Focus Mode & Manna Pacing | ✅ Verified on-device (chrome) | Focus Mode clears all toolbars and restores on exit; Manna Pacing UI data source (`study_refs`) is Phase 3 |
+| `FR-105` | Content Pack Manager | ✅ Verified on-device | Catalogue remove→install of `trans_web`: hash-verified, atomic, no restart, immediately usable in the switcher |
+| — | `tools/pack-builder` ETL (`core_bsb`, `trans_web`, `trans_kjv`) | ✅ Complete | All three packs build & verify; `trans_web` built through the real public-domain WEB ETL (31,103 verses, integrity clean) |
 
 **Phase-1 exit gate (`A3`):** 48h spike passed (Gate-1 Spikes 1–4) · BSB pack built & verified · offline reader + parallel compare + FTS5 + Focus Mode usable daily by the founder.
 
@@ -184,14 +184,14 @@ Most Bible apps stop at *reading*. Breath & Word treats a verse you read as a ve
 5. Verify `FR-101` (Psalm 23 / Matthew 5), `FR-102` (2-column compare), `FR-103` (search incl. testament filter).
 6. On Spike 1 pass → update `docs/G3-changelog.md` Gate-1 Spike 1 = **Pass (device)**.
 
-### 6.2 Phase-1 exit-gate checklist (to close Phase 1)
+### 6.2 Phase-1 exit-gate checklist (CLOSED)
 
-- [ ] Gate-1 Spike 1 (pack install + FTS5 timing) — **device**
-- [ ] Gate-1 Spike 2 (Tauri + PowerSync) — device
-- [ ] Gate-1 Spike 3 (crypto parity) — device
-- [ ] Gate-1 Spike 4 (frame pacing) — device
-- [ ] `trans_web` built through the real ETL (public-domain WEB source)
-- [ ] Offline reader + parallel compare + FTS5 + Focus Mode confirmed usable daily
+- [x] Gate-1 Spike 1 (pack install + FTS5 timing) — **device** (Pass, `G3` `v1.0.37`)
+- [x] Gate-1 Spike 2 (Tauri + PowerSync) — device (Pass, `G3` `v1.0.38`)
+- [x] Gate-1 Spike 3 (crypto parity) — device (Pass, `G3` `v1.0.37`)
+- [x] Gate-1 Spike 4 (frame pacing) — device (Pass, `G3` `v1.0.36`)
+- [x] `trans_web` built through the real ETL (public-domain WEB source) — 31,103 verses, integrity clean (`G3` `v1.0.40`)
+- [x] Offline reader + parallel compare + FTS5 + Focus Mode confirmed usable daily (`G3` `v1.0.39`)
 
 ### 6.3 Housekeeping (carried, open)
 
