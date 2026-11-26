@@ -7,7 +7,9 @@ export default defineConfig({
   plugins: [react()],
   // Tauri's dev server is a fixed port so the WebView can point at it.
   clearScreen: false,
-  server: { port: 5173, strictPort: true },
+  // Never watch the Rust build output: `tauri dev` rewrites `src-tauri/target/**` while Vite is
+  // watching, and on Windows watching the locked `.exe` throws `EBUSY` and kills the dev server.
+  server: { port: 5173, strictPort: true, watch: { ignored: ['**/src-tauri/**'] } },
   build: { outDir: 'dist', emptyOutDir: true, target: 'es2022' },
   // `@powersync/web` ships its WA-SQLite database worker as code-split ESM; Vite's default
   // `iife` worker format cannot code-split and fails the production build (B3 §4.1, ADR-002).
