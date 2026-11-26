@@ -4,6 +4,7 @@
   },
   "build": {
     "development": {
+      "corepack": true,
       "developmentClient": true,
       "distribution": "internal",
       "android": {
@@ -11,12 +12,17 @@
       }
     },
     "preview": {
+      "corepack": true,
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "APP_VARIANT": "preview"
       }
     },
     "production": {
+      "corepack": true,
       "autoIncrement": true,
       "android": {
         "buildType": "app-bundle"

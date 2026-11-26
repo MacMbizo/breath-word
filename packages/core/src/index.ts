@@ -1,6 +1,7 @@
 export * from './domain/types';
 export * from './domain/books';
 export * from './domain/bbcccvvv';
+export * from './domain/verse-alignment';
 export * from './errors/AppError';
 export * from './adapters';
 export * from './content/pack-schema';

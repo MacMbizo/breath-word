@@ -2,10 +2,9 @@
 // (B3 §4.3, B4 §4.6).
 //
 // The HTTPS transfer runs on the native URL session (`File.downloadFileAsync`), streaming into the
-// scratch `.gz`; decompression uses `fflate` (a pure-JS inflate — the device has no zlib), and the
-// atomic swap / integrity / disk-space probes are `File`/`Directory` primitives. SHA-256 of the
-// downloaded pack is computed through the `CryptoPrimitivesAdapter` by the installer flow in
-// `packages/core`, not here.
+// scratch `.gz`; decompression uses `fflate` (a pure-JS inflate — the device has no zlib), the
+// atomic swap / integrity / disk-space probes are `File`/`Directory` primitives, and SHA-256 runs
+// through the native streaming `File.digest` (so the ~19 MB pack never lands in the JS heap).
 
 import { Directory, File, Paths } from 'expo-file-system';
 import { gunzipSync } from 'fflate';
@@ -49,6 +48,12 @@ export function createPackInstallerAdapter(): PackInstallerAdapter {
   return {
     async resolvePaths(packId, contentVersion): Promise<PackInstallPaths> {
       const packsDir = new Directory(Paths.document, 'packs');
+      // The installed-pack directory MUST exist before install: the core atomic swap moves the
+      // staging file into it, and `File.move` throws `DestinationDoesNotExistException` when the
+      // destination's parent directory is missing. `Directory.create` is idempotent.
+      if (!packsDir.exists) {
+        packsDir.create({ intermediates: true, idempotent: true });
+      }
       const stagingDir = new Directory(Paths.cache, 'pack-install');
       const fileName = `${packId}-${contentVersion}.sqlite`;
       return {
@@ -74,8 +79,11 @@ export function createPackInstallerAdapter(): PackInstallerAdapter {
       }
     },
 
-    async readFileBytes(path): Promise<Uint8Array> {
-      return wrap(() => new File(path).bytes());
+    async sha256HexFile(path): Promise<string> {
+      // Native streaming digest (64 KB buffer, `MessageDigest`) — the ~19 MB uncompressed pack
+      // never crosses the JS bridge, so verification cannot stall the way a full-file `bytes()` +
+      // JS hash did.
+      return wrap(() => new File(path).digest('SHA-256'));
     },
 
     async gunzip(srcGzPath, destPath): Promise<void> {

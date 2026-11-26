@@ -1,6 +1,6 @@
 // Desktop shell (B3 §4.1): header, screen tabs and theme switch. Screens read the headless
 // core stores through React (see `useCoreStore`); this component owns only view state.
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { motion, useReducedMotion } from 'framer-motion';
 
@@ -26,11 +26,38 @@ const TABS: readonly { readonly id: Tab; readonly label: string }[] = [
 export function App() {
   const [tab, setTab] = useState<Tab>('read');
   const [theme, setTheme] = useState<ThemeName>(DEFAULT_THEME);
+  const [focusMode, setFocusMode] = useState(false);
   const reduceMotion = useReducedMotion();
 
   function selectTheme(next: ThemeName) {
     applyTheme(next);
     setTheme(next);
+  }
+
+  // FR-104 — Escape is the subtle exit gesture from Focus Mode (the discoverable control
+  // lives in the reader itself); the listener only exists while Focus Mode is active.
+  useEffect(() => {
+    if (!focusMode) return undefined;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setFocusMode(false);
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [focusMode]);
+
+  if (focusMode) {
+    return (
+      <div className="flex h-full flex-col bg-canvas text-ink-primary">
+        <motion.main
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduceMotion === true ? 0 : 0.3 }}
+          className="flex-1 overflow-hidden"
+        >
+          <ReaderView focusMode onExitFocus={() => setFocusMode(false)} />
+        </motion.main>
+      </div>
+    );
   }
 
   return (
@@ -78,7 +105,7 @@ export function App() {
           transition={{ duration: reduceMotion === true ? 0 : 0.25 }}
           className="h-full"
         >
-          {tab === 'read' && <ReaderView />}
+          {tab === 'read' && <ReaderView onEnterFocus={() => setFocusMode(true)} />}
           {tab === 'search' && <SearchView />}
           {tab === 'compare' && <CompareView />}
           {tab === 'library' && <LibraryView />}

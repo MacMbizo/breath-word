@@ -11,3 +11,16 @@ build/
 apps/desktop/src-tauri/target/
 tools/pack-builder/out/
 *.log
+
+# Generated native project. When EAS sees an `android/` directory it skips
+# `expo prebuild`, which silently bypasses every config plugin (and ignores
+# `android.package` from app.json). Excluding it keeps the cloud build on the
+# Continuous Native Generation path so config plugins apply.
+apps/mobile/android/
+
+# Secrets — never upload local env files to the build servers (E1 hard rule).
+# Present in .easignore because EAS uses this file *instead of* .gitignore; without
+# it, an .env.local holding EXPO_TOKEN would be part of the cloud upload.
+.env
+.env.*
+*.local

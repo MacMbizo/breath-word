@@ -48,21 +48,16 @@ function toFsPath(uri: string): string {
   return decodeURIComponent(withoutScheme);
 }
 
-/** `ATTACH` needs the file name and directory separately (op-sqlite composes `location/name`). */
-function splitFilePath(path: string): { directory: string; fileName: string } {
-  const slash = path.lastIndexOf('/');
-  if (slash < 0) {
-    return { directory: '.', fileName: path };
-  }
-  return { directory: path.slice(0, slash) || '/', fileName: path.slice(slash + 1) };
-}
-
 export function createContentDbAdapter(): ContentDbAdapter {
   return {
     async attachPack(packId, absolutePath): Promise<void> {
       await wrap(async () => {
-        const { directory, fileName } = splitFilePath(toFsPath(absolutePath));
-        db().attach({ secondaryDbFileName: fileName, alias: packId, location: directory });
+        // `db.attach()` cannot reach this file. Its native implementation resolves the pack as
+        // `base_path + location` (OPDatabase.cpp `create_jsi_functions`), and `base_path` is frozen
+        // at open time — our primary connection is `:memory:`, so `base_path === ':memory:'` and
+        // every pack resolves to a bogus relative `:memory:/…` path that SQLite cannot open.
+        // Binding the absolute filename to `ATTACH DATABASE ?` sidesteps `base_path` entirely.
+        await db().execute('ATTACH DATABASE ? AS ?', [toFsPath(absolutePath), packId]);
         attached.add(packId);
       });
     },

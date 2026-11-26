@@ -2,19 +2,23 @@
   "expo": {
     "name": "Breath & Word",
     "slug": "breath-and-word",
+    "owner": "trinarpil",
     "version": "0.1.0",
     "scheme": "breathandword",
     "orientation": "default",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "plugins": ["expo-router", "expo-secure-store"],
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "./plugins/with-preview-cleartext"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.breathandword.mobile"
     },
     "android": {
-      "package": "app.breathandword.mobile",
-      "edgeToEdgeEnabled": true
+      "package": "app.breathandword.mobile"
     },
     "web": {
       "bundler": "metro",
@@ -22,6 +26,17 @@
     },
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "root": "app",
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "c0f06452-c147-4b26-9c1a-b8fe49a6b6af"
+      }
     }
   }
 }

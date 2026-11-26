@@ -43,6 +43,7 @@ This is the canonical map of the Breath & Word documentation suite. **Document I
 | `F1` | Testing Strategy, Feature Acceptance Plan & Definition of Done | [`quality/F1-testing-strategy-feature-acceptance-plan-and-definition-of-done.md`](quality/F1-testing-strategy-feature-acceptance-plan-and-definition-of-done.md) | Approved |
 | `G1` | Living Documentation Index | [`G1-index.md`](G1-index.md) | Active |
 | `G3` | Living Changelog | [`G3-changelog.md`](G3-changelog.md) | Active |
+| `G5` | Requirements Register & Traceability Matrix | [`G5-requirements-register.md`](G5-requirements-register.md) | Active |
 | `G4` | Master Glossary & Solo Developer + AI Handover Guide | [`governance/G4-master-glossary-and-solo-developer-ai-handover-guide.md`](governance/G4-master-glossary-and-solo-developer-ai-handover-guide.md) | Approved |
 
 ## ADR Files (`B8`)
@@ -58,6 +59,7 @@ This is the canonical map of the Breath & Word documentation suite. **Document I
 - **`A7` missing:** Many docs cite `ASM-*`, `CON-*`, and resolved `OQ-01..07` from `A7`; the standalone source document has not been extracted yet.
 - **External verification:** Bible.org NET redistribution terms (`B5`) and BSB verse-level audio timestamp availability (`B5`/`B4`) remain open.
 - **Gate-1 spikes:** `B3 §4.5` technical spikes must pass before Phase 1 implementation.
+- **Requirements register:** `G5` is the canonical requirements index; when any `A*`–`F*` document changes a requirement, update `G5` in the same change.
 
 ## Change Log
 

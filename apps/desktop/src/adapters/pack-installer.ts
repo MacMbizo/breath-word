@@ -3,7 +3,7 @@
 // The HTTPS transfer runs on the WebView `fetch` (the Tauri dependency tree builds `reqwest`
 // without a TLS backend), streaming into the scratch `.gz` through `pack_create_file` /
 // `pack_append_bytes`. Everything from verification onwards is native: `pack_gunzip`,
-// `pack_sha256`/`pack_read_file`, `pack_rename` (the atomic swap) and `pack_available_disk_space`.
+// `pack_sha256`, `pack_rename` (the atomic swap) and `pack_available_disk_space`.
 
 import { AppError, type AppErrorFallback, type PackInstallPaths, type PackInstallerAdapter } from '@breath-and-word/core';
 import { callCommand, toAppError } from './invoke';
@@ -78,10 +78,9 @@ export function createPackInstallerAdapter(): PackInstallerAdapter {
       }
     },
 
-    async readFileBytes(path): Promise<Uint8Array> {
-      // `pack_read_file` returns a raw `ArrayBuffer` (`tauri::ipc::Response`), no JSON inflation.
-      const buffer = await callCommand<ArrayBuffer>('pack_read_file', { path }, FALLBACK);
-      return new Uint8Array(buffer);
+    sha256HexFile(path): Promise<string> {
+      // `pack_sha256` streams the file through Rust `sha2`; the pack never crosses the IPC bridge.
+      return callCommand<string>('pack_sha256', { path }, FALLBACK);
     },
 
     async gunzip(srcGzPath, destPath): Promise<void> {

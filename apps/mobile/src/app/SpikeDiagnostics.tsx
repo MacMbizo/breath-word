@@ -12,7 +12,7 @@
 import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import type { ManifestPackEntry } from '@breath-and-word/core';
+import { AppError, parsePackManifest } from '@breath-and-word/core';
 import {
   COLORS,
   FONT_FAMILIES,
@@ -21,8 +21,8 @@ import {
   RADII,
   SPACING,
 } from '@breath-and-word/tokens';
-import Constants from 'expo-constants';
 
+import { packDownloadUrl, packManifestUrl } from '../config/pack-server';
 import { useCoreRuntime } from './CoreRuntime';
 
 const THEME = COLORS.daylight;
@@ -39,8 +39,6 @@ const CONCURRENT_WRITES = 25;
 const DEV_USER_ID = 'spike-user';
 const DEV_ENROLLMENT_ID = 'spike-enrollment';
 const DEV_PLAN_ID = 'spike-plan';
-/** Port the local pack server listens on (`serve:packs`). */
-const PACK_SERVER_PORT = 8787;
 /** Gate-1 Spike 1 latency budget (B3 §4.5). */
 const LATENCY_BUDGET_MS = 20;
 
@@ -50,14 +48,23 @@ function nowMs(): number {
   return perf?.now() ?? Date.now();
 }
 
-/** The pack server runs on the same machine that serves Metro; reuse its host (LAN IP / 10.0.2.2). */
-function packServerBaseUrl(): string {
-  const host = Constants.expoConfig?.hostUri?.split(':')[0] ?? '10.0.2.2';
-  return `http://${host}:${PACK_SERVER_PORT}`;
-}
-
+/** Flatten an error plus its `internalDetail`/cause chain so a device run names the exact failure. */
 function describeError(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+  const parts: string[] = [];
+  let current: unknown = error;
+  for (let depth = 0; depth < 4 && current !== undefined && current !== null; depth += 1) {
+    if (current instanceof AppError) {
+      parts.push(current.internalDetail ?? current.message);
+      current = current.cause;
+    } else if (current instanceof Error) {
+      parts.push(current.message);
+      current = current.cause;
+    } else {
+      parts.push(String(current));
+      current = undefined;
+    }
+  }
+  return parts.filter((part) => part.length > 0).join(' <- ');
 }
 
 /** Nearest-rank percentile of an ascending array. */
@@ -78,20 +85,29 @@ export function SpikeDiagnostics() {
 
   const installSamplePack = useCallback(async () => {
     setBusy(true);
-    const base = packServerBaseUrl();
-    append(`[install] GET ${base}/manifest.json`);
+    const manifestUrl = packManifestUrl();
+    append(`[install] GET ${manifestUrl}`);
     try {
-      const response = await fetch(`${base}/manifest.json`);
+      const response = await fetch(manifestUrl);
       if (!response.ok) {
         throw new Error(`manifest request failed: HTTP ${response.status}`);
       }
-      const manifest = (await response.json()) as { packs?: ManifestPackEntry[] };
-      const entry = manifest.packs?.find((pack) => pack.packId === SAMPLE_PACK_ID);
+      const manifest = parsePackManifest(await response.json());
+      const entry = manifest.packs.find((pack) => pack.packId === SAMPLE_PACK_ID);
       if (entry === undefined) {
         throw new Error(`manifest has no "${SAMPLE_PACK_ID}" pack`);
       }
-      append(`[install] downloading ${entry.downloadUrl} (${entry.compressedBytes} B gz)`);
-      const installed = await runtime.repositories.packs.install(entry);
+      append(`[install] downloading ${packDownloadUrl(entry)} (${entry.compressedBytes} B gz)`);
+      const installed = await runtime.repositories.packs.install(
+        { ...entry, downloadUrl: packDownloadUrl(entry) },
+        (phase, received, total) => {
+          // Non-downloading phases fire once each, so this names exactly which step is in flight
+          // (or stalls) on screen — release builds emit no JS logs to logcat.
+          if (phase !== 'downloading') {
+            append(`[install] ${phase} (${received}/${total} B)`);
+          }
+        },
+      );
       append(`[install] attached "${installed.packId}" v${installed.contentVersion} (${installed.fileSizeBytes} B)`);
     } catch (error) {
       append(`[install] FAILED — ${describeError(error)}`);
@@ -175,7 +191,7 @@ export function SpikeDiagnostics() {
     <View style={styles.screen}>
       <View style={styles.header}>
         <Text style={styles.title}>Gate-1 Spike Diagnostics</Text>
-        <Text style={styles.subtitle}>Dev-only. Server: {packServerBaseUrl()}</Text>
+        <Text style={styles.subtitle}>Dev-only. Catalogue: {packManifestUrl()}</Text>
       </View>
 
       <View style={styles.controls}>

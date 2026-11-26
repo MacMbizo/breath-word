@@ -2,8 +2,10 @@
   "name": "@breath-and-word/mobile",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "main": "expo-router/entry",
+  "op-sqlite": {
+    "fts5": true
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",

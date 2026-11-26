@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import type { VerseSpan } from '../src/domain/types';
+import { alignChapterVerses } from '../src/domain/verse-alignment';
 import { ReaderRepository, type TranslationRef } from '../src/repositories/reader-repository';
 
 import { writeFixturePack, type FixturePackSpec } from './helpers/fixture-pack';
@@ -140,16 +141,28 @@ describe('FR-102 Multi-Translation & Parallel Reader', () => {
     expect(await reader.getVerse('core_bsb', 'BSB', 19_023_999)).toBeNull();
   });
 
-  it('aligns the same verse across packs in the requested order', async () => {
+  it('loads the same chapter across packs in the requested column order', async () => {
     const refs: TranslationRef[] = [
       { packId: 'core_bsb', translationCode: 'BSB' },
       { packId: 'trans_web', translationCode: 'WEB' },
     ];
-    const verses = await reader.compareVerses(refs, ROMANS_8_28);
+    const columns = await reader.compareChapters(refs, 45, 8);
 
-    expect(verses.map((verse) => verse.translationCode)).toEqual(['BSB', 'WEB']);
-    expect(verses[0]?.plainText).not.toBe(verses[1]?.plainText);
-    expect(verses.every((verse) => verse.canonicalVerseId === ROMANS_8_28)).toBe(true);
+    expect(columns.map((column) => column.translationCode)).toEqual(['BSB', 'WEB']);
+    expect(columns[0]?.verses[0]?.canonicalVerseId).toBe(ROMANS_8_28);
+  });
+
+  it('aligns chapter verses onto one row-per-verse grid across columns', async () => {
+    const refs: TranslationRef[] = [
+      { packId: 'core_bsb', translationCode: 'BSB' },
+      { packId: 'trans_web', translationCode: 'WEB' },
+    ];
+    const columns = await reader.compareChapters(refs, 45, 8);
+    const rows = alignChapterVerses(columns);
+
+    expect(rows.map((row) => row.canonicalVerseId)).toEqual([ROMANS_8_28]);
+    expect(rows[0]?.verse).toBe(28);
+    expect(rows[0]?.cells.map((cell) => cell?.translationCode)).toEqual(['BSB', 'WEB']);
   });
 });
 
@@ -175,6 +188,20 @@ describe('FR-103 Offline FTS5 Search', () => {
   it('filters by translation code', async () => {
     const hits = await reader.search({ packId: 'core_bsb', text: 'work', translationCode: 'WEB' });
     expect(hits).toHaveLength(0);
+  });
+
+  it('filters by testament across the whole canon', async () => {
+    // "shepherd OR good" matches Psalm 23:1 (OT, book 19) and Romans 8:28 (NT, book 45).
+    const all = await reader.search({ packId: 'core_bsb', text: 'shepherd OR good' });
+    expect(all.map((hit) => hit.canonicalVerseId).sort()).toEqual(
+      [PSALM_23_1, ROMANS_8_28].sort(),
+    );
+
+    const ot = await reader.search({ packId: 'core_bsb', text: 'shepherd OR good', testament: 'OT' });
+    expect(ot.map((hit) => hit.canonicalVerseId)).toEqual([PSALM_23_1]);
+
+    const nt = await reader.search({ packId: 'core_bsb', text: 'shepherd OR good', testament: 'NT' });
+    expect(nt.map((hit) => hit.canonicalVerseId)).toEqual([ROMANS_8_28]);
   });
 
   it('honours the result limit', async () => {

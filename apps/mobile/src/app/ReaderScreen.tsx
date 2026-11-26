@@ -1,0 +1,379 @@
+// FR-101 structured reader (mobile) + FR-104 Focus Mode — B3 §4.1.
+//
+// Renders a chapter from the headless reader store; no SQL here (AGENTS.md rule 1). A book picker
+// drives canon-wide navigation (Genesis..Revelation) from the pack's own book list, and Prev/Next
+// stay inside the current book. Focus Mode hides every control so only the scripture typography
+// remains, with a low-contrast exit control as the discoverable way back (the desktop shell
+// additionally binds Escape).
+
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+
+import { bookName, type BookSummary, type Footnote } from '@breath-and-word/core';
+import {
+  COLORS,
+  FONT_FAMILIES,
+  FONT_SIZES,
+  LINE_HEIGHTS,
+  MIN_TOUCH_TARGET,
+  RADII,
+  SPACING,
+} from '@breath-and-word/tokens';
+
+import { useCoreRuntime } from './CoreRuntime';
+import { useCoreStore } from './useCoreStore';
+import { VerseSpans } from './VerseSpans';
+
+/** The default (daylight) theme; theme switching lands with the appearance settings. */
+const THEME = COLORS.daylight;
+
+// Defaults open Romans 8 in the `core_bsb` pack (book numbers are canonical BBCCCVVV).
+const DEFAULT_PACK_ID = 'core_bsb';
+const DEFAULT_TRANSLATION = 'BSB';
+const DEFAULT_BOOK = 45;
+const DEFAULT_CHAPTER = 8;
+
+export function ReaderScreen() {
+  const runtime = useCoreRuntime();
+  const { location, chapter, status, error, books } = useCoreStore(runtime.stores.reader);
+  const [focusMode, setFocusMode] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  /** FR-101 — the footnote whose sheet is open, or `null` when the sheet is closed. */
+  const [activeFootnote, setActiveFootnote] = useState<Footnote | null>(null);
+
+  // The store is idle until asked, so open the default passage and its book list once on mount.
+  useEffect(() => {
+    void runtime.stores.reader.getState().openChapter({
+      packId: DEFAULT_PACK_ID,
+      translationCode: DEFAULT_TRANSLATION,
+      bookNumber: DEFAULT_BOOK,
+      chapter: DEFAULT_CHAPTER,
+    });
+    void runtime.stores.reader.getState().loadBooks(DEFAULT_PACK_ID, DEFAULT_TRANSLATION);
+  }, [runtime]);
+
+  // FR-101 — tap-to-open footnote sheet: markers in the text resolve to the chapter's note bodies.
+  const footnotesById = useMemo(
+    () => new Map((chapter?.footnotes ?? []).map((note) => [note.footnoteId, note])),
+    [chapter],
+  );
+  const openFootnote = useCallback(
+    (footnoteId: string) => {
+      const note = footnotesById.get(footnoteId);
+      if (note !== undefined) setActiveFootnote(note);
+    },
+    [footnotesById],
+  );
+
+  const bookNumber = location?.bookNumber ?? DEFAULT_BOOK;
+  const chapterNumber = location?.chapter ?? DEFAULT_CHAPTER;
+  const chapterCount = books.find((book) => book.bookNumber === bookNumber)?.chapterCount;
+  const reference = `${bookName(bookNumber)} ${chapterNumber}`;
+
+  const openChapter = useCallback(
+    (nextBook: number, nextChapter: number) => {
+      if (nextChapter < 1) return;
+      void runtime.stores.reader.getState().openChapter({
+        packId: location?.packId ?? DEFAULT_PACK_ID,
+        translationCode: location?.translationCode ?? DEFAULT_TRANSLATION,
+        bookNumber: nextBook,
+        chapter: nextChapter,
+      });
+    },
+    [runtime, location],
+  );
+
+  const selectBook = useCallback(
+    (book: BookSummary) => {
+      setPickerOpen(false);
+      openChapter(book.bookNumber, 1);
+    },
+    [openChapter],
+  );
+
+  const atFirstChapter = chapterNumber <= 1;
+  const atLastChapter = chapterCount !== undefined && chapterNumber >= chapterCount;
+
+  return (
+    <View style={styles.root}>
+      {!focusMode && (
+        <View style={styles.header}>
+          <View style={styles.headerRow}>
+            <Text style={styles.reference}>{reference}</Text>
+            <View style={styles.headerActions}>
+              <Pressable
+                onPress={() => setPickerOpen(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Choose a book"
+                style={styles.focusButton}
+              >
+                <Text style={styles.focusButtonText}>Books</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setFocusMode(true)}
+                accessibilityRole="button"
+                style={styles.focusButton}
+              >
+                <Text style={styles.focusButtonText}>Focus</Text>
+              </Pressable>
+            </View>
+          </View>
+          <View style={styles.navRow}>
+            <Pressable
+              disabled={atFirstChapter}
+              onPress={() => openChapter(bookNumber, chapterNumber - 1)}
+              accessibilityRole="button"
+              style={[styles.navButton, atFirstChapter && styles.navButtonDisabled]}
+            >
+              <Text style={styles.navButtonText}>‹ Prev</Text>
+            </Pressable>
+            <Pressable
+              disabled={atLastChapter}
+              onPress={() => openChapter(bookNumber, chapterNumber + 1)}
+              accessibilityRole="button"
+              style={[styles.navButton, atLastChapter && styles.navButtonDisabled]}
+            >
+              <Text style={styles.navButtonText}>Next ›</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
+
+      <ScrollView contentContainerStyle={styles.content}>
+        {status === 'loading' && <Text style={styles.muted}>Loading…</Text>}
+        {error !== null && (
+          <Text accessibilityRole="alert" style={styles.error}>
+            {error.userMessage}
+          </Text>
+        )}
+        {chapter !== null && chapter.verses.length === 0 && error === null && (
+          <Text style={styles.muted}>{`No text is available for ${reference}.`}</Text>
+        )}
+        {chapter !== null &&
+          chapter.verses.map((verse) => (
+            <Text key={verse.canonicalVerseId} style={styles.verse}>
+              <Text style={styles.verseNumber}>{`${verse.verse}  `}</Text>
+              <VerseSpans
+                verseId={verse.canonicalVerseId}
+                spans={verse.spans}
+                onFootnotePress={openFootnote}
+              />
+            </Text>
+          ))}
+      </ScrollView>
+
+      {focusMode && (
+        <Pressable
+          onPress={() => setFocusMode(false)}
+          accessibilityRole="button"
+          accessibilityLabel="Exit focus mode"
+          style={styles.exitFocus}
+        >
+          <Text style={styles.exitFocusText}>Exit focus</Text>
+        </Pressable>
+      )}
+
+      <Modal
+        visible={pickerOpen}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setPickerOpen(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Choose a book</Text>
+              <Pressable
+                onPress={() => setPickerOpen(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Close book picker"
+                style={styles.navButton}
+              >
+                <Text style={styles.navButtonText}>Close</Text>
+              </Pressable>
+            </View>
+            <ScrollView contentContainerStyle={styles.bookGrid}>
+              {books.length === 0 && (
+                <Text style={styles.muted}>Install a Bible pack to browse the books.</Text>
+              )}
+              {books.map((book) => {
+                const active = book.bookNumber === bookNumber;
+                return (
+                  <Pressable
+                    key={book.bookNumber}
+                    onPress={() => selectBook(book)}
+                    accessibilityRole="button"
+                    style={[styles.bookChip, active && styles.bookChipActive]}
+                  >
+                    <Text style={[styles.bookChipText, active && styles.bookChipTextActive]}>
+                      {book.name}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={activeFootnote !== null}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setActiveFootnote(null)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{`Note ${activeFootnote?.marker ?? ''}`}</Text>
+              <Pressable
+                onPress={() => setActiveFootnote(null)}
+                accessibilityRole="button"
+                accessibilityLabel="Close footnote"
+                style={styles.navButton}
+              >
+                <Text style={styles.navButtonText}>Close</Text>
+              </Pressable>
+            </View>
+            <ScrollView contentContainerStyle={styles.footnoteBody}>
+              <Text style={styles.footnoteText}>{activeFootnote?.bodyText ?? ''}</Text>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: THEME.bg.canvas },
+  header: {
+    gap: SPACING.sm,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.xl,
+    paddingBottom: SPACING.md,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.border.subtle,
+  },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerActions: { flexDirection: 'row', gap: SPACING.sm },
+  reference: {
+    fontFamily: FONT_FAMILIES.ui,
+    fontSize: FONT_SIZES.uiLg,
+    color: THEME.text.primary,
+  },
+  focusButton: {
+    minHeight: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.lg,
+    borderRadius: RADII.pill,
+    borderWidth: 1,
+    borderColor: THEME.border.subtle,
+  },
+  focusButtonText: {
+    fontFamily: FONT_FAMILIES.ui,
+    fontSize: FONT_SIZES.uiSm,
+    color: THEME.text.secondary,
+  },
+  navRow: { flexDirection: 'row', gap: SPACING.sm },
+  navButton: {
+    minHeight: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.lg,
+    borderRadius: RADII.pill,
+    backgroundColor: THEME.bg.elevated,
+  },
+  navButtonDisabled: { opacity: 0.4 },
+  navButtonText: {
+    fontFamily: FONT_FAMILIES.ui,
+    fontSize: FONT_SIZES.uiSm,
+    color: THEME.text.primary,
+  },
+  content: {
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.xxxl,
+    gap: SPACING.sm,
+  },
+  verse: {
+    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontSize: FONT_SIZES.scriptureDefault,
+    lineHeight: FONT_SIZES.scriptureDefault * LINE_HEIGHTS.scripture,
+    color: THEME.text.primary,
+  },
+  verseNumber: {
+    fontFamily: FONT_FAMILIES.ui,
+    fontSize: FONT_SIZES.uiXs,
+    color: THEME.text.verseNum,
+  },
+  muted: {
+    fontFamily: FONT_FAMILIES.ui,
+    fontSize: FONT_SIZES.uiSm,
+    color: THEME.text.secondary,
+  },
+  error: {
+    fontFamily: FONT_FAMILIES.ui,
+    fontSize: FONT_SIZES.uiSm,
+    color: THEME.text.redLetter,
+  },
+  exitFocus: {
+    position: 'absolute',
+    top: SPACING.xl,
+    right: SPACING.lg,
+    minHeight: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADII.pill,
+    borderWidth: 1,
+    borderColor: THEME.border.subtle,
+    backgroundColor: THEME.bg.surface,
+    opacity: 0.4,
+  },
+  exitFocusText: {
+    fontFamily: FONT_FAMILIES.ui,
+    fontSize: FONT_SIZES.uiXs,
+    color: THEME.text.secondary,
+  },
+  modalBackdrop: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: THEME.bg.elevated,
+  },
+  modalSheet: {
+    maxHeight: '80%',
+    padding: SPACING.xl,
+    gap: SPACING.md,
+    borderTopLeftRadius: RADII.lg,
+    borderTopRightRadius: RADII.lg,
+    backgroundColor: THEME.bg.surface,
+  },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  modalTitle: {
+    fontFamily: FONT_FAMILIES.ui,
+    fontSize: FONT_SIZES.uiLg,
+    color: THEME.text.primary,
+  },
+  bookGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, paddingBottom: SPACING.xl },
+  bookChip: {
+    minHeight: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.lg,
+    borderRadius: RADII.pill,
+    borderWidth: 1,
+    borderColor: THEME.border.subtle,
+  },
+  bookChipActive: { backgroundColor: THEME.accent.primary, borderColor: THEME.accent.primary },
+  bookChipText: {
+    fontFamily: FONT_FAMILIES.ui,
+    fontSize: FONT_SIZES.uiSm,
+    color: THEME.text.primary,
+  },
+  bookChipTextActive: { color: THEME.bg.canvas },
+  footnoteBody: { paddingBottom: SPACING.xl },
+  footnoteText: {
+    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontSize: FONT_SIZES.uiMd,
+    lineHeight: FONT_SIZES.uiMd * LINE_HEIGHTS.ui,
+    color: THEME.text.primary,
+  },
+});

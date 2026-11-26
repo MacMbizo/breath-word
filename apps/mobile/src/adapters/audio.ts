@@ -6,13 +6,30 @@
 // rendered: a two-stream native mixer is out of Gate-1 scope (the desktop HTML5 adapter runs two
 // `Audio` elements instead). `ErrorDomain` (C3) has no `AUDIO` member, so playback-policy failures
 // are swallowed rather than surfaced — audio is non-critical.
+//
+// The module is loaded LAZILY. `react-native-track-player@4.1.2` ships a legacy native module that
+// RN 0.88's New-Architecture interop cannot translate (`TurboModuleInteropUtils` rejects its
+// `@ReactMethod` annotations), so merely importing it aborts the JS runtime at boot. Audio is a
+// Phase-3 concern (FR-106, gated by `ENABLE_AUDIO_MIXER`), so Phase-1 never touches it and the
+// import is deferred to the first playback call.
 
-import TrackPlayer, {
-  Event,
-  type PlaybackProgressUpdatedEvent,
-  type Track,
-} from 'react-native-track-player';
+import type { PlaybackProgressUpdatedEvent, Track } from 'react-native-track-player';
 import type { AudioEngineAdapter } from '@breath-and-word/core';
+
+type TrackPlayerModule = typeof import('react-native-track-player');
+
+let trackPlayerPromise: Promise<TrackPlayerModule> | null = null;
+
+/** Resolve the TrackPlayer module on demand; the first successful load is memoised. */
+function loadTrackPlayer(): Promise<TrackPlayerModule> {
+  if (trackPlayerPromise === null) {
+    trackPlayerPromise = import('react-native-track-player').catch((error: unknown) => {
+      trackPlayerPromise = null;
+      throw error;
+    });
+  }
+  return trackPlayerPromise;
+}
 
 type AmbientTrack = 'none' | 'rain' | 'piano' | 'pad';
 
@@ -29,15 +46,20 @@ function clamp01(volume: number): number {
   return volume;
 }
 
-let setupPromise: Promise<void> | null = null;
+let setupPromise: Promise<TrackPlayerModule> | null = null;
 
-/** Bring TrackPlayer up once; repeated calls reuse the same setup (B7 cold-start guardrails). */
-function ensurePlayer(): Promise<void> {
+/** Load TrackPlayer and bring it up once; repeated calls reuse the same setup (B7 cold-start). */
+function ensurePlayer(): Promise<TrackPlayerModule> {
   if (setupPromise === null) {
-    setupPromise = TrackPlayer.setupPlayer().catch((error: unknown) => {
-      setupPromise = null;
-      throw error;
-    });
+    setupPromise = loadTrackPlayer()
+      .then(async (trackPlayer) => {
+        await trackPlayer.default.setupPlayer();
+        return trackPlayer;
+      })
+      .catch((error: unknown) => {
+        setupPromise = null;
+        throw error;
+      });
   }
   return setupPromise;
 }
@@ -54,26 +76,29 @@ export function createAudioAdapter(): AudioEngineAdapter {
 
   return {
     async loadChapter(urlOrPath, title, subtitle): Promise<void> {
-      await ensurePlayer();
+      const trackPlayer = await ensurePlayer();
       const track: Track = { url: urlOrPath, title, artist: subtitle };
-      await TrackPlayer.load(track);
+      await trackPlayer.default.load(track);
     },
 
     async play(): Promise<void> {
-      await ensurePlayer();
-      await TrackPlayer.play();
+      const trackPlayer = await ensurePlayer();
+      await trackPlayer.default.play();
     },
 
     async pause(): Promise<void> {
-      await TrackPlayer.pause();
+      const trackPlayer = await ensurePlayer();
+      await trackPlayer.default.pause();
     },
 
     async seekTo(ms): Promise<void> {
-      await TrackPlayer.seekTo(ms / 1000);
+      const trackPlayer = await ensurePlayer();
+      await trackPlayer.default.seekTo(ms / 1000);
     },
 
     async setPlaybackRate(rate): Promise<void> {
-      await TrackPlayer.setRate(rate);
+      const trackPlayer = await ensurePlayer();
+      await trackPlayer.default.setRate(rate);
     },
 
     async setAmbientTrack(trackId, volume): Promise<void> {
@@ -82,7 +107,8 @@ export function createAudioAdapter(): AudioEngineAdapter {
     },
 
     async setNarrationVolume(volume): Promise<void> {
-      await TrackPlayer.setVolume(clamp01(volume));
+      const trackPlayer = await ensurePlayer();
+      await trackPlayer.default.setVolume(clamp01(volume));
     },
 
     async setSleepTimer(minutes): Promise<void> {
@@ -92,24 +118,36 @@ export function createAudioAdapter(): AudioEngineAdapter {
       }
       if (minutes === null) return;
       sleepTimer = setTimeout(() => {
-        void TrackPlayer.pause();
+        void ensurePlayer()
+          .then((trackPlayer) => trackPlayer.default.pause())
+          .catch(() => undefined);
         sleepTimer = null;
       }, minutes * 60_000);
     },
 
     onPositionUpdate(cb): () => void {
       positionListeners.add(cb);
-      const subscription = TrackPlayer.addEventListener(
-        Event.PlaybackProgressUpdated,
-        (event: PlaybackProgressUpdatedEvent) => {
-          for (const listener of positionListeners) {
-            listener(event.position * 1000);
-          }
-        },
-      );
+      let subscription: { remove: () => void } | null = null;
+      let unsubscribed = false;
+      void ensurePlayer()
+        .then((trackPlayer) => {
+          if (unsubscribed) return;
+          subscription = trackPlayer.default.addEventListener(
+            trackPlayer.Event.PlaybackProgressUpdated,
+            (event: PlaybackProgressUpdatedEvent) => {
+              for (const listener of positionListeners) {
+                listener(event.position * 1000);
+              }
+            },
+          );
+        })
+        .catch(() => {
+          // Audio is non-critical (C3 has no AUDIO domain); the position stream stays silent.
+        });
       return () => {
+        unsubscribed = true;
         positionListeners.delete(cb);
-        subscription.remove();
+        subscription?.remove();
       };
     },
   };

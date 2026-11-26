@@ -1,10 +1,10 @@
 # C3: Error Model & Offline Failure Modes
 
 **Document ID:** `C3`  
-**Version:** `1.0.0`  
+**Version:** `1.0.2`  
 **Status:** `Approved`  
 **Owner:** Founder / Architect  
-**Last Updated:** `2026-11-24`  
+**Last Updated:** `2026-11-26`  
 **Related Docs:** `B1`, `B2`, `B4`, `B6`, `C1`, `C2`, `C4`, `E4`
 
 ## Purpose & Scope
@@ -98,6 +98,8 @@ All Supabase Edge Functions (`ai-gateway`) return a uniform error JSON payload:
 | `PACK_INTEGRITY_FAILED` | — | `USER_ACTION` | Decompressed SQLite fails `PRAGMA integrity_check`. | Delete staging file; never `DETACH` working pack. |
 | `PACK_SCHEMA_INCOMPATIBLE` | — | `USER_ACTION` | Pack `schemaVersion` exceeds app's supported version. | Show *"Please update Breath & Word to install this pack update."* |
 | `PACK_STORAGE_FULL` | — | `USER_ACTION` | Insufficient device disk space (<2× uncompressed pack size). | Show required MB and shortcut to manage/remove unused packs or audio cache. |
+| `PACK_PARSE_FAILED` | — | `USER_ACTION` | ETL build-time: a raw source (USFM/open dataset) fails to parse into a `PackSource` (`tools/pack-builder`). | Build aborts with the offending file/line in `internalDetail`; never publish a partial pack. |
+| `PACK_MANIFEST_INVALID` | — | `USER_ACTION` | The fetched `manifest.json` catalogue fails shape/version validation (`parsePackManifest`, `B4 §4.6`). | Leave attached packs untouched; show a non-blocking *"Catalogue unavailable"* notice and offer retry. |
 | `AI_OFFLINE_UNAVAILABLE` | — | `USER_ACTION` | User triggers Smart Synopsis or AI Prayer while offline. | Offer instant one-tap fallback to **Offline Prayer Templates** or local Passage Guide. |
 | `AI_QUOTA_EXCEEDED` | 429 | `USER_ACTION` | Exceeded 30 req/day on shared church LLM key (`B2 §4.4`). | Prompt optional BYOK API key entry in Settings or wait until UTC midnight reset. |
 | `AI_BYOK_INVALID` | 401 | `USER_ACTION` | Upstream LLM rejects user's personal `X-BYOK-Key`. | Open BYOK Settings to verify provider + key (never log key). |
@@ -131,6 +133,8 @@ All Supabase Edge Functions (`ai-gateway`) return a uniform error JSON payload:
 ## Change Log
 
 - `1.0.0` | `2026-11-24` | Athena | Initial canonical `AppError` contract, wire envelope, 24 error codes, and offline recovery policy.
+- `1.0.1` | `2026-11-26` | Athena | Add `PACK_PARSE_FAILED` for the `tools/pack-builder` USFM/dataset ETL (`B4 §4.6`).
+- `1.0.2` | `2026-11-26` | Athena | Add `PACK_MANIFEST_INVALID` for validating the fetched FR-105 `manifest.json` catalogue (`parsePackManifest`).
 
 ## Traceability
 

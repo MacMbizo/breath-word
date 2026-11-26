@@ -46,7 +46,11 @@ export interface PackInstallerAdapter {
   resolvePaths(packId: string, contentVersion: string): Promise<PackInstallPaths>;
   /** Fetch `url` into `destPath`; keep the partial file on failure for HTTP `Range` resume. */
   download(url: string, destPath: string, onProgress?: (receivedBytes: number) => void): Promise<void>;
-  readFileBytes(path: string): Promise<Uint8Array>;
+  /**
+   * Lowercase hex SHA-256 of a file's contents, streamed natively (never buffering the whole
+   * file into JS — a pack is ~19 MB uncompressed and a full-buffer copy stalls the JS bridge).
+   */
+  sha256HexFile(path: string): Promise<string>;
   gunzip(srcGzPath: string, destPath: string): Promise<void>;
   fileSizeBytes(path: string): Promise<number>;
   removeFile(path: string): Promise<void>;

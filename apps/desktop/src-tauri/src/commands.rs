@@ -196,8 +196,8 @@ pub fn pack_available_disk_space(directory: String) -> Result<u64, CommandError>
 
 /// Read a whole pack file into memory; the response is a raw `ArrayBuffer`, not JSON.
 ///
-/// `PackManagerRepository` hashes the downloaded and the decompressed pack, so this keeps the
-/// bytes binary across the IPC bridge instead of inflating them into a JSON number array.
+/// Kept as a general binary file-read primitive for the pack tooling; the pack verify path uses
+/// the streaming `pack_sha256` instead so a ~19 MB pack never crosses the IPC bridge.
 #[tauri::command]
 pub fn pack_read_file(path: String) -> Result<tauri::ipc::Response, CommandError> {
     pack_io::read_file_bytes(Path::new(&path))

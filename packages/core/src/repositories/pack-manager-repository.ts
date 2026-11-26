@@ -11,7 +11,6 @@
 
 import type {
   ContentDbAdapter,
-  CryptoPrimitivesAdapter,
   LocalDeviceAdapter,
   PackInstallerAdapter,
 } from '../adapters';
@@ -50,7 +49,6 @@ export interface PackManagerOptions {
   readonly contentDb: ContentDbAdapter;
   readonly localDevice: LocalDeviceAdapter;
   readonly installer: PackInstallerAdapter;
-  readonly crypto: Pick<CryptoPrimitivesAdapter, 'sha256Hex'>;
   /** Injectable clock (tests); defaults to `Date.now`. */
   readonly now?: () => number;
 }
@@ -74,14 +72,12 @@ export class PackManagerRepository {
   private readonly contentDb: ContentDbAdapter;
   private readonly localDevice: LocalDeviceAdapter;
   private readonly installer: PackInstallerAdapter;
-  private readonly crypto: Pick<CryptoPrimitivesAdapter, 'sha256Hex'>;
   private readonly now: () => number;
 
   constructor(options: PackManagerOptions) {
     this.contentDb = options.contentDb;
     this.localDevice = options.localDevice;
     this.installer = options.installer;
-    this.crypto = options.crypto;
     this.now = options.now ?? Date.now;
   }
 
@@ -186,9 +182,7 @@ export class PackManagerRepository {
     }
 
     onProgress?.('verifying', 0, entry.compressedBytes);
-    const compressedHash = await this.crypto.sha256Hex(
-      await this.installer.readFileBytes(paths.tempDownload),
-    );
+    const compressedHash = await this.installer.sha256HexFile(paths.tempDownload);
     if (compressedHash !== entry.sha256Compressed) {
       await this.safeRemove(paths.tempDownload);
       throw checksumMismatch(entry, 'compressed');
@@ -202,9 +196,7 @@ export class PackManagerRepository {
       throw integrityFailed(entry, 'gzip stream could not be decompressed', cause);
     }
 
-    const uncompressedHash = await this.crypto.sha256Hex(
-      await this.installer.readFileBytes(paths.tempExtract),
-    );
+    const uncompressedHash = await this.installer.sha256HexFile(paths.tempExtract);
     if (uncompressedHash !== entry.sha256Uncompressed) {
       await this.safeRemove(paths.tempExtract);
       throw checksumMismatch(entry, 'uncompressed');

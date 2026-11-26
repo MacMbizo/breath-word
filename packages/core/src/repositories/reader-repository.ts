@@ -2,7 +2,7 @@
 //
 // Phase 1 Core Local Reader MVP (A3 §4.1):
 //   FR-101 Structured Verse Renderer  -> getChapter (spans + footnotes)
-//   FR-102 Multi-Translation Reader   -> compareVerses (pack per translation)
+//   FR-102 Multi-Translation Reader   -> compareChapters (pack per translation, aligned in the UI)
 //   FR-103 Offline FTS5 Search        -> search (verses_fts + snippet)
 
 import type { ContentDbAdapter } from '../adapters';
@@ -22,6 +22,15 @@ const SPAN_TYPES: ReadonlySet<string> = new Set([
 ]);
 const DEFAULT_SEARCH_LIMIT = 50;
 const VERSES_PER_BOOK = 1_000_000;
+
+/**
+ * Inclusive BBCCCVVV bounds per Protestant testament (FR-103 "testament filters"). The OT is
+ * books 1–39 and the NT is books 40–66, so the bounds are whole-book multiples of `1_000_000`.
+ */
+const TESTAMENT_RANGES: Record<'OT' | 'NT', { readonly start: number; readonly end: number }> = {
+  OT: { start: 1 * VERSES_PER_BOOK, end: 40 * VERSES_PER_BOOK - 1 },
+  NT: { start: 40 * VERSES_PER_BOOK, end: 67 * VERSES_PER_BOOK - 1 },
+};
 
 interface VerseRow {
   translation_code: string;
@@ -44,6 +53,21 @@ interface FootnoteRow {
 interface SearchRow extends VerseRow {
   snippet: string;
   score: number;
+}
+
+interface BookRow {
+  book_number: number;
+  name: string;
+  testament: string;
+  chapter_count: number;
+}
+
+/** One navigable book of a translation, with its chapter count (FR-101 canon-wide navigation). */
+export interface BookSummary {
+  readonly bookNumber: number;
+  readonly name: string;
+  readonly testament: 'OT' | 'NT';
+  readonly chapterCount: number;
 }
 
 /** A pack + translation pair, used to line up parallel columns (FR-102). */
@@ -79,6 +103,8 @@ export interface SearchQuery {
   readonly text: string;
   readonly translationCode?: string;
   readonly bookNumber?: number;
+  /** Restrict hits to one testament (`OT` books 1–39, `NT` books 40–66) — FR-103. */
+  readonly testament?: 'OT' | 'NT';
   readonly limit?: number;
 }
 
@@ -138,6 +164,28 @@ export class ReaderRepository {
     };
   }
 
+  /**
+   * FR-101 — the books a pack carries for one translation, with chapter counts, so the reader can
+   * navigate the whole canon (Genesis..Revelation) instead of a single fixed passage. Only books
+   * that actually contain verses for `translationCode` are returned.
+   */
+  async listBooks(packId: string, translationCode: string): Promise<BookSummary[]> {
+    await this.assertPackAvailable(packId);
+
+    const { rows } = await this.contentDb.query<BookRow>(
+      `SELECT b.book_number, b.name, b.testament, b.chapter_count
+         FROM "${packId}".books b
+        WHERE EXISTS (
+          SELECT 1 FROM "${packId}".verses v
+           WHERE v.book_number = b.book_number AND v.translation_code = ?
+        )
+        ORDER BY b.book_number ASC`,
+      [translationCode],
+    );
+
+    return rows.map(toBookSummary);
+  }
+
   /** FR-102 — a single canonical verse from one translation, or `null` when absent. */
   async getVerse(
     packId: string,
@@ -155,15 +203,19 @@ export class ReaderRepository {
     return row === undefined ? null : toVerse(row);
   }
 
-  /** FR-102 — the same verse across several translations, in the order requested. */
-  async compareVerses(
+  /**
+   * FR-102 — the same chapter across several translations, in the order requested, for
+   * verse-synchronized parallel columns. Alignment into a row-per-verse grid is a pure projection
+   * (`alignChapterVerses`), so it lives in the domain, not here.
+   */
+  async compareChapters(
     refs: readonly TranslationRef[],
-    canonicalVerseId: number,
-  ): Promise<Verse[]> {
-    const resolved = await Promise.all(
-      refs.map((ref) => this.getVerse(ref.packId, ref.translationCode, canonicalVerseId)),
+    bookNumber: number,
+    chapter: number,
+  ): Promise<Chapter[]> {
+    return Promise.all(
+      refs.map((ref) => this.getChapter(ref.packId, ref.translationCode, bookNumber, chapter)),
     );
-    return resolved.filter((verse): verse is Verse => verse !== null);
   }
 
   /** FR-103 — offline full-text search ranked by relevance. */
@@ -172,6 +224,7 @@ export class ReaderRepository {
     text,
     translationCode,
     bookNumber,
+    testament,
     limit = DEFAULT_SEARCH_LIMIT,
   }: SearchQuery): Promise<SearchHit[]> {
     await this.assertPackAvailable(packId);
@@ -181,6 +234,11 @@ export class ReaderRepository {
     if (translationCode !== undefined) {
       conditions.push('v.translation_code = ?');
       params.push(translationCode);
+    }
+    if (testament !== undefined) {
+      const range = TESTAMENT_RANGES[testament];
+      conditions.push('v.canonical_verse_id BETWEEN ? AND ?');
+      params.push(range.start, range.end);
     }
     if (bookNumber !== undefined) {
       const start = bookNumber * VERSES_PER_BOOK;
@@ -237,6 +295,15 @@ function toVerse(row: VerseRow): Verse {
     verse: row.verse,
     plainText: row.plain_text,
     spans: parseSpans(row.content_json, row.canonical_verse_id),
+  };
+}
+
+function toBookSummary(row: BookRow): BookSummary {
+  return {
+    bookNumber: row.book_number,
+    name: row.name,
+    testament: row.testament === 'NT' ? 'NT' : 'OT',
+    chapterCount: row.chapter_count,
   };
 }
 

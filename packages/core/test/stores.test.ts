@@ -182,6 +182,17 @@ describe('createReaderStore (FR-101..103)', () => {
     expect(state.chapter?.verses.map((verse) => verse.canonicalVerseId)).toEqual([PSALM_23_1, 19_023_002]);
   });
 
+  it('lists the translation’s navigable books for canon-wide navigation (FR-101)', async () => {
+    const { stores } = await buildReaderRuntime();
+
+    const books = await stores.reader.getState().loadBooks('core_bsb', 'BSB');
+
+    expect(books).toEqual([
+      { bookNumber: 19, name: 'Psalms', testament: 'OT', chapterCount: 150 },
+    ]);
+    expect(stores.reader.getState().booksStatus).toBe('ready');
+  });
+
   it('surfaces a canonical AppError instead of throwing when the pack is missing', async () => {
     const { stores } = await buildReaderRuntime();
 
@@ -199,18 +210,18 @@ describe('createReaderStore (FR-101..103)', () => {
     expect(state.error?.domain).toBe('DB');
   });
 
-  it('compares a verse across translations and reports a failed compare', async () => {
+  it('compares a chapter across translations and reports a failed compare', async () => {
     const { stores } = await buildReaderRuntime();
 
-    const verses = await stores.reader
+    const rows = await stores.reader
       .getState()
-      .compareVerses([{ packId: 'core_bsb', translationCode: 'BSB' }], PSALM_23_1);
-    expect(verses.map((verse) => verse.translationCode)).toEqual(['BSB']);
+      .compareChapters([{ packId: 'core_bsb', translationCode: 'BSB' }], 19, 23);
+    expect(rows.map((row) => row.canonicalVerseId)).toEqual([PSALM_23_1, 19_023_002]);
     expect(stores.reader.getState().comparisonStatus).toBe('ready');
 
     const empty = await stores.reader
       .getState()
-      .compareVerses([{ packId: 'trans_kjv', translationCode: 'KJV' }], PSALM_23_1);
+      .compareChapters([{ packId: 'trans_kjv', translationCode: 'KJV' }], 19, 23);
     expect(empty).toEqual([]);
     expect(stores.reader.getState().comparisonStatus).toBe('error');
   });

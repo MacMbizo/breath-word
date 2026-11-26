@@ -5,6 +5,7 @@
 // and `availableDiskSpaceBytes` is settable so the `PACK_STORAGE_FULL` path is reproducible.
 
 import { mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { gunzipSync } from 'node:zlib';
 
 import type { PackInstallPaths, PackInstallerAdapter } from '../../src/adapters';
@@ -57,8 +58,8 @@ export class NodePackInstallerAdapter implements PackInstallerAdapter {
     onProgress?.(bytes.byteLength);
   }
 
-  async readFileBytes(path: string): Promise<Uint8Array> {
-    return new Uint8Array(readFileSync(path));
+  async sha256HexFile(path: string): Promise<string> {
+    return createHash('sha256').update(readFileSync(path)).digest('hex');
   }
 
   async gunzip(srcGzPath: string, destPath: string): Promise<void> {

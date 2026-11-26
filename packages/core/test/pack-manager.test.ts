@@ -135,7 +135,7 @@ beforeEach(() => {
   contentDb = new NodeContentDbAdapter();
   localDevice = new NodeLocalDeviceAdapter();
   installer = new NodePackInstallerAdapter({ rootDir: packsDir });
-  repo = new PackManagerRepository({ contentDb, localDevice, installer, crypto: webCryptoAdapter });
+  repo = new PackManagerRepository({ contentDb, localDevice, installer });
 });
 
 afterEach(() => {
@@ -240,7 +240,6 @@ describe('PackManagerRepository boot restore (FR-105, B4 §4.6)', () => {
         contentDb: restartedContentDb,
         localDevice,
         installer,
-        crypto: webCryptoAdapter,
       });
       expect(await restartedContentDb.getAttachedPacks()).not.toContain('core_bsb');
 

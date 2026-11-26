@@ -8,9 +8,10 @@
 
 import { createStore, type StoreApi } from 'zustand/vanilla';
 
-import type { Verse } from '../domain/types';
+import { alignChapterVerses, type AlignedVerseRow } from '../domain/verse-alignment';
 import { asAppError, type AppError, type AppErrorFallback } from '../errors/AppError';
 import type {
+  BookSummary,
   Chapter,
   ReaderRepository,
   SearchHit,
@@ -41,8 +42,13 @@ export interface ReaderStoreState {
   readonly chapter: Chapter | null;
   readonly status: AsyncStatus;
   readonly error: AppError | null;
-  /** FR-102 — the last `compareVerses` result, one entry per resolved translation. */
-  readonly comparison: readonly Verse[];
+  /** FR-101 — the navigable books of the active translation (canon-wide book picker). */
+  readonly books: readonly BookSummary[];
+  readonly booksStatus: AsyncStatus;
+  /** FR-102 — the last chapter compare: one `Chapter` per requested column, in column order. */
+  readonly comparisonColumns: readonly Chapter[];
+  /** FR-102 — `comparisonColumns` projected onto one row-per-verse grid (see `alignChapterVerses`). */
+  readonly comparisonRows: readonly AlignedVerseRow[];
   readonly comparisonStatus: AsyncStatus;
   /** FR-103 — the last search's query, hits and status. */
   readonly searchQuery: string;
@@ -54,8 +60,14 @@ export interface ReaderStoreState {
 export interface ReaderStoreActions {
   /** FR-101 — load a chapter into the store. */
   openChapter(location: ReaderLocation): Promise<void>;
-  /** FR-102 — load one canonical verse across several translations. */
-  compareVerses(refs: readonly TranslationRef[], canonicalVerseId: number): Promise<readonly Verse[]>;
+  /** FR-101 — load the translation's navigable books for the book picker. */
+  loadBooks(packId: string, translationCode: string): Promise<readonly BookSummary[]>;
+  /** FR-102 — load one chapter across several translations for verse-synchronized columns. */
+  compareChapters(
+    refs: readonly TranslationRef[],
+    bookNumber: number,
+    chapter: number,
+  ): Promise<readonly AlignedVerseRow[]>;
   /** FR-103 — run a local FTS5 search. */
   search(query: SearchQuery): Promise<readonly SearchHit[]>;
   /** Clear the search panel back to its empty state. */
@@ -69,7 +81,10 @@ const INITIAL_STATE: ReaderStoreState = {
   chapter: null,
   status: 'idle',
   error: null,
-  comparison: [],
+  books: [],
+  booksStatus: 'idle',
+  comparisonColumns: [],
+  comparisonRows: [],
   comparisonStatus: 'idle',
   searchQuery: '',
   searchResults: [],
@@ -96,14 +111,27 @@ export function createReaderStore(reader: ReaderRepository): ReaderStore {
       }
     },
 
-    async compareVerses(refs, canonicalVerseId) {
+    async loadBooks(packId, translationCode) {
+      set({ booksStatus: 'loading' });
+      try {
+        const books = await reader.listBooks(packId, translationCode);
+        set({ books, booksStatus: 'ready' });
+        return books;
+      } catch (error) {
+        set({ books: [], booksStatus: 'error', error: asAppError(error, READER_FAILURE) });
+        return [];
+      }
+    },
+
+    async compareChapters(refs, bookNumber, chapter) {
       set({ comparisonStatus: 'loading' });
       try {
-        const comparison = await reader.compareVerses(refs, canonicalVerseId);
-        set({ comparison, comparisonStatus: 'ready' });
-        return comparison;
+        const columns = await reader.compareChapters(refs, bookNumber, chapter);
+        const comparisonRows = alignChapterVerses(columns);
+        set({ comparisonColumns: columns, comparisonRows, comparisonStatus: 'ready' });
+        return comparisonRows;
       } catch {
-        set({ comparison: [], comparisonStatus: 'error' });
+        set({ comparisonColumns: [], comparisonRows: [], comparisonStatus: 'error' });
         return [];
       }
     },

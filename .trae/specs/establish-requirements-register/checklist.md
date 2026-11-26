@@ -1,0 +1,24 @@
+# Checklist
+
+- [x] `docs/G5-requirements-register.md` exists with the standard doc header (Document ID `G5`) and a "How to Use" section.
+- [x] The FR inventory lists every FR exactly once: `FR-101`–`FR-107`, `FR-201`–`FR-206`, `FR-301`–`FR-305`, `FR-401`–`FR-403` (21 total).
+- [x] Each FR row has: verbatim acceptance text, source doc + §, owning phase, status, and a code/test pointer (or `Not implemented`).
+- [x] The phase-boundary section reproduces the four phase exit gates and the six explicit v1 non-goals from `A3`.
+- [x] The `B7` budgets are registered with exact numeric targets and hard ceilings (performance/animation, storage/memory, availability/cost).
+- [x] The architecture-rule section registers `AGENTS.md` rules 1–7, the `B3 §4.3` adapter interfaces, the dual-SQLite planes, and the pack-ETL atomic protocol.
+- [x] The ADR register lists `ADR-001`–`ADR-005`, each with its mandated decision.
+- [x] The `C1` section registers both `ai-gateway` modes, both shared-pool RPCs, and the BYO ESV adapter contract.
+- [x] The `C2` section registers both sync buckets, the conflict-resolution policy, and the full `CoreEvent` union.
+- [x] The `C3` register contains all 26 canonical error codes, each with domain, HTTP status, retry policy, and trigger.
+- [x] The `C4` section registers the auth modes + guest-migration protocol, the RBAC matrix, and the RLS policy list.
+- [x] The `B6` section registers the E2EE envelope spec, key-lifecycle ops, telemetry-redaction policy, and the complete "NEVER" prohibitions list.
+- [x] The `D1`/`D3` sections register the four themes, the token/motion tables, and the WCAG 2.2 AA rule table.
+- [x] The `B5` section registers the licensing matrix and the in-app attribution mechanism.
+- [x] The `E1`/`E2`/`E4` sections register the env-var/secret matrix, the phase feature flags, the CI/CD gates, and runbooks `RB-01`–`RB-03`.
+- [x] The `F1` section registers the testing pyramid, the per-phase acceptance matrix, and the verbatim 7-point Definition of Done.
+- [x] The Gate-1 spike section registers spikes 1–4 with their exact verification criteria.
+- [x] A coverage summary table counts requirements by status per phase and its totals match the table rows.
+- [x] A gap register lists the missing `A7` source, the external open items, and every still-pending verification.
+- [x] `G1-index.md` Document Inventory contains a `G5` row linking `docs/G5-requirements-register.md`.
+- [x] `G3-changelog.md` has a new row recording the register.
+- [x] `pnpm turbo lint typecheck test` is green (12/12).

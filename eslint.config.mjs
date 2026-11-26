@@ -30,9 +30,9 @@ export default tseslint.config(
     },
   },
   {
-    // Build-tool configs (babel/metro/…) are Node CommonJS modules: give them Node globals
-    // and let them use `require`.
-    files: ['**/*.config.js', '**/*.config.cjs'],
+    // Build-tool configs (babel/metro/…) and Expo config plugins are Node CommonJS modules:
+    // give them Node globals and let them use `require`.
+    files: ['**/*.config.js', '**/*.config.cjs', '**/plugins/**/*.js'],
     languageOptions: {
       globals: { ...globals.node },
       sourceType: 'commonjs',

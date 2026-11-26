@@ -62,7 +62,6 @@ export function initCoreRuntime(options: InitCoreRuntimeOptions): CoreRuntime {
       contentDb: adapters.contentDb,
       localDevice: adapters.localDevice,
       installer: adapters.packInstaller,
-      crypto: adapters.crypto,
       ...clock,
     }),
     readingPlans: new ReadingPlanRepository({

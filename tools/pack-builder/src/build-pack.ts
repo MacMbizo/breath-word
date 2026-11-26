@@ -8,7 +8,7 @@
 // builder only enforces the canonical id derived from book/chapter/verse.
 
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { gzipSync } from 'node:zlib';
@@ -70,6 +70,18 @@ export interface PackVerseInput {
   verse: number;
   plainText: string;
   spans: VerseSpan[];
+  /** Inline footnotes (`\f … \f*`) attached to this verse (FR-101 clickable markers). */
+  footnotes?: PackFootnoteInput[];
+}
+
+/** One inline footnote; `footnote_id` is derived at build time as `<canonicalVerseId>:<ordinal>`. */
+export interface PackFootnoteInput {
+  /** Visible caller marker shown in the text (a source marker like `a`, or an auto letter). */
+  marker: string;
+  /** USFM note category; Phase 1 emits `NOTE`. */
+  category: string;
+  /** The note body text, with USFM note markers stripped. */
+  bodyText: string;
 }
 
 /** Normalized, dependency-free input to the pack builder. */
@@ -156,6 +168,10 @@ export function buildPackDatabase(source: PackSource, sqlitePath: string): PackB
       `INSERT INTO verses (translation_code, canonical_verse_id, book_number, chapter, verse, plain_text, content_json)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
     );
+    const insertFootnote = db.prepare(
+      `INSERT INTO footnotes (footnote_id, translation_code, canonical_verse_id, marker, category, body_text)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    );
     for (const verse of source.verses) {
       const canonicalVerseId = toCanonicalVerseId(verse);
       insertVerse.run(
@@ -167,6 +183,17 @@ export function buildPackDatabase(source: PackSource, sqlitePath: string): PackB
         verse.plainText,
         JSON.stringify(verse.spans),
       );
+      const footnotes = verse.footnotes ?? [];
+      footnotes.forEach((note, index) => {
+        insertFootnote.run(
+          `${canonicalVerseId}:${index + 1}`,
+          translation.code,
+          canonicalVerseId,
+          note.marker,
+          note.category,
+          note.bodyText,
+        );
+      });
     }
 
     db.exec("INSERT INTO verses_fts(verses_fts) VALUES('rebuild');");
@@ -253,6 +280,17 @@ const SAMPLE_FILLER =
   'And it came to pass in those days that the congregation assembled at the gate, and the elders spoke to the people concerning the statutes and the ordinances thereof.';
 const SAMPLE_MARKER_TEXT =
   'And we know that all things work together for good to those who love God, to those who are called according to His purpose.';
+/**
+ * Psalm 23 and Matthew 5 carry the fixture's FR-101 styling (poetry heading + red-letter + footnote)
+ * so the on-device reader can exercise heading / poetry-indent / red-letter / footnote rendering
+ * without shipping real scripture. Every other verse is a single plain `text` span.
+ */
+const SAMPLE_PSALM_BOOK = 19;
+const SAMPLE_PSALM_CHAPTER = 23;
+const SAMPLE_SERMON_BOOK = 40;
+const SAMPLE_SERMON_CHAPTER = 5;
+/** Matthew 5 verse that carries the fixture's footnote marker. */
+const SAMPLE_FOOTNOTE_VERSE = 3;
 
 /** Deterministic verse total produced by `createSamplePackSource` (harness assertions). */
 export const SAMPLE_VERSE_COUNT =
@@ -270,7 +308,73 @@ export const SAMPLE_VERSE_COUNT =
  * Exactly one verse (Romans 8:28, canonical id `45008028`) carries a distinctive phrase so the
  * FTS5 probe returns a small, stable result set.
  */
-export function createSamplePackSource(): PackSource {
+export interface SamplePackProfile {
+  /** Pack id to emit (default `core_bsb`). */
+  packId?: string;
+  /** Translation code recorded in the pack (default `BSB`). */
+  translationCode?: string;
+  /** Translation display name (default `Synthetic Spike Fixture`). */
+  translationName?: string;
+  /** Pack display name (default `Synthetic Spike Fixture (NOT scripture)`). */
+  displayName?: string;
+}
+
+/** FR-101 content for one fixture verse (heading / poetry / red-letter / footnote, else plain text). */
+function sampleVerseContent(
+  badge: string,
+  book: number,
+  chapter: number,
+  verse: number,
+  plainText: string,
+): Pick<PackVerseInput, 'plainText' | 'spans' | 'footnotes'> {
+  const text = `${badge}${plainText}`;
+
+  if (book === SAMPLE_PSALM_BOOK && chapter === SAMPLE_PSALM_CHAPTER) {
+    const spans: VerseSpan[] = [];
+    // A superscription is a heading; headings stay out of `plain_text` so they never reach FTS5.
+    if (verse === 1) spans.push({ type: 'heading', text: 'A Psalm of David.' });
+    spans.push({ type: 'poetry', text, indentLevel: verse === 1 ? 1 : 2 });
+    return { plainText: text, spans };
+  }
+
+  if (book === SAMPLE_SERMON_BOOK && chapter === SAMPLE_SERMON_CHAPTER) {
+    if (verse === SAMPLE_FOOTNOTE_VERSE) {
+      const words = text.split(' ');
+      // The footnote marker is a `footnote` span only — deliberately absent from `plain_text`.
+      return {
+        plainText: text,
+        spans: [
+          { type: 'red_letter', text: `${words.slice(0, 4).join(' ')} ` },
+          {
+            type: 'footnote',
+            text: 'a',
+            footnoteId: `${toCanonicalVerseId({ book, chapter, verse })}:1`,
+          },
+          { type: 'red_letter', text: words.slice(4).join(' ') },
+        ],
+        footnotes: [
+          {
+            marker: 'a',
+            category: 'NOTE',
+            bodyText: 'Synthetic fixture footnote — verifies the FR-101 footnote sheet (NOT scripture).',
+          },
+        ],
+      };
+    }
+    return { plainText: text, spans: [{ type: 'red_letter', text }] };
+  }
+
+  return { plainText: text, spans: [{ type: 'text', text }] };
+}
+
+export function createSamplePackSource(profile: SamplePackProfile = {}): PackSource {
+  const packId = profile.packId ?? 'core_bsb';
+  const translationCode = profile.translationCode ?? 'BSB';
+  // A second fixture translation must be *visually* distinguishable in the FR-102 compare view while
+  // still carrying the FTS probe phrase, so its bodies get a `[CODE]` prefix. The default BSB
+  // fixture is byte-identical to before this parameterisation.
+  const badge = translationCode === 'BSB' ? '' : `[${translationCode}] `;
+
   const books: PackBookInput[] = BOOKS.map((book) => ({
     number: book.number,
     osis: book.osis,
@@ -287,13 +391,20 @@ export function createSamplePackSource(): PackSource {
       const verseCount = isMarkerChapter ? SAMPLE_MARKER_CHAPTER_VERSES : SAMPLE_VERSES_PER_CHAPTER;
       for (let verse = 1; verse <= verseCount; verse += 1) {
         const isMarker = isMarkerChapter && verse === SAMPLE_MARKER_VERSE;
-        const text = isMarker ? SAMPLE_MARKER_TEXT : SAMPLE_FILLER;
+        const content = sampleVerseContent(
+          badge,
+          book.number,
+          chapter,
+          verse,
+          isMarker ? SAMPLE_MARKER_TEXT : SAMPLE_FILLER,
+        );
         verses.push({
           book: book.number,
           chapter,
           verse,
-          plainText: text,
-          spans: [{ type: 'text', text }],
+          plainText: content.plainText,
+          spans: content.spans,
+          ...(content.footnotes !== undefined ? { footnotes: content.footnotes } : {}),
         });
       }
     }
@@ -301,17 +412,17 @@ export function createSamplePackSource(): PackSource {
 
   return {
     metadata: {
-      packId: 'core_bsb',
+      packId,
       packType: 'TRANSLATION',
       contentVersion: '1.0.0',
-      displayName: 'Synthetic Spike Fixture (NOT scripture)',
+      displayName: profile.displayName ?? 'Synthetic Spike Fixture (NOT scripture)',
       licenseSpdx: 'CC0-1.0',
       attributionText: 'Generated filler text, produced by pack-builder --sample for Gate-1 device spike timing only.',
       builtAt: '2026-11-25T00:00:00Z',
     },
     translation: {
-      code: 'BSB',
-      name: 'Synthetic Spike Fixture',
+      code: translationCode,
+      name: profile.translationName ?? 'Synthetic Spike Fixture',
       licenseType: 'CC0-1.0',
       version: '1.0.0',
     },
@@ -324,18 +435,25 @@ export function createSamplePackSource(): PackSource {
 export const SAMPLE_SEARCH_QUERY = 'work together for good';
 
 const USAGE = `Usage: pack-builder --source <pack-source.json> --out <dir> [--base-url <url>] [--min-app-version <v>]
-       pack-builder --sample --out <dir> [--base-url <url>] [--min-app-version <v>]
+       pack-builder --sample --out <dir> [--pack-id <id>] [--code <CODE>] [--name <text>]
 
 Builds a modular static content pack (.sqlite + .sqlite.gz + manifest.json, B4 §4.6).
 
   --source <file>          Normalized PackSource JSON (produced by a dataset parser).
   --sample                 Build the synthetic Gate-1 spike fixture instead of a parsed source
                            (generated filler text — NOT scripture; ~31k verses for latency timing).
+  --pack-id <id>           Sample fixture pack id (default: core_bsb).
+  --code <CODE>            Sample fixture translation code (default: BSB).
+  --name <text>            Sample fixture pack display name.
   --out <dir>              Output directory for the built pack artifacts.
   --base-url <url>         CDN prefix recorded in the manifest (default: https://packs.breathandword.app/v1).
   --min-app-version <v>    Minimum compatible app version (default: 0.1.0).
 
-Raw-dataset parsing (BSB/STEPBible/TSK -> PackSource) is a separate upstream step.
+Packs built into the same --out directory accumulate in ONE manifest.json, so the local Gate-1
+server can offer more than one translation (FR-102 compare / FR-103 search).
+
+Raw-dataset parsing (BSB/WEB/KJV/ASV USFM -> PackSource) is the upstream "parse:usfm" step:
+  parse-usfm --in <book.usfm|dir> --out <pack-source.json> --pack-id <id> --code <CODE>
 `;
 
 interface ParsedArgs {
@@ -344,6 +462,10 @@ interface ParsedArgs {
   out?: string;
   baseUrl: string;
   minAppVersion: string;
+  /** `--sample` fixture overrides, so a second translation can be built for FR-102/FR-103. */
+  packId?: string;
+  code?: string;
+  name?: string;
 }
 
 function parseArgs(argv: readonly string[]): ParsedArgs {
@@ -360,8 +482,28 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
     else if (flag === '--out' && value !== undefined) parsed.out = value;
     else if (flag === '--base-url' && value !== undefined) parsed.baseUrl = value;
     else if (flag === '--min-app-version' && value !== undefined) parsed.minAppVersion = value;
+    else if (flag === '--pack-id' && value !== undefined) parsed.packId = value;
+    else if (flag === '--code' && value !== undefined) parsed.code = value;
+    else if (flag === '--name' && value !== undefined) parsed.name = value;
   }
   return parsed;
+}
+
+/** Existing manifest entries in `outDir` (minus this pack), so repeated builds accumulate. */
+function mergeManifestEntries(outDir: string, entry: ManifestPackEntry): ManifestPackEntry[] {
+  const manifestPath = join(outDir, 'manifest.json');
+  let existing: ManifestPackEntry[] = [];
+  if (existsSync(manifestPath)) {
+    try {
+      const parsed = JSON.parse(readFileSync(manifestPath, 'utf8')) as Partial<PackManifest>;
+      if (Array.isArray(parsed.packs)) existing = parsed.packs;
+    } catch {
+      existing = [];
+    }
+  }
+  return [...existing.filter((candidate) => candidate.packId !== entry.packId), entry].sort((a, b) =>
+    a.packId.localeCompare(b.packId),
+  );
 }
 
 export function main(argv: readonly string[]): void {
@@ -369,7 +511,11 @@ export function main(argv: readonly string[]): void {
 
   let source: PackSource;
   if (args.sample) {
-    source = createSamplePackSource();
+    source = createSamplePackSource({
+      ...(args.packId !== undefined ? { packId: args.packId } : {}),
+      ...(args.code !== undefined ? { translationCode: args.code } : {}),
+      ...(args.name !== undefined ? { displayName: args.name } : {}),
+    });
   } else if (args.source !== undefined) {
     source = loadPackSource(args.source);
   } else {
@@ -388,13 +534,20 @@ export function main(argv: readonly string[]): void {
     baseUrl: args.baseUrl,
     minAppVersion: args.minAppVersion,
   });
-  const manifestPath = writeManifest(args.out, [artifacts.entry], source.metadata.builtAt);
+
+  // Merge into any manifest already in the output directory: the local Gate-1 server hosts several
+  // fixture packs at once (FR-102 compare / FR-103 search need more than one translation installed),
+  // so a build must not clobber the entries written by the previous one.
+  const entries = mergeManifestEntries(args.out, artifacts.entry);
+  const manifestPath = writeManifest(args.out, entries, source.metadata.builtAt);
 
   process.stdout.write(
     `pack-builder: built ${artifacts.sqlitePath} (${source.verses.length} verses, ` +
       `${artifacts.entry.uncompressedBytes} bytes)\n`,
   );
-  process.stdout.write(`pack-builder: wrote ${artifacts.gzPath} and ${manifestPath}\n`);
+  process.stdout.write(
+    `pack-builder: wrote ${artifacts.gzPath} and ${manifestPath} (${entries.length} pack(s))\n`,
+  );
 }
 
 // Only run the CLI when invoked directly (not when imported by tests).

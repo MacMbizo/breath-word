@@ -10,6 +10,13 @@ import { useCoreStore } from './useCoreStore';
 
 const DEFAULT_PACK_ID = 'core_bsb';
 
+/** FR-103 "testament filters" — `''` means no testament restriction. */
+const TESTAMENT_OPTIONS: readonly { readonly value: '' | 'OT' | 'NT'; readonly label: string }[] = [
+  { value: '', label: 'All' },
+  { value: 'OT', label: 'Old Testament' },
+  { value: 'NT', label: 'New Testament' },
+];
+
 const FIELD =
   'w-full rounded-md border border-hairline bg-surface px-md py-sm font-ui text-uiSm text-ink-primary outline-none focus:border-accent';
 
@@ -35,6 +42,7 @@ export function SearchView() {
   const [packId, setPackId] = useState(DEFAULT_PACK_ID);
   const [translationCode, setTranslationCode] = useState('');
   const [bookNumber, setBookNumber] = useState('');
+  const [testament, setTestament] = useState<'' | 'OT' | 'NT'>('');
   const [text, setText] = useState('');
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -46,6 +54,7 @@ export function SearchView() {
       text,
       translationCode: translation === '' ? undefined : translation,
       bookNumber: book === '' ? undefined : Number(book),
+      testament: testament === '' ? undefined : testament,
     });
   }
 
@@ -74,6 +83,20 @@ export function SearchView() {
             placeholder="45"
             onChange={(e) => setBookNumber(e.target.value)}
           />
+        </label>
+        <label className="flex w-40 flex-col gap-xxs font-ui text-uiXs text-ink-secondary">
+          Testament (opt.)
+          <select
+            className={FIELD}
+            value={testament}
+            onChange={(e) => setTestament(e.target.value as '' | 'OT' | 'NT')}
+          >
+            {TESTAMENT_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="flex min-w-64 flex-1 flex-col gap-xxs font-ui text-uiXs text-ink-secondary">
           Query (FTS5)

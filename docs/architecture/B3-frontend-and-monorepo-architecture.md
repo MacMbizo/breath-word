@@ -121,7 +121,7 @@ export interface PackInstallPaths {
 export interface PackInstallerAdapter {
   resolvePaths(packId: string, contentVersion: string): Promise<PackInstallPaths>;
   download(url: string, destPath: string, onProgress?: (receivedBytes: number) => void): Promise<void>;
-  readFileBytes(path: string): Promise<Uint8Array>;
+  sha256HexFile(path: string): Promise<string>;
   gunzip(srcGzPath: string, destPath: string): Promise<void>;
   fileSizeBytes(path: string): Promise<number>;
   removeFile(path: string): Promise<void>;
