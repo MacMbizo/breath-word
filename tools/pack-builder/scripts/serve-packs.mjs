@@ -46,15 +46,34 @@ function resolveRequestPath(url) {
   return filePath;
 }
 
+// The desktop WebView fetches packs straight from this server (`apps/desktop` download adapter),
+// and — unlike the React Native mobile client — browsers enforce CORS. Production serves the same
+// artifacts from R2 with an equivalent wildcard policy, so mirror it here to keep the FR-105
+// download path working in local dev.
+const CORS_HEADERS = {
+  'access-control-allow-origin': '*',
+};
+
 const server = createServer((req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, {
+      ...CORS_HEADERS,
+      'access-control-allow-methods': 'GET, HEAD, OPTIONS',
+      'access-control-allow-headers': '*',
+    });
+    res.end();
+    return;
+  }
+
   const filePath = resolveRequestPath(req.url);
   if (filePath === null || !existsSync(filePath) || !statSync(filePath).isFile()) {
-    res.writeHead(404, { 'content-type': 'text/plain' });
+    res.writeHead(404, { ...CORS_HEADERS, 'content-type': 'text/plain' });
     res.end(`not found: ${req.url ?? '/'}\n`);
     return;
   }
 
   res.writeHead(200, {
+    ...CORS_HEADERS,
     'content-type': CONTENT_TYPES[extname(filePath)] ?? 'application/octet-stream',
     'content-length': statSync(filePath).size,
   });

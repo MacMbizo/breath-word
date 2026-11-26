@@ -10,7 +10,7 @@
 // query in `packages/core/src/repositories` runs unchanged. PowerSync's own sync schema starts empty
 // and gains the synced tables when the Phase-2 sync layer is wired behind this same adapter.
 
-import { PowerSyncDatabase, Schema, type Transaction } from '@powersync/web';
+import { PowerSyncDatabase, Schema, WASQLiteVFS, type Transaction } from '@powersync/web';
 import {
   USER_DATA_DDL,
   USER_DATA_SCHEMA_VERSION,
@@ -64,7 +64,16 @@ function openDatabase(): Promise<PowerSyncDatabase> {
       const db = new PowerSyncDatabase({
         // Phase 1 is local-only; the synced-table schema + backend connector arrive in Phase 2.
         schema: new Schema({}),
-        database: { dbFilename: DB_FILENAME },
+        database: {
+          dbFilename: DB_FILENAME,
+          // ADR-002 / B3 §4.2 mandate WA-SQLite + OPFS on desktop. The SDK default is the IndexedDB
+          // `IDBBatchAtomicVFS` served from a *shared* worker, which violates the dual-SQLite storage
+          // decision (and leaves WebView2 reusing a stale shared worker across page reloads). OPFS
+          // VFSes require a dedicated worker; the desktop app is single-window, so multi-tab support
+          // is intentionally off.
+          vfs: WASQLiteVFS.SimpleOpfsVFS,
+          enableMultiTabs: false,
+        },
       });
       await db.init();
       await ensureSchema(db);
