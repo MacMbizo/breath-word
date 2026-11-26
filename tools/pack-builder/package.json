@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "pack:sample": "tsx src/build-pack.ts --sample --out out",
-    "pack:spike": "tsx src/build-pack.ts --sample --out out && tsx src/build-pack.ts --sample --out out --pack-id trans_kjv --code KJV",
+    "pack:spike": "tsx src/build-pack.ts --sample --out out && tsx src/build-pack.ts --sample --out out --pack-id trans_kjv --code KJV && tsx src/build-pack.ts --sample --out out --pack-id trans_web --code WEB",
     "parse:usfm": "tsx src/usfm.ts",
     "serve:packs": "node scripts/serve-packs.mjs"
   },
