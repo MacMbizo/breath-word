@@ -12,3 +12,15 @@ interface ReadableStore<T> {
 export function useCoreStore<T>(store: ReadableStore<T>): T {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
 }
+
+/**
+ * Subscribe to ONE slice of a headless store; re-renders only when that slice changes identity.
+ * The selector must return a stable reference (a store field, not a freshly built object).
+ */
+export function useCoreStoreSelector<T, S>(store: ReadableStore<T>, selector: (state: T) => S): S {
+  return useSyncExternalStore(
+    store.subscribe,
+    () => selector(store.getState()),
+    () => selector(store.getState()),
+  );
+}

@@ -1,10 +1,9 @@
-// Desktop shell (B3 §4.1): header, screen tabs and theme switch. Screens read the headless
-// core stores through React (see `useCoreStore`); this component owns only view state.
+// Desktop shell (B3 §4.1, design round 2026-11-28): the collapsible side panel and the active screen.
+// Screens read the headless core stores through React (see `useCoreStore`); this component owns
+// only view state. The theme (Parchment · Selah · Lamplight) is applied by `useDesktopTheme`.
 import { useEffect, useState } from 'react';
 
 import { motion, useReducedMotion } from 'framer-motion';
-
-import type { ThemeName } from '@breath-and-word/tokens';
 
 import { AccountView } from './AccountView';
 import { BreathRing } from './BreathRing';
@@ -16,46 +15,15 @@ import { PoolsView } from './PoolsView';
 import { PrayerSessionView } from './PrayerSessionView';
 import { ReaderView } from './ReaderView';
 import { SearchView } from './SearchView';
+import { SidePanel, type Tab } from './shell/SidePanel';
+import { useDesktopTheme } from './shell/useDesktopTheme';
 import { VaultView } from './VaultView';
-import { applyTheme, DEFAULT_THEME, THEMES } from './theme';
-
-type Tab =
-  | 'read'
-  | 'search'
-  | 'compare'
-  | 'library'
-  | 'breathe'
-  | 'pools'
-  | 'deck'
-  | 'pray'
-  | 'vault'
-  | 'habits'
-  | 'account';
-
-const TABS: readonly { readonly id: Tab; readonly label: string }[] = [
-  { id: 'read', label: 'Read' },
-  { id: 'search', label: 'Search' },
-  { id: 'compare', label: 'Compare' },
-  { id: 'library', label: 'Library' },
-  { id: 'breathe', label: 'Breathe' },
-  { id: 'pools', label: 'Pools' },
-  { id: 'deck', label: 'Deck' },
-  { id: 'pray', label: 'Guided' },
-  { id: 'vault', label: 'Vault' },
-  { id: 'habits', label: 'Habits' },
-  { id: 'account', label: 'Account' },
-];
 
 export function App() {
+  const theme = useDesktopTheme();
   const [tab, setTab] = useState<Tab>('read');
-  const [theme, setTheme] = useState<ThemeName>(DEFAULT_THEME);
   const [focusMode, setFocusMode] = useState(false);
   const reduceMotion = useReducedMotion();
-
-  function selectTheme(next: ThemeName) {
-    applyTheme(next);
-    setTheme(next);
-  }
 
   // FR-104 — Escape is the subtle exit gesture from Focus Mode (the discoverable control
   // lives in the reader itself); the listener only exists while Focus Mode is active.
@@ -84,43 +52,17 @@ export function App() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-canvas text-ink-primary">
-      <header className="flex items-center justify-between border-b border-hairline px-xl py-md">
-        <div className="flex items-center gap-lg">
-          <h1 className="font-ui text-uiLg font-semibold">Breath &amp; Word</h1>
-          <nav className="flex gap-xs">
-            {TABS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setTab(item.id)}
-                className={`rounded-pill px-lg py-xs font-ui text-uiSm transition ${
-                  tab === item.id ? 'bg-accent text-canvas' : 'text-ink-secondary hover:text-ink-primary'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-        <div className="flex items-center gap-xxs">
-          {THEMES.map((name) => (
-            <button
-              key={name}
-              type="button"
-              onClick={() => selectTheme(name)}
-              aria-pressed={theme === name}
-              className={`rounded-pill px-md py-xs font-ui text-uiXs capitalize transition ${
-                theme === name ? 'bg-elevated text-ink-primary' : 'text-ink-secondary hover:text-ink-primary'
-              }`}
-            >
-              {name}
-            </button>
-          ))}
-        </div>
-      </header>
-
-      <main className="flex-1 overflow-hidden px-xl py-lg">
+    <div className="flex h-full bg-canvas text-ink-primary">
+      <SidePanel
+        tab={tab}
+        onSelect={setTab}
+        onFocus={() => {
+          setTab('read');
+          setFocusMode(true);
+        }}
+        theme={theme}
+      />
+      <main className={`min-w-0 flex-1 overflow-hidden ${tab === 'read' ? '' : 'px-xl py-lg'}`}>
         <motion.div
           key={tab}
           initial={{ opacity: 0 }}
@@ -128,7 +70,7 @@ export function App() {
           transition={{ duration: reduceMotion === true ? 0 : 0.25 }}
           className="h-full"
         >
-          {tab === 'read' && <ReaderView onEnterFocus={() => setFocusMode(true)} />}
+          {tab === 'read' && <ReaderView />}
           {tab === 'search' && <SearchView />}
           {tab === 'compare' && <CompareView />}
           {tab === 'library' && <LibraryView />}

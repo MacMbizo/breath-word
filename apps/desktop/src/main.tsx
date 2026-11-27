@@ -35,7 +35,13 @@ if (container === null) {
 
 const root = createRoot(container);
 
-void bootDesktop().then(
+void bootDesktop()
+  .then(async (runtime) => {
+    // Saved appearance (theme, panel state, last passage) before first paint: no theme flash.
+    await runtime.stores.appearance.getState().load();
+    return runtime;
+  })
+  .then(
   (runtime) => {
     // FR-206 — start the account store once so an existing Supabase session (or a later sign-in)
     // drives the guest→account upgrade. Inert (`configured: false`) in an unprovisioned build.
