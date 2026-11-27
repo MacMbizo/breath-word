@@ -5,7 +5,7 @@
 import { Text, type StyleProp, type TextStyle } from 'react-native';
 
 import { isRtlOriginalLanguage, type OriginalLanguage } from '@breath-and-word/core';
-import { FONT_FAMILIES, LINE_HEIGHTS } from '@breath-and-word/tokens';
+import { FONT_FACES, LINE_HEIGHTS } from '@breath-and-word/tokens';
 
 const RLI = '⁧';
 const LRI = '⁦';
@@ -36,7 +36,7 @@ export function OriginalText({
     <Text
       style={[
         {
-          fontFamily: rtl ? FONT_FAMILIES.hebrew : FONT_FAMILIES.greek,
+          fontFamily: rtl ? FONT_FACES.hebrew.regular : FONT_FACES.greek.regular,
           fontSize: size,
           lineHeight: size * (rtl ? LINE_HEIGHTS.hebrew : LINE_HEIGHTS.greek),
           writingDirection: rtl ? 'rtl' : 'ltr',

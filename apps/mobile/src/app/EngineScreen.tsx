@@ -8,7 +8,7 @@
 // the vault. No SQL and no repository construction happen in this screen (AGENTS.md rule 1).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import {
   generatePrayerPrompt,
@@ -16,20 +16,12 @@ import {
   type PrayerPrompt,
   type PromptFramework,
 } from '@breath-and-word/core';
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  LINE_HEIGHTS,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { FONT_FACES, FONT_SIZES, LINE_HEIGHTS, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { BreathRing } from './BreathRing';
 import { useCoreRuntime } from './CoreRuntime';
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
-const THEME = COLORS.daylight;
 
 const FRAMEWORKS: readonly { key: PromptFramework; label: string }[] = [
   { key: 'LECTIO_DIVINA', label: 'Lectio Divina' },
@@ -49,6 +41,8 @@ const CATEGORIES: readonly { key: PrayerCategory; label: string }[] = [
 ];
 
 export function EngineScreen() {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const runtime = useCoreRuntime();
   const [userId, setUserId] = useState<string | null>(null);
   const [framework, setFramework] = useState<PromptFramework>('LECTIO_DIVINA');
@@ -236,6 +230,7 @@ interface ChipRowProps<T extends string> {
 }
 
 function ChipRow<T extends string>({ label, options, active, onSelect }: ChipRowProps<T>) {
+  const styles = useStyles();
   return (
     <View style={styles.field}>
       <Text style={styles.sectionLabel}>{label}</Text>
@@ -259,7 +254,7 @@ function ChipRow<T extends string>({ label, options, active, onSelect }: ChipRow
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   content: {
     gap: SPACING.lg,
     padding: SPACING.xl,
@@ -267,13 +262,13 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.canvas,
   },
   title: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
   field: { gap: SPACING.sm },
   sectionLabel: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
@@ -288,7 +283,7 @@ const styles = StyleSheet.create({
   },
   chipActive: { backgroundColor: THEME.accent.primary, borderColor: THEME.accent.primary },
   chipText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
@@ -301,7 +296,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME.border.subtle,
     backgroundColor: THEME.bg.surface,
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
@@ -316,31 +311,31 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.surface,
   },
   stageLabel: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiMd,
     color: THEME.accent.primary,
   },
   stagePrompt: {
-    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontFamily: FONT_FACES.scripture.regular,
     fontSize: FONT_SIZES.scriptureDefault,
     lineHeight: FONT_SIZES.scriptureDefault * LINE_HEIGHTS.scripture,
     color: THEME.text.primary,
   },
   progress: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.verseNum,
   },
   actions: { gap: SPACING.lg },
   finishBlock: { gap: SPACING.md },
   muted: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     lineHeight: FONT_SIZES.uiSm * LINE_HEIGHTS.ui,
     color: THEME.text.secondary,
   },
   offlineNote: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.verseNum,
   },
@@ -353,7 +348,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accent.primary,
   },
   primaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
   },
@@ -367,9 +362,9 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   secondaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   disabled: { opacity: 0.4 },
-});
+}));

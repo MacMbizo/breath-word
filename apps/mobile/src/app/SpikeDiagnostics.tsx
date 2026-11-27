@@ -10,7 +10,7 @@
 // SQLITE_BUSY / lock failure on either side (ADR-002 dual-SQLite separation, B4 §4.6).
 
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import {
   AppError,
@@ -23,19 +23,12 @@ import {
   parsePackManifest,
   utf8ToBytes,
 } from '@breath-and-word/core';
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { FONT_FACES, FONT_SIZES, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { packDownloadUrl, packManifestUrl } from '../config/pack-server';
 import { useCoreRuntime } from './CoreRuntime';
+import { makeStyles } from '../theme/ThemeProvider';
 
-const THEME = COLORS.daylight;
 
 /** Pack id emitted by `pack-builder --sample` (tools/pack-builder). */
 const SAMPLE_PACK_ID = 'core_bsb';
@@ -121,6 +114,7 @@ function toHex(bytes: Uint8Array): string {
 }
 
 export function SpikeDiagnostics() {
+  const styles = useStyles();
   const runtime = useCoreRuntime();
   const [busy, setBusy] = useState(false);
   const [lines, setLines] = useState<string[]>([]);
@@ -366,7 +360,7 @@ export function SpikeDiagnostics() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   screen: {
     flex: 1,
     gap: SPACING.lg,
@@ -375,12 +369,12 @@ const styles = StyleSheet.create({
   },
   header: { gap: SPACING.xs },
   title: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
   subtitle: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
@@ -394,7 +388,7 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: { opacity: 0.5 },
   primaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
     textAlign: 'center',
@@ -408,7 +402,7 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   secondaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
     textAlign: 'center',
@@ -422,13 +416,13 @@ const styles = StyleSheet.create({
   },
   logContent: { padding: SPACING.md, gap: SPACING.xs },
   logPlaceholder: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   logLine: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.primary,
   },
-});
+}));

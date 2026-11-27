@@ -7,3 +7,4 @@ export * from './sync-store';
 export * from './account-store';
 export * from './study-store';
 export * from './audio-store';
+export * from './appearance-store';

@@ -7,7 +7,7 @@ import { useLocalSearchParams } from 'expo-router';
 
 import { BOOKS } from '@breath-and-word/core';
 
-import { ReaderScreen, type ReaderStart } from '../src/app/ReaderScreen';
+import { ReaderScreen, type ReaderStart } from '../../src/app/ReaderScreen';
 
 const SAFE_PACK_ID = /^[a-z][a-z0-9_]*$/;
 const SAFE_TRANSLATION = /^[A-Z0-9]{2,12}$/;

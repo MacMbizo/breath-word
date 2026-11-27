@@ -7,6 +7,7 @@ export * from './vault-repository';
 export * from './identity-repository';
 export * from './esv-cache-repository';
 export * from './habits-repository';
+export * from './appearance-repository';
 export * from './exegesis-repository';
 export * from './study-refs-repository';
 export * from './inductive-study-repository';

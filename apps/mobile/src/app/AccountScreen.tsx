@@ -7,24 +7,18 @@
 // It reads only through `runtime.stores.account` — no SQL, no Supabase import here (AGENTS.md rule 1).
 
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  LINE_HEIGHTS,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { FONT_FACES, FONT_SIZES, LINE_HEIGHTS, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { useCoreRuntime } from './CoreRuntime';
 import { useCoreStore } from './useCoreStore';
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
-const THEME = COLORS.daylight;
 
 export function AccountScreen() {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const runtime = useCoreRuntime();
   const store = runtime.stores.account;
   const { configured, signedIn, session, upgrading, status, error, lastMigration } =
@@ -143,7 +137,7 @@ export function AccountScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   content: {
     gap: SPACING.lg,
     padding: SPACING.xl,
@@ -151,7 +145,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.canvas,
   },
   title: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
@@ -164,29 +158,29 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.surface,
   },
   sectionLabel: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
   body: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiMd,
     lineHeight: FONT_SIZES.uiMd * LINE_HEIGHTS.ui,
     color: THEME.text.primary,
   },
   muted: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     lineHeight: FONT_SIZES.uiSm * LINE_HEIGHTS.ui,
     color: THEME.text.secondary,
   },
   notice: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.accent.primary,
   },
   error: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.accent.primary,
   },
@@ -197,7 +191,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME.border.subtle,
     backgroundColor: THEME.bg.canvas,
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiMd,
     color: THEME.text.primary,
   },
@@ -210,7 +204,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accent.primary,
   },
   primaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
   },
@@ -224,14 +218,14 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   secondaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   disabled: { opacity: 0.5 },
   link: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.accent.primary,
   },
-});
+}));

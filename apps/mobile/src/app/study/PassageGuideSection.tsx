@@ -10,7 +10,9 @@ import { SPACING } from '@breath-and-word/tokens';
 import { useCoreRuntime } from '../CoreRuntime';
 import { useCoreStore } from '../useCoreStore';
 
-import { study, THEME } from './studyStyles';
+import { useTheme } from '../../theme/ThemeProvider';
+
+import { useStudy } from './studyStyles';
 
 export interface PassageGuideSectionProps {
   readonly startVerseId: number;
@@ -24,6 +26,7 @@ const MAP = { west: 12, east: 50, south: 22, north: 44 };
 const MAP_ASPECT = 140 / 240;
 
 function Locator({ latitude, longitude }: { latitude: number; longitude: number }) {
+  const { colors: THEME } = useTheme();
   const [width, setWidth] = useState(0);
   const height = width * MAP_ASPECT;
   const px = (lon: number) => ((lon - MAP.west) / (MAP.east - MAP.west)) * width;
@@ -54,6 +57,7 @@ function Locator({ latitude, longitude }: { latitude: number; longitude: number 
 }
 
 export function PassageGuideSection({ startVerseId, endVerseId, translationPackId, onOpenVerse }: PassageGuideSectionProps) {
+  const study = useStudy();
   const { stores } = useCoreRuntime();
   const { passageGuide, activeDossier, error } = useCoreStore(stores.study);
 

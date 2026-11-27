@@ -3,24 +3,16 @@
 // the store calls `ReaderRepository`, which owns the query.
 
 import { useState, type ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, View, type TextStyle } from 'react-native';
 
 import { formatCanonicalRange } from '@breath-and-word/core';
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  LINE_HEIGHTS,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { FONT_FACES, FONT_SIZES, LINE_HEIGHTS, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { useCoreRuntime } from './CoreRuntime';
 import { useCoreStore } from './useCoreStore';
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
 /** The default (daylight) theme; theme switching lands with the appearance settings. */
-const THEME = COLORS.daylight;
 
 const DEFAULT_PACK_ID = 'core_bsb';
 
@@ -32,10 +24,10 @@ const TESTAMENT_OPTIONS: readonly { readonly value: '' | 'OT' | 'NT'; readonly l
 ];
 
 /** Split an FTS5 `snippet(...)` on its `[[…]]` match markers, emphasising the matched terms. */
-function renderSnippet(snippet: string, keyPrefix: string): ReactNode[] {
+function renderSnippet(snippet: string, keyPrefix: string, matchStyle: TextStyle): ReactNode[] {
   return snippet.split(/(\[\[.*?\]\])/g).map((part, index) =>
     part.startsWith('[[') && part.endsWith(']]') ? (
-      <Text key={`${keyPrefix}-${index}`} style={styles.snippetMatch}>
+      <Text key={`${keyPrefix}-${index}`} style={matchStyle}>
         {part.slice(2, -2)}
       </Text>
     ) : (
@@ -45,6 +37,8 @@ function renderSnippet(snippet: string, keyPrefix: string): ReactNode[] {
 }
 
 export function SearchScreen() {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const runtime = useCoreRuntime();
   const { searchQuery, searchResults, searchStatus, searchError } = useCoreStore(runtime.stores.reader);
   const [packId, setPackId] = useState(DEFAULT_PACK_ID);
@@ -169,7 +163,7 @@ export function SearchScreen() {
                     </Text>
                     <Text style={styles.cardTranslation}>{hit.translationCode}</Text>
                   </View>
-                  <Text style={styles.verse}>{renderSnippet(hit.snippet, key)}</Text>
+                  <Text style={styles.verse}>{renderSnippet(hit.snippet, key, styles.snippetMatch)}</Text>
                 </View>
               );
             })}
@@ -180,7 +174,7 @@ export function SearchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   root: { flex: 1, backgroundColor: THEME.bg.canvas },
   header: {
     gap: SPACING.sm,
@@ -191,7 +185,7 @@ const styles = StyleSheet.create({
     borderBottomColor: THEME.border.subtle,
   },
   title: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
@@ -199,7 +193,7 @@ const styles = StyleSheet.create({
   refRow: { flexDirection: 'row', gap: SPACING.sm },
   refField: { flex: 1 },
   label: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
@@ -211,7 +205,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.surface,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
@@ -238,7 +232,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accent.primary,
   },
   segmentText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
@@ -246,7 +240,7 @@ const styles = StyleSheet.create({
     color: THEME.bg.canvas,
   },
   submitButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
   },
@@ -257,7 +251,7 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   summary: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
@@ -272,36 +266,36 @@ const styles = StyleSheet.create({
   },
   cardRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: SPACING.sm },
   cardReference: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
   cardTranslation: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
   verse: {
-    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontFamily: FONT_FACES.scripture.regular,
     fontSize: FONT_SIZES.scriptureDefault,
     lineHeight: FONT_SIZES.scriptureDefault * LINE_HEIGHTS.scripture,
     color: THEME.text.primary,
   },
   snippetMatch: {
-    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontFamily: FONT_FACES.scripture.regular,
     fontWeight: '700',
     color: THEME.text.primary,
     textDecorationLine: 'underline',
     textDecorationColor: THEME.accent.primary,
   },
   muted: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   error: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.redLetter,
   },
-});
+}));

@@ -10,12 +10,12 @@
 // FR-301 — when the pack carries `verse_word_alignments`, aligned English words are nested
 // pressable `<Text>` runs (they stay inline, so the paragraph still wraps as one) that open word
 // study for that word.
-import { StyleSheet, Text } from 'react-native';
+import { Text } from 'react-native';
 
 import { segmentSpanText, type VerseSpan, type VerseWordAlignment } from '@breath-and-word/core';
-import { COLORS, FONT_SIZES } from '@breath-and-word/tokens';
+import { FONT_SIZES } from '@breath-and-word/tokens';
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
-const THEME = COLORS.daylight;
 /** Two non-breaking spaces per nesting level (`\q2` indents one step past the base `\q1` line). */
 const POETRY_INDENT = '\u00A0\u00A0';
 
@@ -31,6 +31,8 @@ interface VerseSpansProps {
 }
 
 export function VerseSpans({ verseId, spans, onFootnotePress, alignments, onWordPress }: VerseSpansProps) {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   return (
     <>
       {spans.map((span, index) => {
@@ -102,9 +104,9 @@ export function VerseSpans({ verseId, spans, onFootnotePress, alignments, onWord
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   footnoteMarker: {
     fontSize: FONT_SIZES.uiXs,
     color: THEME.accent.primary,
   },
-});
+}));

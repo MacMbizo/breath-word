@@ -18,7 +18,7 @@ import { useCoreStore } from '../useCoreStore';
 
 import { BUTTON, PANEL_HEADING, PRIMARY_BUTTON } from './styles';
 
-const PAPER = COLORS.daylight;
+const PAPER = COLORS.parchment;
 /** Pen colours: the paper's ink plus the strong inductive hues (all from tokens). */
 const PENS: readonly { readonly label: string; readonly color: string }[] = [
   { label: 'Ink', color: PAPER.text.primary },

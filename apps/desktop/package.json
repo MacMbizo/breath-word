@@ -14,6 +14,11 @@
   "dependencies": {
     "@breath-and-word/core": "workspace:*",
     "@breath-and-word/tokens": "workspace:*",
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/gentium-book-plus": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/literata": "^5.3.0",
+    "@fontsource/noto-serif-hebrew": "^5.3.0",
     "@powersync/web": "^2.7.0",
     "@supabase/supabase-js": "^2.119.2",
     "@tauri-apps/api": "^2.12.5",

@@ -12,7 +12,6 @@ import {
   Pressable,
   ScrollView,
   Share,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -26,21 +25,13 @@ import type {
   PrayerPoolView,
   PoolVisibility,
 } from '@breath-and-word/core';
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  LINE_HEIGHTS,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { FONT_FACES, FONT_SIZES, LINE_HEIGHTS, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { useCoreRuntime } from './CoreRuntime';
 import { useCoreStore } from './useCoreStore';
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
 /** The default (daylight) theme; theme switching lands with the appearance settings. */
-const THEME = COLORS.daylight;
 
 const CATEGORIES: readonly PrayerCategory[] = [
   'ANXIETY',
@@ -63,6 +54,8 @@ const CATEGORY_LABELS: Record<PrayerCategory, string> = {
 };
 
 export function PoolsScreen() {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const runtime = useCoreRuntime();
   const {
     pools,
@@ -291,6 +284,7 @@ export function PoolsScreen() {
 }
 
 function PoolCard({ pool, onOpen }: { pool: PrayerPoolView; onOpen: (id: string) => void }) {
+  const styles = useStyles();
   return (
     <Pressable
       onPress={() => onOpen(pool.id)}
@@ -327,6 +321,7 @@ function ItemCard({
   onArchive: () => void;
   onEditNote: () => void;
 }) {
+  const styles = useStyles();
   const answered = item.answeredAt !== undefined;
   return (
     <View style={styles.card}>
@@ -364,6 +359,7 @@ function ShareCodePanel({
   onGenerate: () => void;
   onShare: (code: string) => void;
 }) {
+  const styles = useStyles();
   const busy = status === 'loading';
   return (
     <View style={styles.sharePanel}>
@@ -405,6 +401,7 @@ function ShareCodePanel({
 }
 
 function ActionChip({ label, onPress, disabled }: { label: string; onPress: () => void; disabled?: boolean }) {
+  const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
@@ -427,6 +424,8 @@ function CreatePoolModal({
   onClose: () => void;
   onCreate: (input: { title: string; category: PrayerCategory; visibility: PoolVisibility }) => void;
 }) {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<PrayerCategory>('GUIDANCE');
   const [visibility, setVisibility] = useState<PoolVisibility>('PRIVATE');
@@ -499,6 +498,8 @@ function JoinPoolModal({
   onClose: () => void;
   onJoin: (code: string) => void;
 }) {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const [code, setCode] = useState('');
 
   useEffect(() => {
@@ -562,6 +563,8 @@ function NoteModal({
   onClose: () => void;
   onSave: (note: string) => void;
 }) {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const [note, setNote] = useState('');
 
   useEffect(() => {
@@ -610,6 +613,7 @@ function ChipRow<T extends string>({
   labelFor: (value: T) => string;
   onSelect: (value: T) => void;
 }) {
+  const styles = useStyles();
   return (
     <View style={styles.chipRow}>
       {options.map((option) => {
@@ -629,7 +633,7 @@ function ChipRow<T extends string>({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   root: { flex: 1, backgroundColor: THEME.bg.canvas },
   header: {
     paddingHorizontal: SPACING.xl,
@@ -641,7 +645,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   title: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
@@ -662,12 +666,12 @@ const styles = StyleSheet.create({
   cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   cardTitle: {
     flexShrink: 1,
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiMd,
     color: THEME.text.primary,
   },
   cardMeta: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
@@ -678,23 +682,23 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.elevated,
   },
   badgeText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
   passage: {
-    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontFamily: FONT_FACES.scripture.regular,
     fontSize: FONT_SIZES.uiMd,
     lineHeight: FONT_SIZES.uiMd * LINE_HEIGHTS.scripture,
     color: THEME.text.primary,
   },
   note: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   answered: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.accent.primary,
   },
@@ -709,7 +713,7 @@ const styles = StyleSheet.create({
   },
   actionChipDisabled: { opacity: 0.4 },
   actionChipText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.primary,
   },
@@ -721,7 +725,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accent.primary,
   },
   primaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
   },
@@ -734,17 +738,17 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   outlineButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   muted: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   error: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.redLetter,
   },
@@ -759,12 +763,12 @@ const styles = StyleSheet.create({
   },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   modalTitle: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
   fieldLabel: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
@@ -777,7 +781,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.surface,
   },
   shareCode: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     letterSpacing: 3,
     color: THEME.text.primary,
@@ -790,7 +794,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME.border.subtle,
     backgroundColor: THEME.bg.canvas,
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
@@ -806,9 +810,9 @@ const styles = StyleSheet.create({
   },
   chipActive: { backgroundColor: THEME.accent.primary, borderColor: THEME.accent.primary },
   chipText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
   chipTextActive: { color: THEME.bg.canvas },
-});
+}));

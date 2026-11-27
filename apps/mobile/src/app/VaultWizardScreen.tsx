@@ -7,25 +7,17 @@
 // store; the DEK is never surfaced, and no repository or SQL is touched here (AGENTS.md rule 1).
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import { Canvas, Path, Skia } from '@shopify/react-native-skia';
 
 import { generateRecoveryQr } from '@breath-and-word/core';
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  LINE_HEIGHTS,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { COLORS, FONT_FACES, FONT_SIZES, LINE_HEIGHTS, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { useCoreRuntime } from './CoreRuntime';
 import { useCoreStore } from './useCoreStore';
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
-const THEME = COLORS.daylight;
 
 type WizardStep = 'intro' | 'passphrase' | 'recovery' | 'done';
 
@@ -35,8 +27,8 @@ function recoveryKeyBlocks(display: string): string[] {
 }
 
 // A QR code must keep dark-on-light contrast to stay scannable, so its plate ignores the
-// active theme and always uses the daylight surface/ink (B6 §4.2 — offline generation).
-const QR_PLATE = COLORS.daylight;
+// active theme and always uses the light parchment surface/ink (B6 §4.2 — offline generation).
+const QR_PLATE = COLORS.parchment;
 const QR_SIZE_PX = 220;
 /** Modules of quiet zone the spec requires around a QR code (ISO/IEC 18004). */
 const QR_QUIET_ZONE = 2;
@@ -47,6 +39,7 @@ const QR_QUIET_ZONE = 2;
  * generated entirely offline and can be scanned straight into a secondary device.
  */
 function RecoveryQrCode({ display }: { display: string }) {
+  const styles = useStyles();
   const path = useMemo(() => {
     const { matrix, size } = generateRecoveryQr(display);
     const total = size + QR_QUIET_ZONE * 2;
@@ -79,6 +72,8 @@ function RecoveryQrCode({ display }: { display: string }) {
 }
 
 export function VaultWizardScreen() {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const runtime = useCoreRuntime();
   const { status, error, enabled, unlocked, recoveryKeyDisplay, biometricEnabled } = useCoreStore(
     runtime.stores.vault,
@@ -338,7 +333,7 @@ function busy(status: string): boolean {
   return status === 'loading';
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   content: {
     gap: SPACING.lg,
     padding: SPACING.xl,
@@ -346,12 +341,12 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.canvas,
   },
   title: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
   lede: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     lineHeight: FONT_SIZES.uiSm * LINE_HEIGHTS.ui,
     color: THEME.text.secondary,
@@ -365,12 +360,12 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.surface,
   },
   sectionLabel: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
   warn: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     lineHeight: FONT_SIZES.uiSm * LINE_HEIGHTS.ui,
     color: THEME.text.redLetter,
@@ -389,7 +384,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     borderRadius: RADII.sm,
     backgroundColor: THEME.bg.elevated,
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiMd,
     color: THEME.text.primary,
     textAlign: 'center',
@@ -409,7 +404,7 @@ const styles = StyleSheet.create({
   },
   checkboxOn: { backgroundColor: THEME.accent.primary, borderColor: THEME.accent.primary },
   checkLabel: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
@@ -421,13 +416,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME.border.subtle,
     backgroundColor: THEME.bg.canvas,
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
   actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: SPACING.sm },
   error: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.redLetter,
   },
@@ -440,7 +435,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accent.primary,
   },
   primaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
   },
@@ -454,9 +449,9 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   secondaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   disabled: { opacity: 0.4 },
-});
+}));

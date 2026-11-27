@@ -11,17 +11,23 @@ export default {
         canvas: 'var(--bw-bg-canvas)',
         surface: 'var(--bw-bg-surface)',
         elevated: 'var(--bw-bg-elevated)',
+        sunken: 'var(--bw-bg-sunken)',
         ink: {
           primary: 'var(--bw-text-primary)',
           secondary: 'var(--bw-text-secondary)',
           verse: 'var(--bw-text-verse-num)',
           red: 'var(--bw-text-red-letter)',
+          'on-accent': 'var(--bw-text-on-accent)',
         },
         accent: {
           DEFAULT: 'var(--bw-accent-primary)',
           breath: 'var(--bw-accent-breath-glow)',
+          wash: 'var(--bw-accent-wash)',
+          'on-wash': 'var(--bw-accent-on-wash)',
+          rubric: 'var(--bw-accent-rubric)',
         },
         hairline: 'var(--bw-border-subtle)',
+        'hairline-strong': 'var(--bw-border-strong)',
       },
       spacing: {
         none: 'var(--bw-space-none)',
@@ -53,6 +59,7 @@ export default {
       fontFamily: {
         scripture: 'var(--bw-font-scripture)',
         ui: 'var(--bw-font-ui)',
+        display: 'var(--bw-font-display)',
         hebrew: 'var(--bw-font-hebrew)',
         greek: 'var(--bw-font-greek)',
       },

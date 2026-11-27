@@ -10,6 +10,19 @@ import { CoreRuntimeProvider } from './app/CoreRuntime';
 import { applyTheme, DEFAULT_THEME } from './app/theme';
 import { bootDesktop } from './boot';
 
+// D1 §4.4 — bundled OFL fonts (no runtime fetch): Literata, Inter, Cormorant Garamond, Gentium, Noto Serif Hebrew.
+import '@fontsource/literata/400.css';
+import '@fontsource/literata/400-italic.css';
+import '@fontsource/literata/500.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/cormorant-garamond/500-italic.css';
+import '@fontsource/cormorant-garamond/600.css';
+import '@fontsource/gentium-book-plus/400.css';
+import '@fontsource/gentium-book-plus/400-italic.css';
+import '@fontsource/noto-serif-hebrew/400.css';
 import './styles.css';
 
 // Write the D1 token variables before first paint so there is no unstyled flash.

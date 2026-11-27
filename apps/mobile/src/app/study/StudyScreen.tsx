@@ -14,7 +14,9 @@ import { useCoreRuntime } from '../CoreRuntime';
 import { InductiveSection } from './InductiveSection';
 import { InkSketch } from './InkSketch';
 import { PassageGuideSection } from './PassageGuideSection';
-import { study, THEME } from './studyStyles';
+import { useTheme } from '../../theme/ThemeProvider';
+
+import { useStudy } from './studyStyles';
 import { useCurrentUserId } from './useCurrentUserId';
 import { WordStudySection, type WordFocus } from './WordStudySection';
 
@@ -36,6 +38,8 @@ export interface StudyScreenProps {
 }
 
 export function StudyScreen({ initialVerseId, packId, translationCode, initialWordFocus = null }: StudyScreenProps) {
+  const study = useStudy();
+  const { colors: THEME } = useTheme();
   const runtime = useCoreRuntime();
   const router = useRouter();
   const userId = useCurrentUserId();

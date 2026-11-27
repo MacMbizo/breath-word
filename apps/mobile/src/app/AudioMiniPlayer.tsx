@@ -8,7 +8,9 @@ import { MAX_PLAYBACK_RATE, MIN_PLAYBACK_RATE, type AmbientTrackId } from '@brea
 import { SPACING } from '@breath-and-word/tokens';
 
 import { useCoreRuntime } from './CoreRuntime';
-import { study, THEME } from './study/studyStyles';
+import { useTheme } from '../theme/ThemeProvider';
+
+import { useStudy } from './study/studyStyles';
 import { useCoreStore } from './useCoreStore';
 
 const AMBIENT: readonly { readonly id: AmbientTrackId; readonly label: string }[] = [
@@ -22,6 +24,7 @@ const SLEEP: readonly (number | null)[] = [null, 15, 30, 60];
 const VOLUME_STEP = 0.1;
 
 function Stepper({ label, value, onChange }: { label: string; value: number; onChange: (next: number) => void }) {
+  const study = useStudy();
   return (
     <View style={study.row} accessibilityLabel={`${label} ${Math.round(value * 100)} percent`}>
       <Text style={study.muted}>{label}</Text>
@@ -55,6 +58,8 @@ export interface AudioMiniPlayerProps {
 }
 
 export function AudioMiniPlayer({ packId, translationCode, bookNumber, chapter, reference }: AudioMiniPlayerProps) {
+  const study = useStudy();
+  const { colors: THEME } = useTheme();
   const { stores } = useCoreRuntime();
   const audio = useCoreStore(stores.audio);
   const [expanded, setExpanded] = useState(false);

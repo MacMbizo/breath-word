@@ -3,18 +3,20 @@
 // from `SPACING`/`RADII`. Nothing here hard-codes a value.
 
 import {
+  DEFAULT_THEME,
   FONT_FAMILIES,
   FONT_SIZES,
   RADII,
   SPACING,
+  THEME_NAMES,
   themeToCssVariables,
   type ThemeName,
 } from '@breath-and-word/tokens';
 
-export const DEFAULT_THEME: ThemeName = 'parchment';
+export { DEFAULT_THEME };
 
-/** The four D1 §4.2 Sacred Editorial Calm themes, in toggle order. */
-export const THEMES: readonly ThemeName[] = ['daylight', 'parchment', 'midnight', 'sanctuary'];
+/** The three D1 §4.2 themes (Parchment · Selah · Lamplight), in picker order. */
+export const THEMES: readonly ThemeName[] = THEME_NAMES;
 
 /** Write one theme's colours plus the shared font/spacing/radius scales onto a root element. */
 export function applyTheme(theme: ThemeName, root: HTMLElement = document.documentElement): void {
@@ -23,6 +25,8 @@ export function applyTheme(theme: ThemeName, root: HTMLElement = document.docume
   }
   root.style.setProperty('--bw-font-scripture', FONT_FAMILIES.scriptureSerif);
   root.style.setProperty('--bw-font-ui', FONT_FAMILIES.ui);
+  root.style.setProperty('--bw-font-display', FONT_FAMILIES.display);
+  root.style.colorScheme = themeToCssVariables(theme)['--bw-color-scheme'] ?? 'light';
   root.style.setProperty('--bw-font-hebrew', FONT_FAMILIES.hebrew);
   root.style.setProperty('--bw-font-greek', FONT_FAMILIES.greek);
   for (const [key, value] of Object.entries(FONT_SIZES)) {

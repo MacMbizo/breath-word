@@ -1,7 +1,7 @@
 // FR-305 (mobile) — portable vector ink canvas on Skia, driven by a gesture-handler Pan (finger or
 // Apple Pencil / stylus, with pressure when the device reports it). Points are normalized 0..1000
 // (ADR-003) and rendered through the same core path/width helpers desktop uses, on the same fixed 4:3
-// daylight paper plate, so a sketch keeps identical proportions on every device it syncs to.
+// paper plate, so a sketch keeps identical proportions on every device it syncs to.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, Text, View, type LayoutChangeEvent } from 'react-native';
 
@@ -20,9 +20,12 @@ import { COLORS, INDUCTIVE_HIGHLIGHTS, MIN_TOUCH_TARGET, RADII } from '@breath-a
 import { useCoreRuntime } from '../CoreRuntime';
 import { useCoreStore } from '../useCoreStore';
 
-import { study, THEME } from './studyStyles';
+import { useTheme } from '../../theme/ThemeProvider';
 
-const PAPER = COLORS.daylight;
+import { useStudy } from './studyStyles';
+
+/** Ink is always drawn on the same light paper plate, whatever the reading theme. */
+const PAPER = COLORS.parchment;
 const PENS: readonly { readonly label: string; readonly color: string }[] = [
   { label: 'Ink', color: PAPER.text.primary },
   { label: 'Red', color: INDUCTIVE_HIGHLIGHTS.COMMAND.darkWash },
@@ -51,6 +54,8 @@ export interface InkSketchProps {
 }
 
 export function InkSketch({ userId, verseId, reference }: InkSketchProps) {
+  const study = useStudy();
+  const { colors: THEME } = useTheme();
   const { stores } = useCoreRuntime();
   const { inkCanvases, error } = useCoreStore(stores.study);
   const [width, setWidth] = useState(0);

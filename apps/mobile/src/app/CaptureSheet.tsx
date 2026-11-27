@@ -6,23 +6,15 @@
 // headless prayer store (AGENTS.md rule 1) — no repository is constructed and no SQL here.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 import type { Chapter, PrayerPoolView } from '@breath-and-word/core';
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  LINE_HEIGHTS,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { FONT_FACES, FONT_SIZES, LINE_HEIGHTS, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { useCoreRuntime } from './CoreRuntime';
 import { useCoreStore } from './useCoreStore';
+import { makeStyles } from '../theme/ThemeProvider';
 
-const THEME = COLORS.daylight;
 
 export interface CaptureSheetProps {
   readonly visible: boolean;
@@ -34,6 +26,7 @@ export interface CaptureSheetProps {
 }
 
 export function CaptureSheet({ visible, onClose, chapter, reference }: CaptureSheetProps) {
+  const styles = useStyles();
   const runtime = useCoreRuntime();
   const { pools, poolsStatus } = useCoreStore(runtime.stores.prayer);
   const [userId, setUserId] = useState<string | null>(null);
@@ -208,6 +201,7 @@ function PoolChip({
   active: boolean;
   onPress: () => void;
 }) {
+  const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
@@ -229,7 +223,7 @@ function userDefinitelyNull(
   return userId === null || poolId === null || chapter === null;
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   modalBackdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: THEME.bg.elevated },
   modalSheet: {
     maxHeight: '85%',
@@ -242,12 +236,12 @@ const styles = StyleSheet.create({
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   modalTitle: {
     flexShrink: 1,
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
   sectionLabel: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
@@ -264,13 +258,13 @@ const styles = StyleSheet.create({
   },
   verseChipActive: { backgroundColor: THEME.accent.primary, borderColor: THEME.accent.primary },
   verseChipText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
   verseChipTextActive: { color: THEME.bg.canvas },
   preview: {
-    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontFamily: FONT_FACES.scripture.regular,
     fontSize: FONT_SIZES.uiMd,
     lineHeight: FONT_SIZES.uiMd * LINE_HEIGHTS.scripture,
     color: THEME.text.secondary,
@@ -286,7 +280,7 @@ const styles = StyleSheet.create({
   },
   chipActive: { backgroundColor: THEME.accent.primary, borderColor: THEME.accent.primary },
   chipText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
@@ -299,7 +293,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accent.primary,
   },
   primaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
   },
@@ -312,14 +306,14 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   outlineButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   muted: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   disabled: { opacity: 0.4 },
-});
+}));

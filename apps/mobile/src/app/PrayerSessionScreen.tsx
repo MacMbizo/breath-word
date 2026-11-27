@@ -9,19 +9,10 @@
 // no repository is constructed and no SQL is written here.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { Modal, Pressable, Text, TextInput, useWindowDimensions, View } from 'react-native';
 
 import type { PrayerPoolView } from '@breath-and-word/core';
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  LINE_HEIGHTS,
-  MIN_TOUCH_TARGET,
-  MOTION_SPRINGS,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { FONT_FACES, FONT_SIZES, LINE_HEIGHTS, MIN_TOUCH_TARGET, MOTION_SPRINGS, RADII, SPACING } from '@breath-and-word/tokens';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   Extrapolation,
@@ -36,8 +27,8 @@ import Animated, {
 
 import { useCoreRuntime } from './CoreRuntime';
 import { useCoreStore } from './useCoreStore';
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
-const THEME = COLORS.daylight;
 
 /** FR-203 — the deck session length (5 minutes). */
 const SESSION_SECONDS = 5 * 60;
@@ -51,6 +42,8 @@ const MAX_TILT_DEG = 12;
 type SwipeDirection = 'prayed' | 'skipped';
 
 export function PrayerSessionScreen() {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const runtime = useCoreRuntime();
   const { pools, rotationQueue, rotationStatus } = useCoreStore(runtime.stores.prayer);
   const [userId, setUserId] = useState<string | null>(null);
@@ -253,6 +246,7 @@ export function PrayerSessionScreen() {
 }
 
 function PoolButton({ pool, onPress }: { pool: PrayerPoolView; onPress: () => void }) {
+  const styles = useStyles();
   return (
     <Pressable onPress={onPress} accessibilityRole="button" style={styles.poolButton}>
       <Text style={styles.poolButtonTitle}>{pool.title}</Text>
@@ -276,6 +270,7 @@ interface DeckCardProps {
  * JS thread (which reveals the next card).
  */
 function DeckCard({ reference, text, note, prayCount, onSwiped, onAnswer }: DeckCardProps) {
+  const styles = useStyles();
   const { width } = useWindowDimensions();
   const reduceMotion = useReducedMotion() === true;
   const translateX = useSharedValue(0);
@@ -359,7 +354,7 @@ function DeckCard({ reference, text, note, prayCount, onSwiped, onAnswer }: Deck
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   root: {
     flex: 1,
     gap: SPACING.lg,
@@ -368,12 +363,12 @@ const styles = StyleSheet.create({
   },
   header: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   title: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
   clock: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
@@ -390,18 +385,18 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.surface,
   },
   cardReference: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiMd,
     color: THEME.text.primary,
   },
   cardText: {
-    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontFamily: FONT_FACES.scripture.regular,
     fontSize: FONT_SIZES.scriptureDefault,
     lineHeight: FONT_SIZES.scriptureDefault * LINE_HEIGHTS.scripture,
     color: THEME.text.primary,
   },
   cardNote: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     lineHeight: FONT_SIZES.uiSm * LINE_HEIGHTS.ui,
     color: THEME.text.secondary,
@@ -409,7 +404,7 @@ const styles = StyleSheet.create({
   cardFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   hintRow: { flexDirection: 'row', justifyContent: 'space-between' },
   hint: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.verseNum,
   },
@@ -422,13 +417,13 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   answerButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   summary: { gap: SPACING.lg, alignItems: 'flex-start' },
   summaryTitle: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiMd,
     color: THEME.text.primary,
   },
@@ -444,12 +439,12 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.surface,
   },
   poolButtonTitle: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
   muted: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
@@ -462,7 +457,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accent.primary,
   },
   primaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
   },
@@ -476,7 +471,7 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   secondaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
@@ -493,7 +488,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.surface,
   },
   modalTitle: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
@@ -504,9 +499,9 @@ const styles = StyleSheet.create({
     borderRadius: RADII.md,
     borderWidth: 1,
     borderColor: THEME.border.subtle,
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
     textAlignVertical: 'top',
   },
-});
+}));

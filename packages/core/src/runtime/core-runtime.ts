@@ -14,6 +14,7 @@ import { AudioRepository } from '../repositories/audio-repository';
 import { EsvCacheRepository } from '../repositories/esv-cache-repository';
 import { ExegesisRepository } from '../repositories/exegesis-repository';
 import { HabitsRepository } from '../repositories/habits-repository';
+import { AppearanceRepository } from '../repositories/appearance-repository';
 import { IdentityRepository } from '../repositories/identity-repository';
 import { InductiveStudyRepository } from '../repositories/inductive-study-repository';
 import { InkCanvasRepository } from '../repositories/ink-canvas-repository';
@@ -28,6 +29,7 @@ import { NoteSearchIndex } from '../search/note-search';
 import { createLocalOnlySyncAdapter } from '../sync';
 import { createAccountStore, type AccountStore } from '../stores/account-store';
 import { createAudioStore, type AudioStore } from '../stores/audio-store';
+import { createAppearanceStore, type AppearanceStore } from '../stores/appearance-store';
 import { createPackStore, type PackStore } from '../stores/pack-store';
 import { createPrayerStore, type PrayerStore } from '../stores/prayer-store';
 import { createReaderStore, type ReaderStore } from '../stores/reader-store';
@@ -55,6 +57,7 @@ export interface CoreRepositories {
   readonly esv: EsvCacheRepository;
   /** FR-107 — kind habit loop (non-punitive streak + gentle resume copy) and reminder schedule. */
   readonly habits: HabitsRepository;
+  readonly appearance: AppearanceRepository;
   /** FR-301 / FR-302 / FR-103 — interlinear, Strong's lookup, lexicons, word frequency. */
   readonly exegesis: ExegesisRepository;
   /** FR-303 — weighted TSK cross-references, Passage Guide, Theographic Factbook dossiers. */
@@ -69,6 +72,8 @@ export interface CoreRepositories {
 
 /** Headless Zustand stores the UI subscribes to (B3 §4.1 `stores/`, §4.2 rule 2). */
 export interface CoreStores {
+  /** D1 §4.2 — device-local theme, word view, text size and desktop panel state. */
+  readonly appearance: AppearanceStore;
   /** FR-101..103 — current chapter, parallel compare columns and search results. */
   readonly reader: ReaderStore;
   /** FR-105 — installed packs, offline storage total and install progress. */
@@ -171,6 +176,7 @@ export function initCoreRuntime(options: InitCoreRuntimeOptions): CoreRuntime {
     vault,
     esv: new EsvCacheRepository({ localDevice: adapters.localDevice, ...clock }),
     habits: new HabitsRepository({ localDevice: adapters.localDevice, ...clock }),
+    appearance: new AppearanceRepository({ localDevice: adapters.localDevice, ...clock }),
     exegesis: new ExegesisRepository({
       contentDb: adapters.contentDb,
       ...exegesisOpt,
@@ -201,6 +207,7 @@ export function initCoreRuntime(options: InitCoreRuntimeOptions): CoreRuntime {
 
   const vaultStore = createVaultStore(repositories.vault, { noteSearch });
   const stores: CoreStores = {
+    appearance: createAppearanceStore(repositories.appearance),
     reader: createReaderStore(repositories.reader),
     packs: createPackStore(repositories.packs),
     prayer: createPrayerStore(repositories.prayer, adapters.poolShare ?? null),

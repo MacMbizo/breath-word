@@ -10,7 +10,9 @@ import { useCoreRuntime } from '../CoreRuntime';
 import { useCoreStore } from '../useCoreStore';
 
 import { languageFromStrongs, OriginalText } from './OriginalText';
-import { study, THEME } from './studyStyles';
+import { useTheme } from '../../theme/ThemeProvider';
+
+import { useStudy } from './studyStyles';
 
 /** FR-301 — an English word tapped in the reader. */
 export interface WordFocus {
@@ -29,6 +31,8 @@ export interface WordStudySectionProps {
 }
 
 export function WordStudySection({ verseId, reference, wordFocus = null, onOpenVerse }: WordStudySectionProps) {
+  const study = useStudy();
+  const { colors: THEME } = useTheme();
   const { stores } = useCoreRuntime();
   const { verseTokens, activeLexicon, wordFrequency, status, error } = useCoreStore(stores.study);
   const [selected, setSelected] = useState<InterlinearToken | null>(null);

@@ -9,22 +9,14 @@
 // (AGENTS.md rule 1).
 
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, ScrollView, Switch, Text, View } from 'react-native';
 
 import { ESV_CACHE_MAX_VERSES, type HabitSummary, type ReminderSchedule } from '@breath-and-word/core';
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  LINE_HEIGHTS,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { FONT_FACES, FONT_SIZES, LINE_HEIGHTS, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { useCoreRuntime } from './CoreRuntime';
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
-const THEME = COLORS.daylight;
 
 /** The user's local calendar day as `YYYY-MM-DD` (FR-107 day keys). */
 function localDayKey(date = new Date()): string {
@@ -35,6 +27,8 @@ function localDayKey(date = new Date()): string {
 }
 
 export function HabitsScreen() {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const runtime = useCoreRuntime();
   const [schedule, setSchedule] = useState<ReminderSchedule | null>(null);
   const [summary, setSummary] = useState<HabitSummary | null>(null);
@@ -164,6 +158,7 @@ interface StepperProps {
 }
 
 function Stepper({ label, onMinus, onPlus }: StepperProps) {
+  const styles = useStyles();
   return (
     <View style={styles.stepper}>
       <Text style={styles.stepperLabel}>{label}</Text>
@@ -179,7 +174,7 @@ function Stepper({ label, onMinus, onPlus }: StepperProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   content: {
     gap: SPACING.lg,
     padding: SPACING.xl,
@@ -187,7 +182,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.canvas,
   },
   title: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
@@ -200,20 +195,20 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg.surface,
   },
   sectionLabel: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
   reminderRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.lg },
   time: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
   stepperRow: { flexDirection: 'row', gap: SPACING.xl },
   stepper: { gap: SPACING.sm },
   stepperLabel: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
@@ -228,30 +223,30 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   stepButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiMd,
     color: THEME.text.primary,
   },
   streak: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiMd,
     lineHeight: FONT_SIZES.uiMd * LINE_HEIGHTS.ui,
     color: THEME.text.primary,
   },
   resume: {
-    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontFamily: FONT_FACES.scripture.regular,
     fontSize: FONT_SIZES.uiMd,
     lineHeight: FONT_SIZES.uiMd * LINE_HEIGHTS.scripture,
     color: THEME.text.secondary,
   },
   muted: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     lineHeight: FONT_SIZES.uiSm * LINE_HEIGHTS.ui,
     color: THEME.text.secondary,
   },
   notice: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.accent.primary,
   },
@@ -265,7 +260,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accent.primary,
   },
   primaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
   },
@@ -279,8 +274,8 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   secondaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
-});
+}));

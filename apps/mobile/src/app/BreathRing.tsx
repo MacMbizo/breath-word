@@ -7,21 +7,13 @@
 // ring still while the phase cue still advances. Pure UI: no core store, repository, or SQL.
 
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Canvas, Circle } from '@shopify/react-native-skia';
 import { Easing, useReducedMotion, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import {
-  BREATH_EASING,
-  BREATH_TIMING,
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { BREATH_EASING, BREATH_TIMING, FONT_FACES, FONT_SIZES, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
 type BreathPhase = 'inhale' | 'hold-in' | 'exhale' | 'hold-out';
 
@@ -36,7 +28,6 @@ interface BreathStep {
 type BreathCycle = readonly [BreathStep, BreathStep, BreathStep, BreathStep];
 
 /** The default (daylight) theme; theme switching lands with the appearance settings. */
-const THEME = COLORS.daylight;
 
 /** Motion `easing` from the D1 sine-in-out control points (`BREATH_EASING.bezier`). */
 const EASE = Easing.bezier(
@@ -88,6 +79,8 @@ function buildBreathCycle(): BreathCycle {
 }
 
 export function BreathRing() {
+  const styles = useStyles();
+  const { colors: THEME } = useTheme();
   const reduceMotion = useReducedMotion() === true;
   const cycle = useMemo(buildBreathCycle, []);
   const [running, setRunning] = useState(true);
@@ -189,7 +182,7 @@ export function BreathRing() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   screen: {
     flex: 1,
     alignItems: 'center',
@@ -200,12 +193,12 @@ const styles = StyleSheet.create({
   },
   header: { alignItems: 'center', gap: SPACING.xs },
   title: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
   subtitle: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
     textAlign: 'center',
@@ -219,12 +212,12 @@ const styles = StyleSheet.create({
   canvas: { width: RING_SIZE_PX, height: RING_SIZE_PX },
   cue: { position: 'absolute', alignItems: 'center', gap: SPACING.xxs },
   phaseLabel: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiMd,
     color: THEME.text.primary,
   },
   phaseSeconds: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
@@ -237,7 +230,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accent.primary,
   },
   primaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
     textAlign: 'center',
@@ -251,21 +244,21 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   secondaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
     textAlign: 'center',
   },
   breathCount: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   note: {
     maxWidth: 320,
     textAlign: 'center',
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
-});
+}));

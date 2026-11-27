@@ -21,8 +21,8 @@ function recoveryKeyBlocks(display: string): string[] {
 }
 
 // A QR code must keep dark-on-light contrast to stay scannable, so its plate ignores the active
-// theme and always uses the daylight surface/ink (B6 §4.2 — offline generation).
-const QR_PLATE = COLORS.daylight;
+// theme and always uses the light parchment surface/ink (B6 §4.2 — offline generation).
+const QR_PLATE = COLORS.parchment;
 /** Modules of quiet zone the spec requires around a QR code (ISO/IEC 18004). */
 const QR_QUIET_ZONE = 2;
 

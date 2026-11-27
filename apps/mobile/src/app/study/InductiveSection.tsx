@@ -25,7 +25,9 @@ import {
 import { useCoreRuntime } from '../CoreRuntime';
 import { useCoreStore } from '../useCoreStore';
 
-import { study, THEME } from './studyStyles';
+import { useTheme } from '../../theme/ThemeProvider';
+
+import { useStudy } from './studyStyles';
 
 export interface InductiveSectionProps {
   readonly userId: string;
@@ -58,6 +60,7 @@ const EMPTY_5WH: Inductive5WhContent = { who: '', what: '', when: '', where: '',
 const EMPTY_APPLICATION: Application5StepContent = { verse: '', truth: '', need: '', intent: '', checkupNote: '' };
 
 function NoteBody({ note }: { note: StudyNoteRecord }) {
+  const study = useStudy();
   if (note.noteType === 'INDUCTIVE_5WH') {
     const content = parseInductive5Wh(note.body);
     if (content !== null) {
@@ -92,6 +95,8 @@ function NoteBody({ note }: { note: StudyNoteRecord }) {
 }
 
 export function InductiveSection({ userId, verseId, reference, translationCode }: InductiveSectionProps) {
+  const study = useStudy();
+  const { colors: THEME, name: themeName } = useTheme();
   const { stores } = useCoreRuntime();
   const { highlights, notes, checkupReminders, error } = useCoreStore(stores.study);
   const [noteType, setNoteType] = useState<NoteType>('INDUCTIVE_5WH');
@@ -196,7 +201,7 @@ export function InductiveSection({ userId, verseId, reference, translationCode }
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
               accessibilityLabel={meta.meaning}
-              style={[study.chip, { backgroundColor: inductiveWash(symbol, 'daylight') }, active && { borderColor: THEME.accent.primary }]}
+              style={[study.chip, { backgroundColor: inductiveWash(symbol, themeName) }, active && { borderColor: THEME.accent.primary }]}
             >
               <Text style={study.chipText}>{`${meta.badge}  ${meta.meaning}`}</Text>
             </Pressable>

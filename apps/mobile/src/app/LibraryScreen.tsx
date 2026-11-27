@@ -6,7 +6,7 @@
 // store and failures surface as canonical `AppError`s.
 
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 
 import {
   parsePackManifest,
@@ -14,20 +14,13 @@ import {
   type PackManifest,
   type PackType,
 } from '@breath-and-word/core';
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-} from '@breath-and-word/tokens';
+import { FONT_FACES, FONT_SIZES, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { packDownloadUrl, packManifestUrl } from '../config/pack-server';
 import { useCoreRuntime } from './CoreRuntime';
 import { useCoreStore } from './useCoreStore';
+import { makeStyles } from '../theme/ThemeProvider';
 
-const THEME = COLORS.daylight;
 
 const PACK_TYPE_LABELS: Record<PackType, string> = {
   TRANSLATION: 'Translation',
@@ -54,6 +47,7 @@ function describeError(error: unknown): string {
 }
 
 export function LibraryScreen() {
+  const styles = useStyles();
   const runtime = useCoreRuntime();
   const packs = runtime.stores.packs;
   const { installed, storageBytes, status, error, progress } = useCoreStore(packs);
@@ -222,22 +216,22 @@ export function LibraryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   root: { flex: 1, backgroundColor: THEME.bg.canvas },
   content: { padding: SPACING.xl, gap: SPACING.sm },
   header: { gap: SPACING.xs, marginBottom: SPACING.sm },
   title: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
   subtitle: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
   sectionTitle: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
     marginTop: SPACING.md,
@@ -261,17 +255,17 @@ const styles = StyleSheet.create({
   },
   cardBody: { flex: 1, gap: SPACING.xxs },
   packName: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
   muted: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
   error: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.redLetter,
   },
@@ -291,7 +285,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accent.primary,
   },
   primaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.bg.canvas,
     textAlign: 'center',
@@ -305,14 +299,14 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   secondaryButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
     textAlign: 'center',
   },
   installedBadge: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.verseNum,
   },
-});
+}));

@@ -7,7 +7,7 @@
 // additionally binds Escape).
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
@@ -19,17 +19,7 @@ import {
   type SymbolTag,
   type VerseWordAlignment,
 } from '@breath-and-word/core';
-import {
-  COLORS,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  INDUCTIVE_HIGHLIGHTS,
-  LINE_HEIGHTS,
-  MIN_TOUCH_TARGET,
-  RADII,
-  SPACING,
-  inductiveWash,
-} from '@breath-and-word/tokens';
+import { FONT_FACES, FONT_SIZES, INDUCTIVE_HIGHLIGHTS, inductiveWash, LINE_HEIGHTS, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { AudioMiniPlayer } from './AudioMiniPlayer';
 import { CaptureSheet } from './CaptureSheet';
@@ -37,9 +27,9 @@ import { useCoreRuntime } from './CoreRuntime';
 import { useCurrentUserId } from './study/useCurrentUserId';
 import { useCoreStore } from './useCoreStore';
 import { VerseSpans } from './VerseSpans';
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
 /** The default (daylight) theme; theme switching lands with the appearance settings. */
-const THEME = COLORS.daylight;
 
 // Defaults open Romans 8 in the `core_bsb` pack (book numbers are canonical BBCCCVVV).
 const DEFAULT_PACK_ID = 'core_bsb';
@@ -61,6 +51,8 @@ export interface ReaderScreenProps {
 }
 
 export function ReaderScreen({ start }: ReaderScreenProps = {}) {
+  const styles = useStyles();
+  const { name: themeName } = useTheme();
   const runtime = useCoreRuntime();
   const { location, chapter, status, error, books } = useCoreStore(runtime.stores.reader);
   const [focusMode, setFocusMode] = useState(false);
@@ -264,7 +256,7 @@ export function ReaderScreen({ start }: ReaderScreenProps = {}) {
                 key={verse.canonicalVerseId}
                 style={[
                   styles.verse,
-                  wash !== undefined && { backgroundColor: inductiveWash(wash, 'daylight') },
+                  wash !== undefined && { backgroundColor: inductiveWash(wash, themeName) },
                   narrated && styles.verseNarrated,
                 ]}
               >
@@ -393,7 +385,7 @@ export function ReaderScreen({ start }: ReaderScreenProps = {}) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((THEME) => ({
   root: { flex: 1, backgroundColor: THEME.bg.canvas },
   header: {
     gap: SPACING.sm,
@@ -406,7 +398,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerActions: { flexDirection: 'row', gap: SPACING.sm },
   reference: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
@@ -419,7 +411,7 @@ const styles = StyleSheet.create({
     borderColor: THEME.border.subtle,
   },
   focusButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
@@ -433,7 +425,7 @@ const styles = StyleSheet.create({
   },
   navButtonDisabled: { opacity: 0.4 },
   navButtonText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
@@ -444,7 +436,7 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   verse: {
-    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontFamily: FONT_FACES.scripture.regular,
     fontSize: FONT_SIZES.scriptureDefault,
     lineHeight: FONT_SIZES.scriptureDefault * LINE_HEIGHTS.scripture,
     color: THEME.text.primary,
@@ -455,17 +447,17 @@ const styles = StyleSheet.create({
     color: THEME.text.primary,
   },
   verseNumber: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.verseNum,
   },
   muted: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.secondary,
   },
   error: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.redLetter,
   },
@@ -483,7 +475,7 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   exitFocusText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.text.secondary,
   },
@@ -502,7 +494,7 @@ const styles = StyleSheet.create({
   },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   modalTitle: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiLg,
     color: THEME.text.primary,
   },
@@ -517,16 +509,16 @@ const styles = StyleSheet.create({
   },
   bookChipActive: { backgroundColor: THEME.accent.primary, borderColor: THEME.accent.primary },
   bookChipText: {
-    fontFamily: FONT_FAMILIES.ui,
+    fontFamily: FONT_FACES.ui.regular,
     fontSize: FONT_SIZES.uiSm,
     color: THEME.text.primary,
   },
   bookChipTextActive: { color: THEME.bg.canvas },
   footnoteBody: { paddingBottom: SPACING.xl },
   footnoteText: {
-    fontFamily: FONT_FAMILIES.scriptureSerif,
+    fontFamily: FONT_FACES.scripture.regular,
     fontSize: FONT_SIZES.uiMd,
     lineHeight: FONT_SIZES.uiMd * LINE_HEIGHTS.ui,
     color: THEME.text.primary,
   },
-});
+}));
