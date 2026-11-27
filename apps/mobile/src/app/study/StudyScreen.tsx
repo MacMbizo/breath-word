@@ -16,7 +16,7 @@ import { InkSketch } from './InkSketch';
 import { PassageGuideSection } from './PassageGuideSection';
 import { study, THEME } from './studyStyles';
 import { useCurrentUserId } from './useCurrentUserId';
-import { WordStudySection } from './WordStudySection';
+import { WordStudySection, type WordFocus } from './WordStudySection';
 
 type StudyTab = 'words' | 'guide' | 'inductive' | 'ink';
 
@@ -31,9 +31,11 @@ export interface StudyScreenProps {
   readonly initialVerseId: number;
   readonly packId: string;
   readonly translationCode: string;
+  /** FR-301 — the English word tapped in the reader, preselected in the Words tab. */
+  readonly initialWordFocus?: WordFocus | null;
 }
 
-export function StudyScreen({ initialVerseId, packId, translationCode }: StudyScreenProps) {
+export function StudyScreen({ initialVerseId, packId, translationCode, initialWordFocus = null }: StudyScreenProps) {
   const runtime = useCoreRuntime();
   const router = useRouter();
   const userId = useCurrentUserId();
@@ -41,8 +43,12 @@ export function StudyScreen({ initialVerseId, packId, translationCode }: StudySc
   const [tab, setTab] = useState<StudyTab>('words');
   const reference = formatCanonicalRange(verseId, verseId);
 
+  // The tapped word only applies to the verse it came from; following a link clears it.
+  const [wordFocus, setWordFocus] = useState<WordFocus | null>(initialWordFocus);
+
   function openVerse(canonicalVerseId: number) {
     const { book, chapter } = fromCanonicalVerseId(canonicalVerseId);
+    setWordFocus(null);
     setVerseId(canonicalVerseId);
     void runtime.stores.reader.getState().openChapter({ packId, translationCode, bookNumber: book, chapter });
   }
@@ -88,7 +94,7 @@ export function StudyScreen({ initialVerseId, packId, translationCode }: StudySc
         scrollEnabled={tab !== 'ink'}
         keyboardShouldPersistTaps="handled"
       >
-        {tab === 'words' && <WordStudySection verseId={verseId} reference={reference} onOpenVerse={openVerse} />}
+        {tab === 'words' && <WordStudySection verseId={verseId} reference={reference} wordFocus={wordFocus} onOpenVerse={openVerse} />}
         {tab === 'guide' && (
           <PassageGuideSection startVerseId={verseId} endVerseId={verseId} translationPackId={packId} onOpenVerse={openVerse} />
         )}

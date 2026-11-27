@@ -1,27 +1,32 @@
 // FR-301 / FR-302 — interlinear tokens for the selected verse, the Morphology Inspector for a tapped
 // word, and its lexicon entry (BDB / Thayer / Abbott-Smith sections) with the Word Frequency Suite.
 // All data comes through the headless study store; no SQL here (AGENTS.md rule 1).
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { isRtlOriginalLanguage, type InterlinearToken } from '@breath-and-word/core';
+import { isRtlOriginalLanguage, selectAlignedToken, type InterlinearToken } from '@breath-and-word/core';
 
 import { useCoreRuntime } from '../CoreRuntime';
 import { useCoreStore } from '../useCoreStore';
 
 import { languageFromStrongs, OriginalText } from './OriginalText';
+import type { WordFocus } from './StudyPanel';
 import { CARD, LINK, PANEL_HEADING } from './styles';
 
 export interface WordStudyPaneProps {
   readonly verseId: number;
   readonly reference: string;
+  /** FR-301 — an English word tapped in the reader: preselect its original-language token. */
+  readonly wordFocus?: WordFocus | null;
   /** Jump the reader to a verse (word occurrences). */
   readonly onOpenVerse: (canonicalVerseId: number) => void;
 }
 
-export function WordStudyPane({ verseId, reference, onOpenVerse }: WordStudyPaneProps) {
+export function WordStudyPane({ verseId, reference, wordFocus = null, onOpenVerse }: WordStudyPaneProps) {
   const { stores } = useCoreRuntime();
   const { verseTokens, activeLexicon, wordFrequency, status, error } = useCoreStore(stores.study);
   const [selected, setSelected] = useState<InterlinearToken | null>(null);
+  /** A tapped word whose Strong's has no token in the installed exegesis pack: show its lexicon alone. */
+  const [lexiconOnly, setLexiconOnly] = useState<string | null>(null);
 
   useEffect(() => {
     setSelected(null);
@@ -30,12 +35,36 @@ export function WordStudyPane({ verseId, reference, onOpenVerse }: WordStudyPane
 
   function inspect(token: InterlinearToken) {
     setSelected(token);
+    setLexiconOnly(null);
     if (token.strongsId !== undefined) void stores.study.getState().openLexicon(token.strongsId);
   }
 
   const tokens = verseTokens.filter((t) => t.canonicalVerseId === verseId);
+  const tokensSettled = status !== 'loading';
+
+  // FR-301 — once this verse's tokens are in, select the one the tapped English word points at;
+  // if the installed exegesis pack has no token for it, still show the lexicon entry.
+  // Handle each (focus, loaded tokens) pair once: `openLexicon` toggles `status`, which would
+  // otherwise re-run this effect and reopen the lexicon forever.
+  const handledFocus = useRef<{ focus: WordFocus; tokens: readonly InterlinearToken[] } | null>(null);
+  useEffect(() => {
+    if (wordFocus === null || !tokensSettled) return;
+    const handled = handledFocus.current;
+    if (handled !== null && handled.focus === wordFocus && handled.tokens === verseTokens) return;
+    handledFocus.current = { focus: wordFocus, tokens: verseTokens };
+    const token = selectAlignedToken(tokens, wordFocus);
+    if (token !== undefined) {
+      inspect(token);
+    } else if (wordFocus.strongsId !== undefined) {
+      setSelected(null);
+      setLexiconOnly(wordFocus.strongsId);
+      void stores.study.getState().openLexicon(wordFocus.strongsId);
+    }
+    // `tokens`/`inspect` derive from state read here; re-run only when the focus or loaded tokens change.
+  }, [wordFocus, tokensSettled, verseTokens]);
   const verseLanguage = languageFromStrongs(tokens.find((t) => t.strongsId !== undefined)?.strongsId);
-  const lexicon = selected?.strongsId !== undefined && activeLexicon?.strongsId === selected.strongsId ? activeLexicon : null;
+  const lexiconStrongs = selected?.strongsId ?? lexiconOnly ?? undefined;
+  const lexicon = lexiconStrongs !== undefined && activeLexicon?.strongsId === lexiconStrongs ? activeLexicon : null;
   const frequency = lexicon !== null && wordFrequency?.strongsId === lexicon.strongsId ? wordFrequency : null;
   const maxBook = Math.max(1, ...(frequency?.byBook.map((b) => b.occurrences) ?? [1]));
 

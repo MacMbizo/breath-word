@@ -146,12 +146,24 @@ export class ExegesisRepository {
 
     if (wordPositionOrSpanIndex.spanIndex !== undefined || wordPositionOrSpanIndex.charOffset !== undefined) {
       const alignments = await this.getVerseWordAlignments(translationPackId, translationCode, canonicalVerseId);
-      if (wordPositionOrSpanIndex.charOffset !== undefined) {
-        const offset = wordPositionOrSpanIndex.charOffset;
-        alignment = alignments.find((a) => offset >= a.charStart && offset < a.charEnd);
+      const { spanIndex, charOffset } = wordPositionOrSpanIndex;
+      // Offsets are relative to one span's text, so an offset only matches inside its own span.
+      const inSpan = spanIndex === undefined ? alignments : alignments.filter((a) => a.spanIndex === spanIndex);
+      if (charOffset !== undefined) {
+        alignment = inSpan.find((a) => charOffset >= a.charStart && charOffset < a.charEnd);
+      } else {
+        alignment = inSpan[0];
       }
-      if (alignment === undefined && wordPositionOrSpanIndex.spanIndex !== undefined) {
-        alignment = alignments.find((a) => a.spanIndex === wordPositionOrSpanIndex.spanIndex);
+      if (alignment !== undefined && alignment.interlinearWordPos === undefined && alignment.strongsId !== undefined) {
+        // Packs leave the cross-pack word position NULL; resolve it by Strong's occurrence instead.
+        const strongs = alignment.strongsId;
+        const rank = alignments.filter(
+          (a) =>
+            a.strongsId === strongs &&
+            (a.spanIndex < alignment!.spanIndex || (a.spanIndex === alignment!.spanIndex && a.charStart < alignment!.charStart)),
+        ).length;
+        const resolved = await this.resolveWordPositionByStrongs(canonicalVerseId, strongs, rank);
+        if (resolved !== undefined) alignment = { ...alignment, interlinearWordPos: resolved };
       }
     }
 
@@ -180,6 +192,54 @@ export class ExegesisRepository {
       ...(token !== undefined ? { token } : {}),
       ...(lexicon !== undefined ? { lexicon } : {}),
     };
+  }
+
+  /**
+   * FR-301 — Alignments for a run of verses (a chapter) in one query, grouped by verse, so the
+   * reader can mark tappable English words without a round trip per verse (B7 < 30 ms tap budget).
+   * Returns an empty map when the translation pack carries no alignments.
+   */
+  async getWordAlignmentsForRange(
+    translationPackId: string,
+    translationCode: string,
+    firstVerseId: number,
+    lastVerseId: number,
+  ): Promise<Map<number, VerseWordAlignment[]>> {
+    const pack = await this.requirePack(translationPackId);
+    const { rows } = await this.contentDb.query<AlignmentRow>(
+      `SELECT id, translation_code, canonical_verse_id, span_index, char_start, char_end,
+              strongs_id, interlinear_word_pos
+         FROM ${pack}.verse_word_alignments
+        WHERE translation_code = ? AND canonical_verse_id BETWEEN ? AND ?
+        ORDER BY canonical_verse_id ASC, span_index ASC, char_start ASC`,
+      [translationCode, firstVerseId, lastVerseId],
+    );
+    const byVerse = new Map<number, VerseWordAlignment[]>();
+    for (const row of rows) {
+      const alignment = mapAlignmentRow(row);
+      const list = byVerse.get(alignment.canonicalVerseId);
+      if (list === undefined) byVerse.set(alignment.canonicalVerseId, [alignment]);
+      else list.push(alignment);
+    }
+    return byVerse;
+  }
+
+  /** The `rank`-th (0-based) interlinear token in a verse carrying `strongsId`, by word order. */
+  private async resolveWordPositionByStrongs(
+    canonicalVerseId: number,
+    strongsId: string,
+    rank: number,
+  ): Promise<number | undefined> {
+    const pack = await this.requirePack(this.exegesisPackId);
+    const { rows } = await this.contentDb.query<{ word_position: number }>(
+      `SELECT word_position FROM ${pack}.interlinear_tokens
+        WHERE canonical_verse_id = ? AND strongs_id = ?
+        ORDER BY word_position ASC`,
+      [canonicalVerseId, strongsId],
+    );
+    if (rows.length === 0) return undefined;
+    // An English translation may repeat a word the original says once: clamp to the last token.
+    return (rows[Math.min(rank, rows.length - 1)] ?? rows[0])?.word_position;
   }
 
   /** FR-301 / FR-302 — Load the full BDB / Thayer / Abbott-Smith lexicon entry for a Strong's ID. */

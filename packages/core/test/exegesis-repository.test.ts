@@ -179,6 +179,16 @@ beforeAll(() => {
          VALUES ('BSB', 46013004, 0, 0, 4, 'G0026', 2)`,
       )
       .run();
+    // Pack-builder output: interlinear_word_pos left NULL, resolved at read time by Strong's.
+    trDb
+      .prepare(
+        `INSERT INTO verse_word_alignments
+           (translation_code, canonical_verse_id, span_index, char_start, char_end, strongs_id, interlinear_word_pos)
+         VALUES ('BSB', 46013004, 1, 0, 10, 'G3114', NULL),
+                ('BSB', 43003016, 0, 11, 16, 'G26', NULL),
+                ('BSB', 43003016, 0, 30, 34, 'G9999', NULL)`,
+      )
+      .run();
   } finally {
     trDb.close();
   }
@@ -229,6 +239,31 @@ describe('ExegesisRepository (FR-301, FR-302, FR-103 Strong’s)', () => {
     expect(inspection.token?.morphologyHuman).toBe('Noun - Nominative Feminine Singular');
     expect(inspection.lexicon?.strongsId).toBe('G26');
     expect(inspection.lexicon?.sections[0]?.heading).toBe('Thayer Definition');
+  });
+
+  it('FR-301: a char offset only matches inside the tapped span', async () => {
+    const inspection = await repo.inspectAlignedWord('core_bsb', 'BSB', 46013004, { spanIndex: 1, charOffset: 1 });
+    expect(inspection.alignment?.strongsId).toBe('G3114');
+    expect(inspection.token?.wordPosition).toBe(3);
+  });
+
+  it('FR-301: resolves a NULL interlinear word position by Strong’s occurrence', async () => {
+    const inspection = await repo.inspectAlignedWord('core_bsb', 'BSB', 43003016, { spanIndex: 0, charOffset: 12 });
+    expect(inspection.alignment?.interlinearWordPos).toBe(5);
+    expect(inspection.token?.originalWord).toBe('ἀγάπη');
+    expect(inspection.lexicon?.strongsId).toBe('G26');
+  });
+
+  it('FR-301: an alignment with no matching token still reports its Strong’s ID', async () => {
+    const inspection = await repo.inspectAlignedWord('core_bsb', 'BSB', 43003016, { spanIndex: 0, charOffset: 31 });
+    expect(inspection.alignment?.strongsId).toBe('G9999');
+    expect(inspection.token).toBeUndefined();
+  });
+
+  it('FR-301: loads a chapter of alignments grouped by verse in one call', async () => {
+    const byVerse = await repo.getWordAlignmentsForRange('core_bsb', 'BSB', 46013001, 46013999);
+    expect([...byVerse.keys()]).toEqual([46013004]);
+    expect(byVerse.get(46013004)?.map((a) => a.spanIndex)).toEqual([0, 1]);
   });
 
   it('FR-301: returns ordered interlinear tokens for a verse', async () => {

@@ -1,7 +1,7 @@
 # Advanced Study Feature Candidates (Research Backlog)
 
 **Document ID:** `EXTRAS-FEAT`  
-**Version:** `0.2.0`  
+**Version:** `0.2.1`  
 **Status:** `Draft — Research / Pre-Approval`  
 **Last Updated:** `2026-11-27`  
 **Related Docs:** `A2`, `A3`, `B4`, `B5`, `B6`, `D1`, `G1`, source: `extras.md` (root)
@@ -99,7 +99,7 @@ fully compatible with `B4`'s dual-SQLite split.
 | --- | --- | --- |
 | **Topical search beyond FTS5** (semantic/concept matching) | OpenBible.info Topical Index (~10k topics / ~300k verses), Nave's Topical | **Phase 3+** — new `study_topics` pack; complements rather than replaces FTS5. |
 | **Geographic/historical map layer** | OpenBible geocoding, Pleiades Gazetteer, chronological datasets | **v1.1+** — feeds `factbook_entities`; significant new UI surface (maps) — needs `D3` design work. |
-| **Daily lectionary / reading plans** | Lectionary cores, word-count plan generators | **v1.1+ or later** — not in `A2`; would need new `FR-*` requirements. |
+| **Daily lectionary** (beyond existing reading plans) | Lectionary cores, word-count plan generators | **v1.1+ or later** — reading plans already exist (`FR-104` Manna Pacing over `reading_plan_days`; Phase 3 ships two generated plans in the `study_refs` pack). Only lectionary-calendar plans would need new `FR-*` requirements. |
 | **Semantic/embedding search** ("find verses about X" by concept) | Pre-tokenized JSON + local embeddings | **Requires `B6` review** — must be fully on-device or E2EE-safe; flag before any design. |
 
 ### 6. Unfolding Story — Chronological Story Mode

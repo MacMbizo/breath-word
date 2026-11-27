@@ -1,7 +1,7 @@
 # Bible Content Sources & External Datasets (Research Catalog)
 
 **Document ID:** `EXTRAS-SRC`  
-**Version:** `0.1.0`  
+**Version:** `0.1.1`  
 **Status:** `Draft — Research / Pre-Approval`  
 **Last Updated:** `2026-11-27`  
 **Related Docs:** `A3`, `B4`, `B5`, `G1`, source: `extras.md` (root)
@@ -60,7 +60,7 @@ additional scripture or study-content sources.
 
 ### 3. Commentaries & Cross-References (Beyond Current `study_refs`)
 
-- **Treasury of Scripture Knowledge (TSK)** via Free Use Bible API — ~500k cross-references; **already planned** in `B5 §4.1` (`study_refs` pack).
+- **Treasury of Scripture Knowledge (TSK)** via Free Use Bible API — ~500k cross-references; listed in `B5 §4.1`, but the **built `study_refs` pack uses OpenBible.info cross-references** (~345k, CC-BY). TSK is an optional second source, not the current one.
 - **Matthew Henry's Concise Commentary** — verse-by-verse public-domain devotional; candidate for `commentary_pd` pack (Phase 4), alongside JFB, Keil & Delitzsch, Calvin already listed in `B5`.
 - **bible-api.com cross-reference / translation-note params** — keyless REST extras; same rate-limit caveat as §1.2.
 
@@ -106,7 +106,7 @@ additional scripture or study-content sources.
 | **USFM** | Global translator/publisher standard (markdown-like tags) | Already assumed as ETL input in `B5 §4.1`; `ubsicap/usfm-grammar` (tree-sitter) validates/converts USFM → JSON/AST for `tools/pack-builder`. |
 | **OSIS** | Multi-tier XML standard interleaving text, Strong's, morphology, parallel versions | Alternative ingestion format; relevant to **v1.1+ BYO importer** (deferred in `A3`). |
 | **`openbibleinfo/Bible-Passage-Reference-Parser` (bcv-parser)** | JS/TS reference parsing: "1 Jn 3:1", "First John 3.1" → structured ranges | **High-priority adoption candidate** — pure JS, MIT-licensed, directly usable in `apps/*` and `packages/core` (pure TS) for search/reference input. |
-| **`vscandura/python-bible`** | Python-side parsing, verse counts, integer ID arrays | For `tools/pack-builder` (Python) pipelines. |
+| **`vscandura/python-bible`** | Python-side parsing, verse counts, integer ID arrays | Reference only — `tools/pack-builder` is a **Node/TS** pipeline (run via `tsx`), so a JS/TS equivalent (bcv-parser) is preferred. |
 | **`interedition/collatex`** | Word-level alignment/collation engine for comparing textual witnesses | Enables translation-diff highlighting; v1.1+ feature, needs structured verse pairs. |
 
 ### 10. Audio, Accessibility & Formatting Metadata

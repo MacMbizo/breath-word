@@ -3,6 +3,7 @@ export * from './domain/books';
 export * from './domain/bbcccvvv';
 export * from './domain/strongs';
 export * from './domain/verse-alignment';
+export * from './domain/word-alignment';
 export * from './ink/strokes';
 export * from './prayer/prompt-templates';
 export * from './errors/AppError';

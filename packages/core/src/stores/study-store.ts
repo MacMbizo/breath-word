@@ -16,6 +16,7 @@ import type {
   PassageGuide,
   StudyNoteRecord,
   SymbolTag,
+  VerseWordAlignment,
   WordFrequencySummary,
   WordInspection,
 } from '../domain/types';
@@ -52,6 +53,8 @@ export interface StudyState {
   readonly inspectedWord: WordInspection | null;
   readonly activeLexicon: LexiconEntry | null;
   readonly wordFrequency: WordFrequencySummary | null;
+  /** FR-301 — aligned English words for the open chapter, by canonical verse id. */
+  readonly wordAlignments: ReadonlyMap<number, readonly VerseWordAlignment[]>;
 
   // FR-303 Passage Guide & Factbook
   readonly passageGuide: PassageGuide | null;
@@ -73,6 +76,11 @@ export interface StudyState {
     target: { readonly spanIndex?: number; readonly charOffset?: number; readonly wordPosition?: number },
   ): Promise<void>;
   clearInspection(): void;
+  /**
+   * FR-301 — load the aligned English words for a verse range (one chapter). Alignments are an
+   * enhancement: a pack without them, or a failed read, leaves an empty map and never blocks reading.
+   */
+  loadRangeAlignments(translationPackId: string, translationCode: string, startVerseId: number, endVerseId: number): Promise<void>;
   openLexicon(strongsId: string): Promise<void>;
   loadPassageGuide(startVerseId: number, endVerseId: number, translationPackId?: string): Promise<void>;
   openFactbookEntity(entityId: string): Promise<void>;
@@ -118,12 +126,14 @@ export interface CreateStudyStoreOptions {
 
 export function createStudyStore(options: CreateStudyStoreOptions): StudyStore {
   const { exegesis, studyRefs, inductive, ink } = options;
+  let latestAlignmentRequest: string | null = null;
 
   return createStore<StudyState>((set, get) => ({
     status: 'idle',
     error: null,
     verseTokens: [],
     inspectedWord: null,
+    wordAlignments: new Map(),
     activeLexicon: null,
     wordFrequency: null,
     passageGuide: null,
@@ -164,6 +174,19 @@ export function createStudyStore(options: CreateStudyStoreOptions): StudyStore {
 
     clearInspection() {
       set({ inspectedWord: null });
+    },
+
+    async loadRangeAlignments(translationPackId, translationCode, startVerseId, endVerseId) {
+      const requestKey = `${translationPackId}|${translationCode}|${startVerseId}|${endVerseId}`;
+      latestAlignmentRequest = requestKey;
+      let wordAlignments: ReadonlyMap<number, readonly VerseWordAlignment[]>;
+      try {
+        wordAlignments = await exegesis.getWordAlignmentsForRange(translationPackId, translationCode, startVerseId, endVerseId);
+      } catch {
+        wordAlignments = new Map();
+      }
+      // A slower response for a chapter the reader has already left must not overwrite the new one.
+      if (latestAlignmentRequest === requestKey) set({ wordAlignments });
     },
 
     async openLexicon(strongsId) {

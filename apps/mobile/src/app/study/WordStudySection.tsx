@@ -1,9 +1,9 @@
 // FR-301 / FR-302 (mobile) — interlinear tokens for a verse, the Morphology Inspector for a tapped
 // word, and its lexicon entry with OT/NT/per-book frequency and tappable occurrences.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { isRtlOriginalLanguage, type InterlinearToken } from '@breath-and-word/core';
+import { isRtlOriginalLanguage, selectAlignedToken, type InterlinearToken } from '@breath-and-word/core';
 import { FONT_SIZES, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { useCoreRuntime } from '../CoreRuntime';
@@ -12,16 +12,28 @@ import { useCoreStore } from '../useCoreStore';
 import { languageFromStrongs, OriginalText } from './OriginalText';
 import { study, THEME } from './studyStyles';
 
+/** FR-301 — an English word tapped in the reader. */
+export interface WordFocus {
+  readonly strongsId?: string;
+  readonly wordPosition?: number;
+  /** Earlier same-Strong's words in the verse (picks the matching interlinear token). */
+  readonly rank: number;
+}
+
 export interface WordStudySectionProps {
   readonly verseId: number;
   readonly reference: string;
+  /** FR-301 — preselect the original-language token for this tapped English word. */
+  readonly wordFocus?: WordFocus | null;
   readonly onOpenVerse: (canonicalVerseId: number) => void;
 }
 
-export function WordStudySection({ verseId, reference, onOpenVerse }: WordStudySectionProps) {
+export function WordStudySection({ verseId, reference, wordFocus = null, onOpenVerse }: WordStudySectionProps) {
   const { stores } = useCoreRuntime();
   const { verseTokens, activeLexicon, wordFrequency, status, error } = useCoreStore(stores.study);
   const [selected, setSelected] = useState<InterlinearToken | null>(null);
+  /** A tapped word whose Strong's has no token in the installed exegesis pack: show its lexicon alone. */
+  const [lexiconOnly, setLexiconOnly] = useState<string | null>(null);
 
   useEffect(() => {
     setSelected(null);
@@ -30,13 +42,34 @@ export function WordStudySection({ verseId, reference, onOpenVerse }: WordStudyS
 
   function inspect(token: InterlinearToken) {
     setSelected(token);
+    setLexiconOnly(null);
     if (token.strongsId !== undefined) void stores.study.getState().openLexicon(token.strongsId);
   }
 
   const tokens = verseTokens.filter((t) => t.canonicalVerseId === verseId);
+  const tokensSettled = status !== 'loading';
+
+  // FR-301 — once this verse's tokens are in, select the one the tapped English word points at;
+  // if the installed exegesis pack has no token for it, still show the lexicon entry. Each
+  // (focus, tokens) pair is handled once: `openLexicon` toggles `status`, which re-runs this effect.
+  const handledFocus = useRef<{ focus: WordFocus; tokens: readonly InterlinearToken[] } | null>(null);
+  useEffect(() => {
+    if (wordFocus === null || !tokensSettled) return;
+    const handled = handledFocus.current;
+    if (handled !== null && handled.focus === wordFocus && handled.tokens === verseTokens) return;
+    handledFocus.current = { focus: wordFocus, tokens: verseTokens };
+    const token = selectAlignedToken(tokens, wordFocus);
+    if (token !== undefined) {
+      inspect(token);
+    } else if (wordFocus.strongsId !== undefined) {
+      setSelected(null);
+      setLexiconOnly(wordFocus.strongsId);
+      void stores.study.getState().openLexicon(wordFocus.strongsId);
+    }
+  }, [wordFocus, tokensSettled, verseTokens]);
   const rtlVerse = isRtlOriginalLanguage(languageFromStrongs(tokens.find((t) => t.strongsId !== undefined)?.strongsId));
-  const lexicon =
-    selected?.strongsId !== undefined && activeLexicon?.strongsId === selected.strongsId ? activeLexicon : null;
+  const lexiconStrongs = selected?.strongsId ?? lexiconOnly ?? undefined;
+  const lexicon = lexiconStrongs !== undefined && activeLexicon?.strongsId === lexiconStrongs ? activeLexicon : null;
   const frequency = lexicon !== null && wordFrequency?.strongsId === lexicon.strongsId ? wordFrequency : null;
   const maxBook = Math.max(1, ...(frequency?.byBook.map((b) => b.occurrences) ?? [1]));
 

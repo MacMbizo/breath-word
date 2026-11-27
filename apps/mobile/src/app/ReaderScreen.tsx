@@ -11,7 +11,14 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 
 import { useRouter } from 'expo-router';
 
-import { bookName, type BookSummary, type Footnote, type SymbolTag } from '@breath-and-word/core';
+import {
+  bookName,
+  strongsOccurrenceRank,
+  type BookSummary,
+  type Footnote,
+  type SymbolTag,
+  type VerseWordAlignment,
+} from '@breath-and-word/core';
 import {
   COLORS,
   FONT_FAMILIES,
@@ -51,7 +58,7 @@ export function ReaderScreen() {
   const [activeFootnote, setActiveFootnote] = useState<Footnote | null>(null);
   const router = useRouter();
   const userId = useCurrentUserId();
-  const { highlights } = useCoreStore(runtime.stores.study);
+  const { highlights, wordAlignments } = useCoreStore(runtime.stores.study);
   const { activeVerseId: narratedVerseId } = useCoreStore(runtime.stores.audio);
 
   // The store is idle until asked, so open the default passage and its book list once on mount.
@@ -117,6 +124,12 @@ export function ReaderScreen() {
     void runtime.stores.study.getState().loadRangeStudy(userId, firstVerseId, lastVerseId, translationCode);
   }, [runtime, userId, firstVerseId, lastVerseId, translationCode]);
 
+  // FR-301 — aligned English words for the chapter (empty when the translation carries none).
+  useEffect(() => {
+    if (firstVerseId === undefined || lastVerseId === undefined) return;
+    void runtime.stores.study.getState().loadRangeAlignments(packId, translationCode, firstVerseId, lastVerseId);
+  }, [runtime, packId, translationCode, firstVerseId, lastVerseId]);
+
   const symbolsByVerse = useMemo(() => {
     const map = new Map<number, SymbolTag[]>();
     for (const h of highlights) {
@@ -139,6 +152,25 @@ export function ReaderScreen() {
       });
     },
     [router, packId, translationCode],
+  );
+
+  // FR-301 — tapping an aligned English word opens study focused on that word's original token.
+  const openWord = useCallback(
+    (alignment: VerseWordAlignment) => {
+      const verseAlignments = wordAlignments.get(alignment.canonicalVerseId) ?? [];
+      router.push({
+        pathname: '/study',
+        params: {
+          verse: String(alignment.canonicalVerseId),
+          pack: packId,
+          translation: translationCode,
+          ...(alignment.strongsId !== undefined ? { strongs: alignment.strongsId } : {}),
+          ...(alignment.interlinearWordPos !== undefined ? { wordPos: String(alignment.interlinearWordPos) } : {}),
+          rank: String(strongsOccurrenceRank(verseAlignments, alignment)),
+        },
+      });
+    },
+    [router, packId, translationCode, wordAlignments],
   );
 
   return (
@@ -229,6 +261,9 @@ export function ReaderScreen() {
                   verseId={verse.canonicalVerseId}
                   spans={verse.spans}
                   onFootnotePress={openFootnote}
+                  {...(focusMode
+                    ? {}
+                    : { alignments: wordAlignments.get(verse.canonicalVerseId), onWordPress: openWord })}
                 />
                 {symbols.length > 0 && (
                   <Text style={styles.verseNumber} accessibilityLabel={symbols.map((sym) => INDUCTIVE_HIGHLIGHTS[sym].meaning).join(', ')}>

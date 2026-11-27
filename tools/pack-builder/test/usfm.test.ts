@@ -350,3 +350,69 @@ describe('USFM -> PackSource parser: real BSB/WEB dialects (B4 §4.6)', () => {
     expect(jhn316?.plainText.includes('  ')).toBe(false);
   });
 });
+
+describe('USFM word-level Strong\'s alignments (FR-301)', () => {
+  const ALIGNED_USFM = [
+    '\\id JHN',
+    '\\c 1',
+    '\\s The Word',
+    '\\p',
+    '\\v 16 \\w From|strong="G1537"\\w* \\w his|strong="G0846"\\w*  \\w fullness|strong="G4138"\\w* we all received \\w grace|strong="G5485"\\w*.',
+    '\\c 3',
+    '\\p',
+    '\\v 16 \\wj “For \\+w God|strong="G2316"\\+w* so \\+w loved|strong="G0025"\\+w* the world.\\wj*',
+    '\\q1 \\w Selah|lemma="x"\\w* \\w ok|strong="H9999z"\\w*',
+  ].join('\n');
+
+  it('records exact span offsets for every tagged word and strips the markers from the text', () => {
+    const source = parseUsfmToPackSource(ALIGNED_USFM, PROFILE);
+    const v116 = source.verses.find((v) => v.chapter === 1 && v.verse === 16);
+    const v316 = source.verses.find((v) => v.chapter === 3 && v.verse === 16);
+    expect(v116?.alignments?.map((a) => a.strongsId)).toEqual(['G1537', 'G846', 'G4138', 'G5485']);
+    for (const verse of [v116, v316]) {
+      for (const span of verse?.spans ?? []) expect(span.text).not.toMatch(/[\uE000-\uE002]/);
+      expect(verse?.plainText).not.toMatch(/[\uE000-\uE002]/);
+    }
+    const words = (v: typeof v116): string[] =>
+      (v?.alignments ?? []).map((a) => v?.spans[a.spanIndex]?.text.slice(a.charStart, a.charEnd) ?? '');
+    expect(words(v116)).toEqual(['From', 'his', 'fullness', 'grace']);
+    // Red-letter words are aligned inside their red_letter span; "Selah" has no strong tag.
+    expect(words(v316)).toEqual(['God', 'loved', 'ok']);
+    expect(v316?.alignments?.[0] && v316.spans[v316.alignments[0].spanIndex]?.type).toBe('red_letter');
+    expect(v316?.alignments?.map((a) => a.strongsId)).toEqual(['G2316', 'G25', 'H9999']);
+  });
+
+  it('builds verse_word_alignments rows and sets has_word_alignments', () => {
+    const source = parseUsfmToPackSource(ALIGNED_USFM, PROFILE);
+    const outDir = join(tmpRoot, 'aligned-out');
+    buildPackArtifacts(source, outDir, { minAppVersion: '0.1.0', baseUrl: 'https://example.invalid' });
+    const db = new DatabaseSync(join(outDir, 'core_bsb-1.0.0.sqlite'));
+    try {
+      const flag = db.prepare('SELECT has_word_alignments AS f FROM translations').get() as { f: number };
+      expect(flag.f).toBe(1);
+      const rows = db
+        .prepare(
+          'SELECT canonical_verse_id AS v, strongs_id AS s, interlinear_word_pos AS p FROM verse_word_alignments ORDER BY id',
+        )
+        .all() as { v: number; s: string; p: number | null }[];
+      expect(rows).toHaveLength(7);
+      expect(rows[0]).toEqual({ v: 43001016, s: 'G1537', p: null });
+    } finally {
+      db.close();
+    }
+  });
+
+  it('rejects an alignment whose range falls outside its span', () => {
+    const source = parseUsfmToPackSource(ALIGNED_USFM, PROFILE);
+    const verse = source.verses[0]!;
+    verse.alignments = [{ spanIndex: 0, charStart: 0, charEnd: 9999, strongsId: 'G1537' }];
+    expect(
+      codeOf(() =>
+        buildPackArtifacts(source, join(tmpRoot, 'bad-align'), {
+          minAppVersion: '0.1.0',
+          baseUrl: 'https://example.invalid',
+        }),
+      ),
+    ).toBe('PACK_INTEGRITY_FAILED');
+  });
+});

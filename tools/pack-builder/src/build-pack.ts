@@ -31,6 +31,7 @@ import {
   closeAndDiscard,
   closeQuietly,
   insertPackMetadata,
+  packIntegrityFailed,
   packageArtifacts,
   verifyPackDatabase,
   type PackBuildArtifacts,
@@ -42,6 +43,7 @@ import {
   BOOKS,
   MANIFEST_VERSION,
   TRANSLATION_PACK_DDL,
+  normalizeStrongsId,
   toCanonicalVerseId,
   type ManifestPackEntry,
   type PackManifest,
@@ -83,6 +85,22 @@ export interface PackVerseInput {
   spans: VerseSpan[];
   /** Inline footnotes (`\f … \f*`) attached to this verse (FR-101 clickable markers). */
   footnotes?: PackFootnoteInput[];
+  /** English-word -> Strong's alignments (`verse_word_alignments`, FR-301 tap-any-English-word). */
+  alignments?: PackWordAlignmentInput[];
+}
+
+/**
+ * One aligned English word. Offsets are UTF-16 indices into `spans[spanIndex].text`
+ * (`char_end` exclusive). The interlinear word position is deliberately NOT stored here: it is
+ * resolved at read time by Strong's occurrence, so a rebuilt exegesis pack (partial -> full
+ * STEPBible) never leaves stale cross-pack word positions behind.
+ */
+export interface PackWordAlignmentInput {
+  spanIndex: number;
+  charStart: number;
+  charEnd: number;
+  /** Canonical unpadded uppercase Strong's ID (`G26`, `H430`). */
+  strongsId: string;
 }
 
 /** One inline footnote; `footnote_id` is derived at build time as `<canonicalVerseId>:<ordinal>`. */
@@ -106,6 +124,32 @@ export interface PackSource {
 export interface PackBuildStats {
   bookCount: number;
   verseCount: number;
+  alignmentCount: number;
+}
+
+/**
+ * Post-parse gate for one alignment: the span must exist and not be a heading/footnote, the range
+ * must sit inside that span's text and cover a non-blank word, and the Strong's ID must already be
+ * canonical. A drifted offset would light up the wrong word in the reader, so it is a hard failure.
+ */
+function assertAlignment(
+  packId: string,
+  verse: PackVerseInput, canonicalVerseId: number, alignment: PackWordAlignmentInput): void {
+  const span = verse.spans[alignment.spanIndex];
+  const where = `verse ${canonicalVerseId} span ${alignment.spanIndex} [${alignment.charStart}, ${alignment.charEnd})`;
+  if (span === undefined || span.type === 'heading' || span.type === 'footnote') {
+    throw packIntegrityFailed(packId, `Alignment at ${where} does not point at a scripture text span.`);
+  }
+  const { charStart, charEnd } = alignment;
+  if (!Number.isInteger(charStart) || !Number.isInteger(charEnd) || charStart < 0 || charEnd <= charStart || charEnd > span.text.length) {
+    throw packIntegrityFailed(packId, `Alignment at ${where} is outside the span text (length ${span.text.length}).`);
+  }
+  if (span.text.slice(charStart, charEnd).trim() === '') {
+    throw packIntegrityFailed(packId, `Alignment at ${where} covers only whitespace.`);
+  }
+  if (normalizeStrongsId(alignment.strongsId) !== alignment.strongsId) {
+    throw packIntegrityFailed(packId, `Alignment at ${where} has non-canonical Strong's ID "${alignment.strongsId}".`);
+  }
 }
 
 /** Build the pack `.sqlite` with the canonical schema and populated FTS5 index (B4 §4.2/§4.6). */
@@ -137,7 +181,7 @@ export function buildPackDatabase(source: PackSource, sqlitePath: string): PackB
       translation.licenseType,
       translation.versification ?? 'protestant',
       translation.hasAudio ? 1 : 0,
-      translation.hasWordAlignments ? 1 : 0,
+      (translation.hasWordAlignments ?? source.verses.some((v) => (v.alignments?.length ?? 0) > 0)) ? 1 : 0,
       translation.version,
     );
 
@@ -157,6 +201,12 @@ export function buildPackDatabase(source: PackSource, sqlitePath: string): PackB
       `INSERT INTO footnotes (footnote_id, translation_code, canonical_verse_id, marker, category, body_text)
        VALUES (?, ?, ?, ?, ?, ?)`,
     );
+    const insertAlignment = db.prepare(
+      `INSERT INTO verse_word_alignments
+         (translation_code, canonical_verse_id, span_index, char_start, char_end, strongs_id, interlinear_word_pos)
+       VALUES (?, ?, ?, ?, ?, ?, NULL)`,
+    );
+    let alignmentCount = 0;
     for (const verse of source.verses) {
       const canonicalVerseId = toCanonicalVerseId(verse);
       insertVerse.run(
@@ -179,6 +229,18 @@ export function buildPackDatabase(source: PackSource, sqlitePath: string): PackB
           note.bodyText,
         );
       });
+      for (const alignment of verse.alignments ?? []) {
+        assertAlignment(metadata.packId, verse, canonicalVerseId, alignment);
+        insertAlignment.run(
+          translation.code,
+          canonicalVerseId,
+          alignment.spanIndex,
+          alignment.charStart,
+          alignment.charEnd,
+          alignment.strongsId,
+        );
+        alignmentCount += 1;
+      }
     }
 
     db.exec("INSERT INTO verses_fts(verses_fts) VALUES('rebuild');");
@@ -186,7 +248,7 @@ export function buildPackDatabase(source: PackSource, sqlitePath: string): PackB
 
     verifyPackDatabase(db, metadata);
 
-    return { bookCount: source.books.length, verseCount: source.verses.length };
+    return { bookCount: source.books.length, verseCount: source.verses.length, alignmentCount };
   } catch (error) {
     // Never leave a half-built or unverified pack where a later step could publish it.
     closeAndDiscard(db, sqlitePath);

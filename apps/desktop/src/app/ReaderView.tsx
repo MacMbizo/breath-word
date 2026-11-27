@@ -8,13 +8,21 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 
 import { useReducedMotion } from 'framer-motion';
 
-import { bookName, formatCanonicalRange, fromCanonicalVerseId, type Footnote, type SymbolTag } from '@breath-and-word/core';
+import {
+  bookName,
+  formatCanonicalRange,
+  fromCanonicalVerseId,
+  strongsOccurrenceRank,
+  type Footnote,
+  type SymbolTag,
+  type VerseWordAlignment,
+} from '@breath-and-word/core';
 import { INDUCTIVE_HIGHLIGHTS, SCRIPTURE_METRICS, inductiveCssVariable } from '@breath-and-word/tokens';
 
 import { AudioMiniPlayer } from './AudioMiniPlayer';
 import { CapturePanel } from './CapturePanel';
 import { useCoreRuntime } from './CoreRuntime';
-import { StudyPanel } from './study/StudyPanel';
+import { StudyPanel, type WordFocus } from './study/StudyPanel';
 import { useCurrentUserId } from './study/useCurrentUserId';
 import { useCoreStore } from './useCoreStore';
 import { VerseSpans } from './VerseSpans';
@@ -53,10 +61,12 @@ export function ReaderView({ focusMode = false, onEnterFocus, onExitFocus }: Rea
   const [captureOpen, setCaptureOpen] = useState(false);
   /** FR-301..305 — the verse whose study tools are open in the side panel. */
   const [selectedVerseId, setSelectedVerseId] = useState<number | null>(null);
+  /** FR-301 — the tapped English word whose study is open (its verse is `selectedVerseId`). */
+  const [wordFocus, setWordFocus] = useState<WordFocus | null>(null);
   /** A verse to scroll to once its chapter has loaded (cross-reference / occurrence jumps). */
   const [pendingVerseId, setPendingVerseId] = useState<number | null>(null);
   const userId = useCurrentUserId();
-  const { highlights } = useCoreStore(stores.study);
+  const { highlights, wordAlignments } = useCoreStore(stores.study);
   const { activeVerseId: audioVerseId, isPlaying } = useCoreStore(stores.audio);
   const reduceMotion = useReducedMotion() === true;
 
@@ -130,6 +140,28 @@ export function ReaderView({ focusMode = false, onEnterFocus, onExitFocus }: Rea
     void stores.study.getState().loadRangeStudy(userId, firstVerseId, lastVerseId, openTranslation);
   }, [stores, userId, firstVerseId, lastVerseId, openTranslation]);
 
+  // FR-301 — aligned English words for the chapter (empty when the translation carries none).
+  const openPack = location?.packId;
+  useEffect(() => {
+    if (openPack === undefined || openTranslation === undefined) return;
+    if (firstVerseId === undefined || lastVerseId === undefined) return;
+    void stores.study.getState().loadRangeAlignments(openPack, openTranslation, firstVerseId, lastVerseId);
+  }, [stores, openPack, openTranslation, firstVerseId, lastVerseId]);
+
+  const openWord = useCallback(
+    (alignment: VerseWordAlignment) => {
+      const verseAlignments = wordAlignments.get(alignment.canonicalVerseId) ?? [];
+      setSelectedVerseId(alignment.canonicalVerseId);
+      setWordFocus({
+        alignmentId: alignment.id,
+        ...(alignment.strongsId !== undefined ? { strongsId: alignment.strongsId } : {}),
+        ...(alignment.interlinearWordPos !== undefined ? { wordPosition: alignment.interlinearWordPos } : {}),
+        rank: strongsOccurrenceRank(verseAlignments, alignment),
+      });
+    },
+    [wordAlignments],
+  );
+
   const symbolsByVerse = useMemo(() => {
     const map = new Map<number, SymbolTag[]>();
     for (const h of highlights) {
@@ -190,7 +222,10 @@ export function ReaderView({ focusMode = false, onEnterFocus, onExitFocus }: Rea
               ) : (
                 <button
                   type="button"
-                  onClick={() => setSelectedVerseId(isSelected ? null : verse.canonicalVerseId)}
+                  onClick={() => {
+                    setWordFocus(null);
+                    setSelectedVerseId(isSelected ? null : verse.canonicalVerseId);
+                  }}
                   className="mr-xs align-super font-ui text-uiXs text-ink-verse hover:text-accent"
                   aria-label={`Study ${formatCanonicalRange(verse.canonicalVerseId, verse.canonicalVerseId)}`}
                   aria-pressed={isSelected}
@@ -202,6 +237,14 @@ export function ReaderView({ focusMode = false, onEnterFocus, onExitFocus }: Rea
                 verseId={verse.canonicalVerseId}
                 spans={verse.spans}
                 onFootnotePress={openFootnote}
+                {...(focusMode
+                  ? {}
+                  : {
+                      alignments: wordAlignments.get(verse.canonicalVerseId),
+                      onWordPress: openWord,
+                      wordsFocusable: isSelected,
+                      ...(isSelected && wordFocus !== null ? { activeAlignmentId: wordFocus.alignmentId } : {}),
+                    })}
               />
               {symbols.map((symbol) => (
                 <span
@@ -383,8 +426,12 @@ export function ReaderView({ focusMode = false, onEnterFocus, onExitFocus }: Rea
             reference={formatCanonicalRange(selectedVerseId, selectedVerseId)}
             packId={location?.packId ?? packId}
             translationCode={location?.translationCode ?? translationCode}
+            wordFocus={wordFocus}
             onOpenVerse={openVerse}
-            onClose={() => setSelectedVerseId(null)}
+            onClose={() => {
+              setWordFocus(null);
+              setSelectedVerseId(null);
+            }}
           />
         )}
       </div>

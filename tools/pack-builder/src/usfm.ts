@@ -17,13 +17,20 @@ import { pathToFileURL } from 'node:url';
 import {
   AppError,
   BOOKS,
+  normalizeStrongsId,
   toCanonicalVerseId,
   type BookMeta,
   type PackType,
   type VerseSpan,
 } from '@breath-and-word/core';
 
-import type { PackBookInput, PackFootnoteInput, PackSource, PackVerseInput } from './build-pack';
+import type {
+  PackBookInput,
+  PackFootnoteInput,
+  PackSource,
+  PackVerseInput,
+  PackWordAlignmentInput,
+} from './build-pack';
 
 /** USFM `\id` book codes in Protestant canonical order (index + 1 = `book_number`). */
 const USFM_BOOK_CODES = [
@@ -171,15 +178,56 @@ function parseFootnoteBody(rawBody: string): { marker: string; text: string } {
 }
 
 /**
+ * Private-use sentinels wrapping a Strong's-tagged word while a verse is assembled:
+ * `WORD_OPEN <index> WORD_SEP <surface> WORD_CLOSE`. They are never whitespace, so span merging
+ * and space normalisation leave them intact, and `extractWordMarks` strips them from the final
+ * span text while recording exact offsets. They never reach `plain_text` or `content_json`.
+ */
+const WORD_OPEN = '\uE000';
+const WORD_SEP = '\uE001';
+const WORD_CLOSE = '\uE002';
+const WORD_MARK = /\uE000(\d+)\uE001([^\uE002]*)\uE002/g;
+const ANY_SENTINEL = /[\uE000-\uE002]/;
+
+/** First valid `strong="…"` value in a `\w` attribute list, canonicalised (`G0846` -> `G846`). */
+function strongsAttribute(attributes: string): string | null {
+  const match = /strong\s*=\s*"([^"]*)"/.exec(attributes);
+  if (match === null) return null;
+  for (const candidate of (match[1] ?? '').split(/[\s,]+/)) {
+    const normalized = normalizeStrongsId(candidate.replace(/^[a-z]+:/i, '').replace(/[a-z]$/i, ''));
+    if (normalized !== null) return normalized;
+  }
+  return null;
+}
+
+/** Strip word sentinels from one span's text, returning the clean text and each word's range. */
+function extractWordMarks(text: string): { text: string; marks: { index: number; start: number; end: number }[] } {
+  const marks: { index: number; start: number; end: number }[] = [];
+  let out = '';
+  let last = 0;
+  for (const match of text.matchAll(WORD_MARK)) {
+    out += text.slice(last, match.index);
+    const surface = match[2] ?? '';
+    marks.push({ index: Number.parseInt(match[1] ?? '', 10), start: out.length, end: out.length + surface.length });
+    out += surface;
+    last = match.index + match[0].length;
+  }
+  out += text.slice(last);
+  if (ANY_SENTINEL.test(out)) throw parseFailure(`Unbalanced word marker in text "${out}".`);
+  return { text: out, marks };
+}
+
+/**
  * Split one line body into an ordered stream of `\v` milestones and text spans.
  *
- * Word-level attributes (`\w God|strong="H430"\w*`) keep only the surface word; cross-references
+ * Word-level attributes (`\w God|strong="H430"\w*`) keep only the surface word, wrapped in word
+ * sentinels when it carries a Strong's tag so `finalizeSegments` can emit an FR-301 alignment; cross-references
  * (`\x … \x*`) are dropped whole while footnotes (`\f … \f*`) become `footnote` events (FR-101);
  * red-letter runs (`\wj … \wj*`) are tracked across span *and* verse boundaries via `redLetter`;
  * every other inline marker (`\add`, `\nd`, `\qt`, `\em`, `\k`, `\qs`, …) is stripped but its
  * contents are kept.
  */
-function tokenizeContent(raw: string, redLetter: { value: boolean }): ContentEvent[] {
+function tokenizeContent(raw: string, redLetter: { value: boolean }, wordStrongs: string[]): ContentEvent[] {
   const events: ContentEvent[] = [];
   let buffer = '';
   let index = 0;
@@ -232,7 +280,15 @@ function tokenizeContent(raw: string, redLetter: { value: boolean }): ContentEve
       const end = raw.indexOf(close, index + consumed);
       const body = end === -1 ? raw.slice(index + consumed) : raw.slice(index + consumed, end);
       const pipe = body.indexOf('|');
-      buffer += (pipe === -1 ? body : body.slice(0, pipe)).trim();
+      const surface = (pipe === -1 ? body : body.slice(0, pipe)).trim();
+      const strongs = pipe === -1 || full === 'ref' || full === '+ref' ? null : strongsAttribute(body.slice(pipe + 1));
+      if (strongs !== null && surface !== '') {
+        // Mark the word so its offsets survive span merging and whitespace normalisation.
+        buffer += `${WORD_OPEN}${wordStrongs.length}${WORD_SEP}${surface}${WORD_CLOSE}`;
+        wordStrongs.push(strongs);
+      } else {
+        buffer += surface;
+      }
       index = end === -1 ? raw.length : end + close.length;
       continue;
     }
@@ -271,8 +327,12 @@ function tokenizeContent(raw: string, redLetter: { value: boolean }): ContentEve
  * `footnotes` table, not the searchable verse text). Whitespace is normalised and segments are
  * joined with a single space.
  */
-function finalizeSegments(segments: readonly Segment[]): { plainText: string; spans: VerseSpan[] } {
+function finalizeSegments(
+  segments: readonly Segment[],
+  wordStrongs: readonly string[],
+): { plainText: string; spans: VerseSpan[]; alignments: PackWordAlignmentInput[] } {
   const spans: VerseSpan[] = [];
+  const alignments: PackWordAlignmentInput[] = [];
   const plainPieces: string[] = [];
 
   for (const segment of segments) {
@@ -305,17 +365,28 @@ function finalizeSegments(segments: readonly Segment[]): { plainText: string; sp
       if (run.text === '') continue;
       const type =
         run.type === 'footnote' ? 'footnote' : segment.style === 'text' ? run.type : segment.style;
-      const span: VerseSpan = { type, text: run.text };
+      const { text, marks } = extractWordMarks(run.text);
+      if (text === '') continue;
+      const span: VerseSpan = { type, text };
+      // Headings are not scripture text, so their tagged words are not tappable alignments.
+      if (type !== 'heading' && type !== 'footnote') {
+        for (const mark of marks) {
+          const strongsId = wordStrongs[mark.index];
+          if (strongsId !== undefined) {
+            alignments.push({ spanIndex: spans.length, charStart: mark.start, charEnd: mark.end, strongsId });
+          }
+        }
+      }
       if (run.footnoteId !== undefined) span.footnoteId = run.footnoteId;
       if (type === 'poetry' && segment.indentLevel !== undefined) span.indentLevel = segment.indentLevel;
       spans.push(span);
-      if (!isHeading && run.type !== 'footnote') plainPieces.push(run.text);
+      if (!isHeading && run.type !== 'footnote') plainPieces.push(text);
     }
   }
 
   // Collapse run-boundary artefacts: a note removed between two words can leave a lone-space run
   // next to a space-led run, so normalise the joined searchable text to single spacing.
-  return { plainText: plainPieces.join('').replace(/\s+/g, ' ').trim(), spans };
+  return { plainText: plainPieces.join('').replace(/\s+/g, ' ').trim(), spans, alignments };
 }
 
 /**
@@ -329,6 +400,8 @@ export function parseUsfmToPackSource(usfm: string, profile: UsfmPackProfile): P
   const verses: PackVerseInput[] = [];
   const pendingChrome: Segment[] = [];
   const redLetter = { value: false };
+  /** Strong's ID per word sentinel, indexed by the number embedded in the sentinel. */
+  const wordStrongs: string[] = [];
 
   let bookMeta: BookMeta | undefined;
   let chapter = 0;
@@ -342,7 +415,7 @@ export function parseUsfmToPackSource(usfm: string, profile: UsfmPackProfile): P
     if (accumulator === null) return;
     const current = accumulator;
     accumulator = null;
-    const { plainText, spans } = finalizeSegments(current.segments);
+    const { plainText, spans, alignments } = finalizeSegments(current.segments, wordStrongs);
     if (spans.length === 0) return;
     verses.push({
       book: current.book,
@@ -351,6 +424,7 @@ export function parseUsfmToPackSource(usfm: string, profile: UsfmPackProfile): P
       plainText,
       spans,
       ...(current.footnotes.length > 0 ? { footnotes: current.footnotes } : {}),
+      ...(alignments.length > 0 ? { alignments } : {}),
     });
   };
 
@@ -397,7 +471,7 @@ export function parseUsfmToPackSource(usfm: string, profile: UsfmPackProfile): P
       target.push({ style: spanStyle, spans, ...(indentLevel !== undefined ? { indentLevel } : {}) });
     };
 
-    for (const event of tokenizeContent(content, redLetter)) {
+    for (const event of tokenizeContent(content, redLetter, wordStrongs)) {
       if (event.kind === 'verse') {
         flushBucket();
         startVerse(event.number, line);
