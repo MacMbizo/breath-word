@@ -56,38 +56,47 @@ export function VerseSpans({ verseId, spans, onFootnotePress, alignments, onWord
           span.type === 'poetry'
             ? POETRY_INDENT.repeat(Math.max(0, (span.indentLevel ?? 1) - 1))
             : '';
-        return (
-          <Text
-            key={`${verseId}-${index}`}
-            style={
-              span.type === 'red_letter'
-                ? { color: THEME.text.redLetter }
-                : span.type === 'heading'
-                  ? { color: THEME.text.secondary, fontStyle: 'italic' }
-                  : undefined
-            }
-          >
-            {span.type === 'poetry' && index > 0 ? '\n' : ''}
-            {indent}
-            {onWordPress === undefined || span.type === 'heading'
-              ? span.text
-              : segmentSpanText(span.text, index, alignments).map((segment, part) => {
-                  const alignment = segment.alignment;
-                  if (alignment === undefined) return segment.text;
-                  return (
-                    <Text
-                      key={part}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Study the word ${segment.text}`}
-                      suppressHighlighting={false}
-                      onPress={() => onWordPress(alignment)}
-                    >
-                      {segment.text}
-                    </Text>
-                  );
-                })}
-          </Text>
-        );
+        const spanStyle =
+          span.type === 'red_letter'
+            ? { color: THEME.text.redLetter }
+            : span.type === 'heading'
+              ? { color: THEME.text.secondary, fontStyle: 'italic' as const }
+              : undefined;
+        const prefix = `${span.type === 'poetry' && index > 0 ? '\n' : ''}${indent}`;
+        if (onWordPress === undefined || span.type === 'heading') {
+          return (
+            <Text key={`${verseId}-${index}`} style={spanStyle}>
+              {prefix}
+              {span.text}
+            </Text>
+          );
+        }
+        // Each run is a direct child of the verse paragraph, so a pressable word sits at the same
+        // nesting depth as the verse number. On Android (RN 0.88, new architecture) a pressable
+        // <Text> nested a third level deep did not receive presses in device testing.
+        return segmentSpanText(span.text, index, alignments).map((segment, part) => {
+          const alignment = segment.alignment;
+          const text = part === 0 ? `${prefix}${segment.text}` : segment.text;
+          if (alignment === undefined) {
+            return (
+              <Text key={`${verseId}-${index}-${part}`} style={spanStyle}>
+                {text}
+              </Text>
+            );
+          }
+          return (
+            <Text
+              key={`${verseId}-${index}-${part}`}
+              style={spanStyle}
+              accessibilityRole="button"
+              accessibilityLabel={`Study the word ${segment.text}`}
+              suppressHighlighting={false}
+              onPress={() => onWordPress(alignment)}
+            >
+              {text}
+            </Text>
+          );
+        });
       })}
     </>
   );

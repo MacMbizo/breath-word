@@ -47,7 +47,20 @@ const DEFAULT_TRANSLATION = 'BSB';
 const DEFAULT_BOOK = 45;
 const DEFAULT_CHAPTER = 8;
 
-export function ReaderScreen() {
+/** Where the reader opens; every field falls back to the Romans 8 / BSB default. */
+export interface ReaderStart {
+  readonly packId?: string;
+  readonly translationCode?: string;
+  readonly bookNumber?: number;
+  readonly chapter?: number;
+}
+
+export interface ReaderScreenProps {
+  /** Deep-link start (`/read?pack=trans_kjv&translation=KJV&book=43&chapter=3`). */
+  readonly start?: ReaderStart;
+}
+
+export function ReaderScreen({ start }: ReaderScreenProps = {}) {
   const runtime = useCoreRuntime();
   const { location, chapter, status, error, books } = useCoreStore(runtime.stores.reader);
   const [focusMode, setFocusMode] = useState(false);
@@ -61,16 +74,21 @@ export function ReaderScreen() {
   const { highlights, wordAlignments } = useCoreStore(runtime.stores.study);
   const { activeVerseId: narratedVerseId } = useCoreStore(runtime.stores.audio);
 
-  // The store is idle until asked, so open the default passage and its book list once on mount.
+  // The store is idle until asked, so open the start passage and its book list on mount (and
+  // again whenever a deep link names a different start).
+  const startPack = start?.packId ?? DEFAULT_PACK_ID;
+  const startTranslation = start?.translationCode ?? DEFAULT_TRANSLATION;
+  const startBook = start?.bookNumber ?? DEFAULT_BOOK;
+  const startChapter = start?.chapter ?? DEFAULT_CHAPTER;
   useEffect(() => {
     void runtime.stores.reader.getState().openChapter({
-      packId: DEFAULT_PACK_ID,
-      translationCode: DEFAULT_TRANSLATION,
-      bookNumber: DEFAULT_BOOK,
-      chapter: DEFAULT_CHAPTER,
+      packId: startPack,
+      translationCode: startTranslation,
+      bookNumber: startBook,
+      chapter: startChapter,
     });
-    void runtime.stores.reader.getState().loadBooks(DEFAULT_PACK_ID, DEFAULT_TRANSLATION);
-  }, [runtime]);
+    void runtime.stores.reader.getState().loadBooks(startPack, startTranslation);
+  }, [runtime, startPack, startTranslation, startBook, startChapter]);
 
   // FR-101 — tap-to-open footnote sheet: markers in the text resolve to the chapter's note bodies.
   const footnotesById = useMemo(
