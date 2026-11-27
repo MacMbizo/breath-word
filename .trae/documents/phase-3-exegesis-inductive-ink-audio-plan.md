@@ -2,7 +2,7 @@
 
 **Plan ID:** `phase-3-exegesis-inductive-ink-audio-plan`
 **Author:** Athena
-**Status:** Active — in execution
+**Status:** Built — device exit-gate checks open
 **Created:** 2026-11-27
 **Predecessor:** `phase-2-scripture-prayer-and-e2ee-plan` (Phase 2 — exit gate PASSED, `G3 v1.0.42`)
 **Related Docs:** `A3 §4.1`, `A2 §4.1/§4.3`, `B4 §4.2–4.6`, `B5`, `B6`, `B7`, `C2`, `C3`, `D1`, `D3`, `F1`, `G5`, `ADR-003`, `AGENTS.md`
@@ -88,34 +88,41 @@ Strictly out of scope in Phase 3 (`AGENTS.md` rule 7): Phase 4 (`FR-401` AI Smar
 
 ## 4. Phase-3 Exit-Gate Checklist (`A3 §4.1`, `F1`)
 
-- [ ] Tap-to-Strong's displays `G26` (*agapē*), definition, and morphology (<60 ms); RTL Hebrew renders with `dir="rtl"` + `unicode-bidi: isolate` (`FR-301`).
-- [ ] BDB/Thayer lexicon sections + OT/NT frequency counts & verse occurrences work offline (`FR-302`).
-- [ ] Passage Guide lists top-voted TSK refs on Rom 8; Factbook opens Ephesus dossier with occurrences & map coordinates (`FR-303`).
+- [x] Tap-to-Strong's displays `G26` (*agapē*), definition, and morphology (<60 ms); RTL Hebrew renders with `dir="rtl"` + `unicode-bidi: isolate` (`FR-301`).
+- [x] BDB/Thayer lexicon sections + OT/NT frequency counts & verse occurrences work offline (`FR-302`).
+- [x] Passage Guide lists top-voted TSK refs on Rom 8; Factbook opens Ephesus dossier with occurrences & map coordinates (`FR-303`).
 - [ ] Inductive highlights (`◇ △ ↳ ✦ ✓`), 5Ws&H, Paraphrase, and 5-step Application card schedule `checkup_remind_at` and sync (`FR-304`).
 - [ ] Vector ink stroke drawn on one device syncs via `ink_canvases` and renders at identical normalized proportions cross-platform (`FR-305`).
 - [ ] Synchronized audio highlights verses within ±250 ms, supports independent ambient mixer (`rain`/`piano`/`pad`), and smoothly fades out on sleep timer (`FR-106`).
-- [ ] `exegesis_step` and `study_refs` ETL packs pass `PRAGMA integrity_check` and license/attribution checks (`B5`).
-- [ ] `pnpm turbo lint typecheck test` green.
+- [x] `exegesis_step` and `study_refs` ETL packs pass `PRAGMA integrity_check` and license/attribution checks (`B5`).
+- [x] `pnpm turbo lint typecheck test` green.
 
 ---
+
+> Exit-gate notes (2026-11-27): ticked items were verified live in the desktop app against real
+> STEPBible / OpenBible / Theographic packs (`G3` `v1.0.44`). Tap-to-Strong's works from the verse
+> interlinear; tapping the English word needs `verse_word_alignments`, which no translation pack
+> ships yet. Still open: the mobile run (new native build for `expo-audio`), iPad → Android/Desktop ink
+> rendering, cross-device sync of study data, an OS-level checkup notification, and the ±250 ms audio
+> check (needs an audio edition with verse timestamps).
 
 ## 5. Progress Ledger
 
 | Unit | State | Where |
 | --- | --- | --- |
-| `P3-01` | ✅ Host (tests) | `packages/core/src/content/pack-schema.ts`, `src/domain/strongs.ts`, `src/domain/types.ts` — covered by `test/exegesis-repository.test.ts` (no standalone `strongs.test.ts`) |
-| `P3-02` | ✅ Host (tests) | `packages/core/src/repositories/exegesis-repository.ts` · `test/exegesis-repository.test.ts` |
-| `P3-03` | ✅ Host (tests) | `packages/core/src/repositories/study-refs-repository.ts` · `test/study-refs-repository.test.ts` |
-| `P3-04` | ✅ Host (tests) | `packages/core/src/repositories/inductive-study-repository.ts` · `test/inductive-study-repository.test.ts` |
-| `P3-05` | ✅ Host (tests) | `packages/core/src/repositories/ink-canvas-repository.ts`, `src/ink/strokes.ts` · `test/ink-canvas-repository.test.ts` |
-| `P3-06` | ✅ Host (tests) | `packages/core/src/repositories/audio-repository.ts` · `test/audio-repository.test.ts` |
-| `P3-07` | 🟡 Partial | `src/stores/audio-store.ts`, `src/stores/study-store.ts` built; `test/study-store.test.ts` exists, **`test/audio-store.test.ts` still missing** |
-| `P3-08` | ✅ Host (tests) | `packages/core/src/runtime/core-runtime.ts` · `test/core-runtime.test.ts` |
-| `P3-09` | 🟡 Partial | **Exegesis done (2026-11-27):** `tools/pack-builder/src/exegesis-pack.ts` (`buildExegesisPackDatabase` / `buildExegesisPackArtifacts`, Strong's normalization, derived occurrence counts, post-insert integrity checks, `--sample-exegesis` fixture), shared B5 licence/attribution + integrity gates in `src/pack-common.ts` (now also applied to TRANSLATION packs) · `test/phase3-packs.test.ts` (17 tests). **Pending:** `buildStudyRefsPack` (CC-BY-SA-4.0 ShareAlike notice) and the raw STEPBible TAHOT/TAGNT TSV parser. |
-| `P3-10` | ⬜ Pending | — |
-| `P3-11` | ⬜ Pending | — |
-| `P3-12` | ⬜ Pending | — |
-| `P3-13` | ⬜ Pending | — |
-| `P3-14` | ⬜ Pending | — |
-| `P3-15` | 🔄 Ongoing | Gate `12/12` green after P3-09 (exegesis) |
-| `P3-16` | 🔄 Ongoing | This ledger + `G3 v1.0.43` |
+| `P3-01` | ✅ Host (tests) | `packages/core/src/content/pack-schema.ts`, `src/domain/strongs.ts`, `src/domain/types.ts` — covered by `test/exegesis-repository.test.ts` |
+| `P3-02` | ✅ Host + desktop | `exegesis-repository.ts` · verified live on real STEPBible data |
+| `P3-03` | ✅ Host + desktop | `study-refs-repository.ts` · Rom 8:28 guide + Ephesus dossier live |
+| `P3-04` | ✅ Host + desktop | `inductive-study-repository.ts` · symbols + 5Ws & H persist across reload |
+| `P3-05` | ✅ Host + desktop | `ink-canvas-repository.ts`, `ink/strokes.ts` (+ `inkStrokeWidthToPixels`) |
+| `P3-06` | ✅ Host (tests) | `audio-repository.ts` |
+| `P3-07` | ✅ Host (tests) | `stores/audio-store.ts` (`test/audio-store.test.ts`, 11 tests), `stores/study-store.ts`, `audio/sleep-fade.ts` |
+| `P3-08` | ✅ Host (tests) | `runtime/core-runtime.ts` |
+| `P3-09` | ✅ Host (real data) | `exegesis-pack.ts`, `study-refs-pack.ts`, `pack-common.ts`, `datasets/{stepbible,openbible,theographic,morphology,reading-plans}.ts`, `parse-datasets.ts` · 87 pack-builder tests · real packs built and installed via FR-105 |
+| `P3-10` | ✅ Desktop live · mobile typecheck | `WordStudyPane.tsx` / `WordStudySection.tsx`, `OriginalText` (RTL isolate) |
+| `P3-11` | ✅ Desktop live · mobile typecheck | `PassageGuidePane.tsx` / `PassageGuideSection.tsx` |
+| `P3-12` | ✅ Desktop live · mobile typecheck | `InductivePane.tsx` / `InductiveSection.tsx` (OS notification for checkups still open) |
+| `P3-13` | ✅ Desktop live · mobile typecheck | `InkCanvas.tsx` (SVG) / `InkSketch.tsx` (Skia) |
+| `P3-14` | 🟡 Built | `AudioMiniPlayer.tsx` ×2, two-stream adapters + fade, ambient loops; narration verse sync needs an audio edition with timestamps |
+| `P3-15` | ✅ | Gate `12/12` (core 276 / 29 files, pack-builder 87 / 4 files) |
+| `P3-16` | ✅ | This ledger, `G3 v1.0.44`, `G5 1.0.4` |
