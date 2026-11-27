@@ -138,6 +138,55 @@ CREATE INDEX idx_audio_ts_lookup ON audio_verse_timestamps(edition_id, start_ms)
 `.trim();
 
 /**
+ * DDL for the EXEGESIS pack `.sqlite` file (`exegesis_step.sqlite`; B4 §4.2, pack type 2).
+ * Holds versification maps, word-level interlinear tokens with pre-expanded morphology,
+ * and structured BDB / Thayer / Abbott-Smith lexicon entries keyed by unpadded Strong's ID.
+ */
+export const EXEGESIS_PACK_DDL = `
+${PACK_METADATA_DDL}
+
+CREATE TABLE versification_maps (
+    source_versification TEXT NOT NULL,
+    source_verse_id INTEGER NOT NULL,
+    canonical_verse_id INTEGER NOT NULL,
+    mapping_type TEXT NOT NULL DEFAULT 'EXACT',
+    PRIMARY KEY (source_versification, source_verse_id, canonical_verse_id)
+);
+CREATE INDEX idx_vmap_canonical ON versification_maps(canonical_verse_id);
+
+CREATE TABLE interlinear_tokens (
+    token_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    canonical_verse_id INTEGER NOT NULL,
+    source_verse_id INTEGER NOT NULL,
+    word_position INTEGER NOT NULL,
+    original_word TEXT NOT NULL,
+    transliteration TEXT,
+    english_gloss TEXT,
+    strongs_id TEXT,
+    lemma TEXT,
+    morphology_code TEXT,
+    morphology_human TEXT,
+    CONSTRAINT unq_token UNIQUE (canonical_verse_id, word_position)
+);
+CREATE INDEX idx_tokens_verse ON interlinear_tokens(canonical_verse_id);
+CREATE INDEX idx_tokens_strongs ON interlinear_tokens(strongs_id);
+CREATE INDEX idx_tokens_lemma ON interlinear_tokens(lemma);
+
+CREATE TABLE lexicon_entries (
+    strongs_id TEXT PRIMARY KEY,
+    language TEXT NOT NULL,
+    lemma TEXT NOT NULL,
+    transliteration TEXT,
+    pronunciation TEXT,
+    short_definition TEXT NOT NULL,
+    full_entry_json TEXT NOT NULL,
+    ot_occurrences INTEGER NOT NULL DEFAULT 0,
+    nt_occurrences INTEGER NOT NULL DEFAULT 0,
+    total_occurrences INTEGER NOT NULL DEFAULT 0
+);
+`.trim();
+
+/**
  * DDL for the STUDY_REFS pack `.sqlite` file (B4 §4.2, pack type 3).
  * FR-104 Manna Pacing reads `reading_plans` / `reading_plan_days`; the cross-reference and
  * factbook tables ship in the same pack for the later Passage Guide / Factbook surfaces.

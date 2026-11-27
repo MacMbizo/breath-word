@@ -1,9 +1,9 @@
 # G1: Living Documentation Index
 
 **Document ID:** `G1`  
-**Version:** `1.0.0`  
+**Version:** `1.2.0`  
 **Status:** `Active`  
-**Last Updated:** `2026-11-24`  
+**Last Updated:** `2026-11-27`  
 **Related Docs:** `AGENTS.md`, `SPECIFICATION.md`, `G3`
 
 This is the canonical map of the Breath & Word documentation suite. **Document IDs are canonical; folder names are organizational only.**
@@ -14,6 +14,7 @@ This is the canonical map of the Breath & Word documentation suite. **Document I
 2. Use this index to locate the authoritative document for any `A*`–`G*` ID.
 3. Consult `G3-changelog.md` before assuming a contract, schema, or phase boundary has changed.
 4. Treat `SPECIFICATION.md` as the original product/architecture source; the `docs/` suite is the normalized build specification.
+5. For a fast status/handover snapshot, read the `S*` docs (`status/`): current scope and progress, challenges and fixes, and the live backend setup.
 
 ## Document Inventory
 
@@ -45,6 +46,12 @@ This is the canonical map of the Breath & Word documentation suite. **Document I
 | `G3` | Living Changelog | [`G3-changelog.md`](G3-changelog.md) | Active |
 | `G5` | Requirements Register & Traceability Matrix | [`G5-requirements-register.md`](G5-requirements-register.md) | Active |
 | `G4` | Master Glossary & Solo Developer + AI Handover Guide | [`governance/G4-master-glossary-and-solo-developer-ai-handover-guide.md`](governance/G4-master-glossary-and-solo-developer-ai-handover-guide.md) | Approved |
+| `EXTRAS-SRC` | Bible Content Sources & External Datasets (Research) | [`integrations/bible-content-sources-and-external-datasets.md`](integrations/bible-content-sources-and-external-datasets.md) | Draft |
+| `EXTRAS-FEAT` | Advanced Study Feature Candidates (Research) | [`product/advanced-study-feature-candidates.md`](product/advanced-study-feature-candidates.md) | Draft |
+| `S1` | Project Vision & Full Scope (status) | [`status/S1-project-vision-and-scope.md`](status/S1-project-vision-and-scope.md) | Living |
+| `S2` | Build History & Progress (status) | [`status/S2-build-history-and-progress.md`](status/S2-build-history-and-progress.md) | Living |
+| `S3` | Challenges & How They Were Solved (status) | [`status/S3-challenges-and-solutions.md`](status/S3-challenges-and-solutions.md) | Living |
+| `S4` | Current Backend Setup — Supabase & PowerSync (status) | [`status/S4-backend-setup-supabase-and-powersync.md`](status/S4-backend-setup-supabase-and-powersync.md) | Living |
 
 ## ADR Files (`B8`)
 
@@ -64,3 +71,5 @@ This is the canonical map of the Breath & Word documentation suite. **Document I
 ## Change Log
 
 - `1.0.0` | `2026-11-24` | Devin | Initial extracted-docs index reflecting the current `docs/` tree.
+- `1.1.0` | `2026-11-27` | Devin | Registered research docs `EXTRAS-SRC` and `EXTRAS-FEAT` distilled from root `extras.md`.
+- `1.2.0` | `2026-11-27` | Devin | Registered the living status/handover docs `S1`–`S4` under `docs/status/`: project vision & full scope, build history & progress, challenges & solutions, and the current Supabase + PowerSync backend setup. Added a "how to use" pointer to the `S*` family.

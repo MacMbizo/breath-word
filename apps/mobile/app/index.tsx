@@ -35,6 +35,24 @@ export default function HomeScreen() {
         <Link href="/library" style={styles.devLink}>
           <Text style={styles.devLinkText}>Library</Text>
         </Link>
+        <Link href="/pools" style={styles.devLink}>
+          <Text style={styles.devLinkText}>Pools</Text>
+        </Link>
+        <Link href="/prayer-session" style={styles.devLink}>
+          <Text style={styles.devLinkText}>Prayer session</Text>
+        </Link>
+        <Link href="/prayer-engines" style={styles.devLink}>
+          <Text style={styles.devLinkText}>Guided prayer</Text>
+        </Link>
+        <Link href="/vault" style={styles.devLink}>
+          <Text style={styles.devLinkText}>Vault</Text>
+        </Link>
+        <Link href="/habits" style={styles.devLink}>
+          <Text style={styles.devLinkText}>Habits</Text>
+        </Link>
+        <Link href="/account" style={styles.devLink}>
+          <Text style={styles.devLinkText}>Account</Text>
+        </Link>
         <Link href="/diagnostics" style={styles.devLink}>
           <Text style={styles.devLinkText}>Gate-1 spike diagnostics</Text>
         </Link>

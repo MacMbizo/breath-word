@@ -9,6 +9,11 @@ import { base64UrlToBytes, bytesToBase64Url } from './base64url';
 const ENVELOPE_PREFIX = 'e2ee:v1:';
 const IV_BYTES = 12;
 
+/** True when a stored string carries the `e2ee:v1:` ciphertext envelope prefix (B6 §4.2). */
+export function isEncryptedEnvelope(value: string): boolean {
+  return value.startsWith(ENVELOPE_PREFIX);
+}
+
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 

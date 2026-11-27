@@ -7,42 +7,46 @@
 // `PackSource`; Protestant BBCCCVVV mapping happens during that parse step, so this
 // builder only enforces the canonical id derived from book/chapter/verse.
 
-import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { gzipSync } from 'node:zlib';
 
 import { DatabaseSync } from './node-sqlite';
+import {
+  EXEGESIS_PACK_ID,
+  buildExegesisPackArtifacts,
+  createSampleExegesisPackSource,
+  isExegesisPackSource,
+  type ExegesisPackSource,
+} from './exegesis-pack';
+import {
+  assertPackMetadata,
+  closeAndDiscard,
+  closeQuietly,
+  insertPackMetadata,
+  packageArtifacts,
+  verifyPackDatabase,
+  type PackBuildArtifacts,
+  type PackBuildOptions,
+  type PackMetadataInput,
+} from './pack-common';
 
 import {
-  AppError,
   BOOKS,
   MANIFEST_VERSION,
-  PACK_SCHEMA_VERSION,
   TRANSLATION_PACK_DDL,
   toCanonicalVerseId,
   type ManifestPackEntry,
   type PackManifest,
-  type PackType,
   type VerseSpan,
 } from '@breath-and-word/core';
+
+export type { PackBuildArtifacts, PackBuildOptions, PackMetadataInput } from './pack-common';
 
 /** Content packs scheduled for the Phase 1 Core Local Reader MVP (A3 §4.1). */
 export const PHASE1_PACK_IDS = ['core_bsb', 'trans_web', 'trans_kjv'] as const;
 
 export type Phase1PackId = (typeof PHASE1_PACK_IDS)[number];
-
-export interface PackMetadataInput {
-  packId: string;
-  packType: PackType;
-  contentVersion: string;
-  displayName: string;
-  licenseSpdx: string;
-  attributionText: string;
-  /** ISO-8601 UTC. */
-  builtAt: string;
-}
 
 export interface PackTranslationInput {
   code: string;
@@ -97,24 +101,11 @@ export interface PackBuildStats {
   verseCount: number;
 }
 
-export interface PackBuildOptions {
-  /** Base URL the `*.sqlite.gz` files are hosted under (Cloudflare R2 prefix). */
-  baseUrl: string;
-  minAppVersion: string;
-}
-
-export interface PackBuildArtifacts {
-  sqlitePath: string;
-  gzPath: string;
-  entry: ManifestPackEntry;
-}
-
-function sha256Hex(bytes: Uint8Array): string {
-  return createHash('sha256').update(bytes).digest('hex');
-}
-
 /** Build the pack `.sqlite` with the canonical schema and populated FTS5 index (B4 §4.2/§4.6). */
 export function buildPackDatabase(source: PackSource, sqlitePath: string): PackBuildStats {
+  // B5 §4.3: refuse to build a pack with a blank licence or attribution before touching disk.
+  assertPackMetadata(source.metadata, 'TRANSLATION');
+
   // Rebuilds must be idempotent: start from a clean file so the DDL never collides with a prior run.
   rmSync(sqlitePath, { force: true });
   const db = new DatabaseSync(sqlitePath);
@@ -126,20 +117,7 @@ export function buildPackDatabase(source: PackSource, sqlitePath: string): PackB
     db.exec('BEGIN');
 
     const { metadata, translation } = source;
-    db.prepare(
-      `INSERT INTO pack_metadata
-         (pack_id, pack_type, schema_version, content_version, display_name, license_spdx, attribution_text, built_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    ).run(
-      metadata.packId,
-      metadata.packType,
-      PACK_SCHEMA_VERSION,
-      metadata.contentVersion,
-      metadata.displayName,
-      metadata.licenseSpdx,
-      metadata.attributionText,
-      metadata.builtAt,
-    );
+    insertPackMetadata(db, metadata);
 
     db.prepare(
       `INSERT INTO translations
@@ -199,23 +177,15 @@ export function buildPackDatabase(source: PackSource, sqlitePath: string): PackB
     db.exec("INSERT INTO verses_fts(verses_fts) VALUES('rebuild');");
     db.exec('COMMIT');
 
-    db.exec('ANALYZE;');
-    db.exec('VACUUM;');
-
-    const integrity = db.prepare('PRAGMA integrity_check;').get() as { integrity_check: string };
-    if (integrity.integrity_check !== 'ok') {
-      throw new AppError({
-        code: 'PACK_INTEGRITY_FAILED',
-        domain: 'PACK',
-        retryPolicy: 'USER_ACTION',
-        userMessage: 'The downloaded Bible pack could not be verified.',
-        internalDetail: `PRAGMA integrity_check returned "${integrity.integrity_check}" for ${metadata.packId}.`,
-      });
-    }
+    verifyPackDatabase(db, metadata);
 
     return { bookCount: source.books.length, verseCount: source.verses.length };
+  } catch (error) {
+    // Never leave a half-built or unverified pack where a later step could publish it.
+    closeAndDiscard(db, sqlitePath);
+    throw error;
   } finally {
-    db.close();
+    closeQuietly(db);
   }
 }
 
@@ -230,29 +200,7 @@ export function buildPackArtifacts(
   const { metadata } = source;
   const sqlitePath = join(outDir, `${metadata.packId}-${metadata.contentVersion}.sqlite`);
   buildPackDatabase(source, sqlitePath);
-
-  const uncompressed = readFileSync(sqlitePath);
-  const compressed = gzipSync(uncompressed);
-  const gzPath = `${sqlitePath}.gz`;
-  writeFileSync(gzPath, compressed);
-
-  return {
-    sqlitePath,
-    gzPath,
-    entry: {
-      packId: metadata.packId,
-      packType: metadata.packType,
-      contentVersion: metadata.contentVersion,
-      schemaVersion: PACK_SCHEMA_VERSION,
-      minAppVersion: options.minAppVersion,
-      downloadUrl: `${options.baseUrl.replace(/\/$/, '')}/${basename(gzPath)}`,
-      compressedBytes: compressed.byteLength,
-      uncompressedBytes: uncompressed.byteLength,
-      sha256Compressed: sha256Hex(compressed),
-      sha256Uncompressed: sha256Hex(uncompressed),
-      licenseSpdx: metadata.licenseSpdx,
-    },
-  };
+  return packageArtifacts(sqlitePath, metadata, options);
 }
 
 /** Write the R2 `manifest.json` contract (B4 §4.6) for the given pack entries. */
@@ -266,6 +214,11 @@ export function writeManifest(outDir: string, entries: ManifestPackEntry[], gene
 /** Load a normalized `PackSource` from a JSON file produced by a dataset parser. */
 export function loadPackSource(jsonPath: string): PackSource {
   return JSON.parse(readFileSync(jsonPath, 'utf8')) as PackSource;
+}
+
+/** Load any normalized source JSON; the builder is chosen by `metadata.packType`. */
+export function loadAnyPackSource(jsonPath: string): PackSource | ExegesisPackSource {
+  return JSON.parse(readFileSync(jsonPath, 'utf8')) as PackSource | ExegesisPackSource;
 }
 
 /** Synthetic chapter/verse shape used only by `createSamplePackSource` (see below). */
@@ -436,10 +389,14 @@ export const SAMPLE_SEARCH_QUERY = 'work together for good';
 
 const USAGE = `Usage: pack-builder --source <pack-source.json> --out <dir> [--base-url <url>] [--min-app-version <v>]
        pack-builder --sample --out <dir> [--pack-id <id>] [--code <CODE>] [--name <text>]
+       pack-builder --sample-exegesis --out <dir>
 
 Builds a modular static content pack (.sqlite + .sqlite.gz + manifest.json, B4 §4.6).
 
-  --source <file>          Normalized PackSource JSON (produced by a dataset parser).
+  --source <file>          Normalized source JSON (produced by a dataset parser). A source whose
+                           metadata.packType is EXEGESIS is built as an exegesis pack.
+  --sample-exegesis        Build the tiny ${EXEGESIS_PACK_ID} sample fixture (Gen 1:1, 1 John 4:8; NOT a
+                           release pack) for FR-301/302 device testing.
   --sample                 Build the synthetic Gate-1 spike fixture instead of a parsed source
                            (generated filler text — NOT scripture; ~31k verses for latency timing).
   --pack-id <id>           Sample fixture pack id (default: core_bsb).
@@ -459,6 +416,7 @@ Raw-dataset parsing (BSB/WEB/KJV/ASV USFM -> PackSource) is the upstream "parse:
 interface ParsedArgs {
   source?: string;
   sample: boolean;
+  sampleExegesis: boolean;
   out?: string;
   baseUrl: string;
   minAppVersion: string;
@@ -471,6 +429,7 @@ interface ParsedArgs {
 function parseArgs(argv: readonly string[]): ParsedArgs {
   const parsed: ParsedArgs = {
     sample: false,
+    sampleExegesis: false,
     baseUrl: 'https://packs.breathandword.app/v1',
     minAppVersion: '0.1.0',
   };
@@ -479,6 +438,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
     const value = argv[i + 1];
     if (flag === '--source' && value !== undefined) parsed.source = value;
     else if (flag === '--sample') parsed.sample = true;
+    else if (flag === '--sample-exegesis') parsed.sampleExegesis = true;
     else if (flag === '--out' && value !== undefined) parsed.out = value;
     else if (flag === '--base-url' && value !== undefined) parsed.baseUrl = value;
     else if (flag === '--min-app-version' && value !== undefined) parsed.minAppVersion = value;
@@ -509,15 +469,17 @@ function mergeManifestEntries(outDir: string, entry: ManifestPackEntry): Manifes
 export function main(argv: readonly string[]): void {
   const args = parseArgs(argv);
 
-  let source: PackSource;
-  if (args.sample) {
+  let source: PackSource | ExegesisPackSource;
+  if (args.sampleExegesis) {
+    source = createSampleExegesisPackSource();
+  } else if (args.sample) {
     source = createSamplePackSource({
       ...(args.packId !== undefined ? { packId: args.packId } : {}),
       ...(args.code !== undefined ? { translationCode: args.code } : {}),
       ...(args.name !== undefined ? { displayName: args.name } : {}),
     });
   } else if (args.source !== undefined) {
-    source = loadPackSource(args.source);
+    source = loadAnyPackSource(args.source);
   } else {
     process.stdout.write(USAGE);
     process.exitCode = 1;
@@ -530,10 +492,27 @@ export function main(argv: readonly string[]): void {
     return;
   }
 
-  const artifacts = buildPackArtifacts(source, args.out, {
-    baseUrl: args.baseUrl,
-    minAppVersion: args.minAppVersion,
-  });
+  const options = { baseUrl: args.baseUrl, minAppVersion: args.minAppVersion };
+  let artifacts: PackBuildArtifacts;
+  let summary: string;
+  if (isExegesisPackSource(source)) {
+    const built = buildExegesisPackArtifacts(source, args.out, options);
+    artifacts = built;
+    const { stats } = built;
+    summary =
+      `${stats.tokenCount} tokens, ${stats.lexiconEntryCount} lexicon entries, ` +
+      `${stats.versificationMapCount} versification maps`;
+    if (stats.unresolvedStrongsIds.length > 0) {
+      process.stdout.write(
+        `pack-builder: note — ${stats.unresolvedStrongsIds.length} Strong's id(s) used by tokens have no lexicon entry ` +
+          `(e.g. ${stats.unresolvedStrongsIds.slice(0, 5).join(', ')})
+`,
+      );
+    }
+  } else {
+    artifacts = buildPackArtifacts(source, args.out, options);
+    summary = `${source.verses.length} verses`;
+  }
 
   // Merge into any manifest already in the output directory: the local Gate-1 server hosts several
   // fixture packs at once (FR-102 compare / FR-103 search need more than one translation installed),
@@ -542,11 +521,12 @@ export function main(argv: readonly string[]): void {
   const manifestPath = writeManifest(args.out, entries, source.metadata.builtAt);
 
   process.stdout.write(
-    `pack-builder: built ${artifacts.sqlitePath} (${source.verses.length} verses, ` +
-      `${artifacts.entry.uncompressedBytes} bytes)\n`,
+    `pack-builder: built ${artifacts.sqlitePath} (${summary}, ${artifacts.entry.uncompressedBytes} bytes)
+`,
   );
   process.stdout.write(
-    `pack-builder: wrote ${artifacts.gzPath} and ${manifestPath} (${entries.length} pack(s))\n`,
+    `pack-builder: wrote ${artifacts.gzPath} and ${manifestPath} (${entries.length} pack(s))
+`,
   );
 }
 

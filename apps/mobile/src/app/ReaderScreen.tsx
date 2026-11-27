@@ -20,6 +20,7 @@ import {
   SPACING,
 } from '@breath-and-word/tokens';
 
+import { CaptureSheet } from './CaptureSheet';
 import { useCoreRuntime } from './CoreRuntime';
 import { useCoreStore } from './useCoreStore';
 import { VerseSpans } from './VerseSpans';
@@ -38,6 +39,8 @@ export function ReaderScreen() {
   const { location, chapter, status, error, books } = useCoreStore(runtime.stores.reader);
   const [focusMode, setFocusMode] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  /** FR-201 — whether the ≤2-tap capture sheet is open over the reader. */
+  const [captureOpen, setCaptureOpen] = useState(false);
   /** FR-101 — the footnote whose sheet is open, or `null` when the sheet is closed. */
   const [activeFootnote, setActiveFootnote] = useState<Footnote | null>(null);
 
@@ -101,6 +104,14 @@ export function ReaderScreen() {
           <View style={styles.headerRow}>
             <Text style={styles.reference}>{reference}</Text>
             <View style={styles.headerActions}>
+              <Pressable
+                onPress={() => setCaptureOpen(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Capture passage"
+                style={styles.focusButton}
+              >
+                <Text style={styles.focusButtonText}>Capture</Text>
+              </Pressable>
               <Pressable
                 onPress={() => setPickerOpen(true)}
                 accessibilityRole="button"
@@ -241,6 +252,13 @@ export function ReaderScreen() {
           </View>
         </View>
       </Modal>
+
+      <CaptureSheet
+        visible={captureOpen}
+        onClose={() => setCaptureOpen(false)}
+        chapter={chapter}
+        reference={reference}
+      />
     </View>
   );
 }

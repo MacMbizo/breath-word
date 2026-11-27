@@ -6,14 +6,31 @@ import { motion, useReducedMotion } from 'framer-motion';
 
 import type { ThemeName } from '@breath-and-word/tokens';
 
+import { AccountView } from './AccountView';
 import { BreathRing } from './BreathRing';
 import { CompareView } from './CompareView';
+import { EngineView } from './EngineView';
+import { HabitsView } from './HabitsView';
 import { LibraryView } from './LibraryView';
+import { PoolsView } from './PoolsView';
+import { PrayerSessionView } from './PrayerSessionView';
 import { ReaderView } from './ReaderView';
 import { SearchView } from './SearchView';
+import { VaultView } from './VaultView';
 import { applyTheme, DEFAULT_THEME, THEMES } from './theme';
 
-type Tab = 'read' | 'search' | 'compare' | 'library' | 'breathe';
+type Tab =
+  | 'read'
+  | 'search'
+  | 'compare'
+  | 'library'
+  | 'breathe'
+  | 'pools'
+  | 'deck'
+  | 'pray'
+  | 'vault'
+  | 'habits'
+  | 'account';
 
 const TABS: readonly { readonly id: Tab; readonly label: string }[] = [
   { id: 'read', label: 'Read' },
@@ -21,6 +38,12 @@ const TABS: readonly { readonly id: Tab; readonly label: string }[] = [
   { id: 'compare', label: 'Compare' },
   { id: 'library', label: 'Library' },
   { id: 'breathe', label: 'Breathe' },
+  { id: 'pools', label: 'Pools' },
+  { id: 'deck', label: 'Deck' },
+  { id: 'pray', label: 'Guided' },
+  { id: 'vault', label: 'Vault' },
+  { id: 'habits', label: 'Habits' },
+  { id: 'account', label: 'Account' },
 ];
 
 export function App() {
@@ -110,6 +133,12 @@ export function App() {
           {tab === 'compare' && <CompareView />}
           {tab === 'library' && <LibraryView />}
           {tab === 'breathe' && <BreathRing />}
+          {tab === 'pools' && <PoolsView />}
+          {tab === 'deck' && <PrayerSessionView />}
+          {tab === 'pray' && <EngineView />}
+          {tab === 'vault' && <VaultView />}
+          {tab === 'habits' && <HabitsView />}
+          {tab === 'account' && <AccountView />}
         </motion.div>
       </main>
     </div>

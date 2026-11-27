@@ -1,0 +1,16 @@
+-- ============================================================================
+-- seed.sql — Local development seed (executed by `supabase db reset` after all
+-- migrations in `supabase/migrations/`).
+-- Authority: supabase/config.jsonc (`db.seed.sql_paths: ["./seed.sql"]`).
+--
+-- This file is intentionally empty. Supabase stores NO static biblical content:
+-- scripture, Strong's and interlinear data live exclusively in read-only modular
+-- `.sqlite` packs (`ContentDbAdapter`; ADR-002, B4 §4.2). All user rows are created
+-- by the apps at runtime, and `auth.users` rows are created through Supabase Auth.
+-- Therefore the hosted/local Postgres legitimately starts empty.
+--
+-- Transactional RLS/RPC fixtures live with their suite in `supabase/tests/`, not
+-- here, so they can roll back cleanly after every run.
+-- ============================================================================
+
+-- (no seed data)

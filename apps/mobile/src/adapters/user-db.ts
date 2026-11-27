@@ -1,23 +1,24 @@
 // UserDbAdapter — the synced `user_data.sqlite` (B3 §4.3, B4 §4.3, ADR-002).
 //
 // Backed by PowerSync's `@powersync/react-native` SDK (op-sqlite) as mandated by ADR-002: rows
-// written here live in the device's SQLite file and survive an app restart, and — once the Phase-2
-// backend connector is attached — sync offline-first across devices. Phase 1 runs the database
-// local-only: `connect()` is never called, so no sync client, network or bucket machinery starts.
+// written here live in the device's SQLite file and survive an app restart, and — once the WS4
+// backend connector is attached (`createSyncAdapter`) — sync offline-first across devices. Without
+// a configured backend the same database still opens and behaves exactly as Phase 1: `connect()`
+// is never called, so no sync client, network or bucket machinery starts.
 //
-// The canonical `USER_DATA_DDL` (B4 §4.3) is applied verbatim at first boot, so every repository
-// query in `packages/core/src/repositories` runs unchanged. PowerSync's own sync schema starts empty
-// and gains the synced tables when the Phase-2 sync layer is wired behind this same adapter.
+// PowerSync owns the synced tables: `db.init()` materialises each one from `userDataSchema` (the
+// client mirror of the canonical `USER_DATA_DDL`, B4 §4.3), so every repository query in
+// `packages/core/src/repositories` runs unchanged.
 
-import { PowerSyncDatabase, Schema, type Transaction } from '@powersync/react-native';
+import { PowerSyncDatabase, type Transaction } from '@powersync/react-native';
 import {
-  USER_DATA_DDL,
-  USER_DATA_SCHEMA_VERSION,
   asAppError,
   type AppErrorFallback,
   type SqlQueryResult,
   type UserDbAdapter,
 } from '@breath-and-word/core';
+
+import { userDataSchema } from './powersync-schema';
 
 const FALLBACK: AppErrorFallback = {
   code: 'DB_OPERATION_FAILED',
@@ -43,30 +44,18 @@ function wrap<T>(run: () => Promise<T>): Promise<T> {
   });
 }
 
-/** Apply the canonical DDL the first time this user DB is opened, then stamp the version. */
-async function ensureSchema(db: PowerSyncDatabase): Promise<void> {
-  const version = await db.getOptional<Record<string, number>>('PRAGMA user_version');
-  const current = version === null ? 0 : (Object.values(version)[0] ?? 0);
-  if (current >= USER_DATA_SCHEMA_VERSION) {
-    return;
-  }
-  // `USER_DATA_DDL` is a multi-statement script; PowerSync runs every statement when no bindings
-  // are passed.
-  await db.execute(USER_DATA_DDL);
-  await db.execute(`PRAGMA user_version = ${USER_DATA_SCHEMA_VERSION}`);
-}
-
-/** Lazily open — and memoise — the one PowerSync connection this device owns. */
-function openDatabase(): Promise<PowerSyncDatabase> {
+/**
+ * Lazily open — and memoise — the one PowerSync connection this device owns. Shared with
+ * `createSyncAdapter()` so the sync layer drives the very same database handle.
+ */
+export function getUserPowerSyncDatabase(): Promise<PowerSyncDatabase> {
   if (databasePromise === null) {
     databasePromise = (async () => {
       const db = new PowerSyncDatabase({
-        // Phase 1 is local-only; the synced-table schema + backend connector arrive in Phase 2.
-        schema: new Schema({}),
+        schema: userDataSchema,
         database: { dbFilename: DB_FILENAME },
       });
       await db.init();
-      await ensureSchema(db);
       return db;
     })().catch((error: unknown) => {
       databasePromise = null;
@@ -99,7 +88,7 @@ function sqlOf(source: PowerSyncDatabase | Transaction): UserDbTx {
 }
 
 export async function createUserDbAdapter(): Promise<UserDbAdapter> {
-  const db = await openDatabase();
+  const db = await getUserPowerSyncDatabase();
   const sql = sqlOf(db);
 
   return {

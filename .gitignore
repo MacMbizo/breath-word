@@ -39,3 +39,8 @@ tools/pack-builder/out/
 Thumbs.db
 .idea/
 .vscode/
+
+# Local scratch: device UI dumps / screenshots and exported session transcripts
+.tmp/
+Continue Renaming.md
+.devin/

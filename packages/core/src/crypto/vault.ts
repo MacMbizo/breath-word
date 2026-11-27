@@ -192,8 +192,51 @@ export function zeroizeDek(dek: Uint8Array): void {
   zeroize(dek);
 }
 
+/**
+ * B6 §4.2.2 — the OS-keystore key under which the raw DEK is parked for biometric fast unlock.
+ * Namespaced per user so a shared device never crosses vaults.
+ */
+export function biometricDekStorageKey(userId: string): string {
+  return `bw.vault.dek.${userId}`;
+}
+
+/** B6 §4.2.2 — base64url form of the raw DEK written to the hardware-backed keystore. */
+export function encodeDekForBiometric(dek: Uint8Array): string {
+  return bytesToBase64Url(dek);
+}
+
+/**
+ * B6 §4.2.2 — decode a DEK parked in the keystore. A malformed or wrong-length value is a canonical
+ * `CRYPTO_VAULT_LOCKED` so the UI falls back to the Vault Passphrase.
+ */
+export function decodeBiometricDek(stored: string): Uint8Array {
+  let dek: Uint8Array;
+  try {
+    dek = base64UrlToBytes(stored);
+  } catch (cause) {
+    throw biometricUnavailable('The stored biometric key is not valid base64url.', cause);
+  }
+  if (dek.length !== DEK_BYTES) {
+    throw biometricUnavailable(
+      `Stored biometric key decoded to ${dek.length} bytes, expected ${DEK_BYTES}.`,
+    );
+  }
+  return dek;
+}
+
 function zeroize(bytes: Uint8Array): void {
   bytes.fill(0);
+}
+
+function biometricUnavailable(internalDetail: string, cause?: unknown): AppError {
+  return new AppError({
+    code: 'CRYPTO_VAULT_LOCKED',
+    domain: 'CRYPTO',
+    retryPolicy: 'USER_ACTION',
+    userMessage: 'Biometric unlock is not available. Please use your Vault Passphrase.',
+    internalDetail,
+    cause,
+  });
 }
 
 /**

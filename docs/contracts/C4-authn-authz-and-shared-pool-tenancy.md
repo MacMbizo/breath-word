@@ -1,10 +1,10 @@
 # C4: AuthN/AuthZ & Shared Pool Tenancy
 
 **Document ID:** `C4`  
-**Version:** `1.0.0`  
+**Version:** `1.0.1`  
 **Status:** `Approved`  
 **Owner:** Founder / Security  
-**Last Updated:** `2026-11-24`  
+**Last Updated:** `2026-11-27`  
 **Related Docs:** `B2`, `B4`, `B6`, `C2`, `C3`
 
 ## Purpose & Scope
@@ -153,6 +153,15 @@ CREATE TABLE public.share_code_attempts (
 );
 CREATE INDEX idx_attempts_user_time ON public.share_code_attempts(user_id, attempted_at DESC);
 
+-- A failed attempt MUST be committed. Because a plain INSERT shares the caller's
+-- transaction, a RAISE would roll it back (PostgREST rolls back on error), leaving the
+-- rate limit permanently inert. PostgreSQL has no autonomous transactions, and a
+-- loopback `dblink` is unusable here (non-superusers must supply a password, which
+-- would leak a credential into the schema), so the branch that records the attempt
+-- RETURNS its error code instead of raising. The branches with no durable side effect
+-- (AUTH_REQUIRED, POOL_JOIN_RATE_LIMITED) keep raising. Shipped in
+-- `supabase/migrations/0004_fix_join_rate_limit_attempt_log.sql`.
+
 CREATE OR REPLACE FUNCTION public.join_shared_pool_by_code(p_code text)
 RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
@@ -179,8 +188,10 @@ BEGIN
        AND deleted_at IS NULL;
 
     IF v_pool.id IS NULL THEN
-        INSERT INTO public.share_code_attempts(user_id) VALUES (v_uid);
-        RAISE EXCEPTION 'POOL_SHARE_CODE_INVALID';
+        -- Must COMMIT: this branch RETURNS instead of raising, because a RAISE here
+        -- would roll the INSERT back and the rate-limit window could never fill.
+        INSERT INTO public.share_code_attempts (user_id) VALUES (v_uid);
+        RETURN jsonb_build_object('error', 'POOL_SHARE_CODE_INVALID');
     END IF;
 
     INSERT INTO public.prayer_pool_members (id, pool_id, user_id, role, joined_at, updated_at, deleted_at)
@@ -232,7 +243,7 @@ $$;
 - Supabase RLS test suite verifies:
   - User B cannot `SELECT` or `UPDATE` User A's `prayer_item_user_states`, `study_notes`, or `prayer_session_logs`.
   - A `MEMBER` in a leader-curated pool (`allow_member_contributions = false`) receives HTTP 403 when attempting to `INSERT` into `prayer_pool_items`.
-  - Six consecutive invalid calls to `join_shared_pool_by_code` trigger `POOL_JOIN_RATE_LIMITED`.
+  - Five consecutive invalid calls to `join_shared_pool_by_code` each yield `POOL_SHARE_CODE_INVALID` (returned as `{"error":"POOL_SHARE_CODE_INVALID"}`) and are durably recorded; the sixth call within 15 minutes raises `POOL_JOIN_RATE_LIMITED`.
 - Guest-to-Account upgrade migrates all local rows (`highlights`, `study_notes`, `prayer_pools`, `prayer_pool_items`, `prayer_item_user_states`) with zero data loss and syncs cleanly to Supabase.
 
 ## Open Questions
@@ -245,6 +256,7 @@ $$;
 
 ## Change Log
 
+- `1.0.1` | `2026-11-27` | Athena | Fix inert join rate limit: `join_shared_pool_by_code` now returns `{"error":"POOL_SHARE_CODE_INVALID"}` on a bad code (so the failed-attempt log commits) while `AUTH_REQUIRED` / `POOL_JOIN_RATE_LIMITED` keep raising. Shipped in `supabase/migrations/0004_fix_join_rate_limit_attempt_log.sql`.
 - `1.0.0` | `2026-11-24` | Athena | Complete AuthN/Guest upgrade protocol, Shared Pool RBAC matrix, non-recursive Postgres RLS SQL, and rate-limited `join_shared_pool_by_code` / `rotate_pool_share_code` RPCs.
 
 ## Traceability

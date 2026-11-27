@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import { bookName, type Footnote } from '@breath-and-word/core';
 import { SCRIPTURE_METRICS } from '@breath-and-word/tokens';
 
+import { CapturePanel } from './CapturePanel';
 import { useCoreRuntime } from './CoreRuntime';
 import { useCoreStore } from './useCoreStore';
 import { VerseSpans } from './VerseSpans';
@@ -43,6 +44,8 @@ export function ReaderView({ focusMode = false, onEnterFocus, onExitFocus }: Rea
   const [translationCode, setTranslationCode] = useState(DEFAULT_TRANSLATION);
   /** FR-101 — the footnote whose sheet is open, or `null` when the sheet is closed. */
   const [activeFootnote, setActiveFootnote] = useState<Footnote | null>(null);
+  /** FR-201 — whether the ≤2-tap capture panel is open over the reader. */
+  const [captureOpen, setCaptureOpen] = useState(false);
 
   // The store is idle until asked, so open the default passage and its book list once on mount.
   useEffect(() => {
@@ -206,6 +209,9 @@ export function ReaderView({ focusMode = false, onEnterFocus, onExitFocus }: Rea
           >
             Open
           </button>
+          <button type="button" onClick={() => setCaptureOpen(true)} className={BUTTON}>
+            Capture
+          </button>
           {onEnterFocus !== undefined && (
             <button type="button" onClick={onEnterFocus} className={BUTTON}>
               Focus
@@ -278,6 +284,12 @@ export function ReaderView({ focusMode = false, onEnterFocus, onExitFocus }: Rea
         {chapter !== null && scripture}
       </div>
       {footnoteSheet}
+      <CapturePanel
+        visible={captureOpen}
+        onClose={() => setCaptureOpen(false)}
+        chapter={chapter}
+        reference={reference}
+      />
     </section>
   );
 }

@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import type { AudioEngineAdapter, CoreAdapters, SecureStorageAdapter } from '../src/adapters';
+import type { CoreEvent } from '../src/events';
 import { initCoreRuntime } from '../src/runtime/core-runtime';
 
 import { writeFixturePack } from './helpers/fixture-pack';
@@ -27,6 +28,7 @@ const bsbPath = join(tmpRoot, 'core_bsb.sqlite');
 const studyRefsPath = join(tmpRoot, 'study_refs.sqlite');
 
 const secureStorage: SecureStorageAdapter = {
+  supportsBiometric: false,
   async getItem() {
     return null;
   },
@@ -121,6 +123,92 @@ describe('initCoreRuntime (B3 §4.2 rule 2)', () => {
     expect(runtime.repositories.reader).toBeInstanceOf(Object);
     expect(runtime.repositories.packs).toBeInstanceOf(Object);
     expect(runtime.repositories.readingPlans).toBeInstanceOf(Object);
+  });
+
+  it('wires the Phase-2 prayer + vault repositories and stores (FR-201..206)', async () => {
+    const adapters = await buildAdapters();
+    const runtime = initCoreRuntime({ adapters, now: () => FIXED_NOW });
+
+    expect(runtime.repositories.prayer).toBeInstanceOf(Object);
+    expect(runtime.repositories.prayerEngine).toBeInstanceOf(Object);
+    expect(runtime.repositories.vault).toBeInstanceOf(Object);
+    expect(runtime.repositories.identity).toBeInstanceOf(Object);
+    expect(runtime.repositories.esv).toBeInstanceOf(Object);
+    expect(runtime.repositories.habits).toBeInstanceOf(Object);
+    expect(runtime.stores.prayer.getState().pools).toEqual([]);
+    expect(runtime.stores.vault.getState().unlocked).toBe(false);
+
+    // The device boots as an offline guest with a generated, persisted identity (C4 §4.1).
+    expect(await runtime.repositories.identity.getGuestUserId()).toBeNull();
+    const guestUserId = await runtime.repositories.identity.getOrCreateGuestUserId();
+    expect(await runtime.repositories.identity.getCurrentUserId()).toBe(guestUserId);
+
+    // FR-107 — the ESV ephemeral cache starts empty and is capped (B4 §4.4).
+    expect(await runtime.repositories.esv.totalVerseCount()).toBe(0);
+
+    // FR-107 — the kind habit loop boots with a gentle default reminder and no streak.
+    expect((await runtime.repositories.habits.getReminderSchedule()).enabled).toBe(false);
+    expect((await runtime.repositories.habits.getHabitSummary('2026-11-25')).currentStreakDays).toBe(0);
+
+    // Vault disabled => private fields round-trip as plaintext.
+    expect(await runtime.repositories.vault.load(USER_ID)).toBe(false);
+    const pool = await runtime.repositories.prayer.createPool({
+      ownerUserId: USER_ID,
+      title: 'Wired',
+      category: 'GUIDANCE',
+    });
+    const item = await runtime.repositories.prayer.addItem({
+      poolId: pool.id,
+      createdByUserId: USER_ID,
+      startVerseId: 19_023_001,
+      endVerseId: 19_023_001,
+      translationCode: 'BSB',
+      capturedText: 'v1',
+    });
+    await runtime.repositories.prayer.setUserNote(USER_ID, item.itemId, pool.id, 'plain note');
+    const [plain] = await runtime.repositories.prayer.listItems(USER_ID, pool.id);
+    expect(plain?.isEncrypted).toBe(false);
+    expect(plain?.userNotes).toBe('plain note');
+
+    // Enabling the vault routes subsequent writes through the field cipher.
+    await runtime.repositories.vault.initVault(USER_ID, 'a-strong-passphrase');
+    expect(runtime.repositories.vault.isUnlocked()).toBe(true);
+    await runtime.stores.prayer.getState().openPool(USER_ID, pool.id);
+    await runtime.stores.prayer.getState().setNote(USER_ID, item.itemId, pool.id, 'sealed note');
+
+    const [sealed] = await runtime.repositories.prayer.listItems(USER_ID, pool.id);
+    expect(sealed?.isEncrypted).toBe(true);
+    expect(sealed?.userNotes).toBe('sealed note');
+
+    const session = await runtime.repositories.prayerEngine.logSession({
+      userId: USER_ID,
+      framework: 'ACTS',
+      durationSeconds: 120,
+      journal: 'a reflection',
+    });
+    expect(session.framework).toBe('ACTS');
+    expect((await runtime.repositories.prayerEngine.listRecentSessions(USER_ID))[0]?.journal).toBe(
+      'a reflection',
+    );
+  });
+
+  it('wires the sync store and event bus (FR-206, C2 §4.3)', async () => {
+    const adapters = await buildAdapters();
+    const runtime = initCoreRuntime({ adapters });
+
+    // No platform sync adapter injected => local-only default, permanently offline (Plan §6).
+    expect(runtime.stores.sync.getState().offline).toBe(true);
+    expect(runtime.stores.sync.getState().offlineError?.code).toBe('SYNC_OFFLINE');
+
+    const seen: CoreEvent[] = [];
+    runtime.events.onAny((event) => seen.push(event));
+
+    await runtime.stores.sync.getState().start();
+
+    expect(runtime.stores.sync.getState().status).toBe('ready');
+    expect(runtime.stores.sync.getState().offline).toBe(true);
+    // The local-only default reports its (offline) status once when `start` seeds from the adapter.
+    expect(seen.map((event) => event.type)).toEqual(['SYNC_STATUS_CHANGED']);
   });
 
   it('exposes a working offline reader (FR-101)', async () => {

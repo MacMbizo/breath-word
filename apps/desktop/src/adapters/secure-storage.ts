@@ -11,6 +11,11 @@ const PREFIX = 'bw.secure.';
 
 export function createSecureStorageAdapter(): SecureStorageAdapter {
   return {
+    // B3 §4.1 still targets the OS Keychain (macOS/Windows) via a Tauri plugin. Until that lands
+    // this `localStorage` placeholder is not hardware-backed, so the vault never parks a raw DEK
+    // here and biometric fast-unlock stays unavailable (B6 §4.2.2).
+    supportsBiometric: false,
+
     async getItem(key: string): Promise<string | null> {
       return globalThis.localStorage.getItem(PREFIX + key);
     },

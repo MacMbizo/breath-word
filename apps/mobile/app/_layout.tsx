@@ -10,6 +10,7 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AppLock } from '../src/app/AppLock';
 import { CoreRuntimeProvider } from '../src/app/CoreRuntime';
 import { bootMobile } from '../src/boot';
 
@@ -34,6 +35,16 @@ export default function RootLayout() {
     };
   }, []);
 
+  // FR-206 — start the account store once so an existing Supabase session (or a later sign-in)
+  // drives the guest→account upgrade. Inert (`configured: false`) in an unprovisioned build.
+  useEffect(() => {
+    if (runtime === null) return undefined;
+    void runtime.stores.account.getState().start();
+    return () => {
+      void runtime.stores.account.getState().stop();
+    };
+  }, [runtime]);
+
   if (error !== null) {
     return (
       <View style={styles.centered}>
@@ -56,6 +67,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <CoreRuntimeProvider runtime={runtime}>
+          <AppLock />
           <StatusBar style="auto" />
           <Stack screenOptions={{ headerShown: false }} />
         </CoreRuntimeProvider>

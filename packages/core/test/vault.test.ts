@@ -12,9 +12,18 @@ import {
   parseRecoveryKey,
 } from '../src/crypto/recovery-key';
 import {
+  RECOVERY_QR_PREFIX,
+  generateRecoveryQr,
+  parseRecoveryQrPayload,
+  recoveryKeyQrPayload,
+} from '../src/crypto/recovery-qr';
+import {
   DEK_BYTES,
   PBKDF2_ITERATIONS,
   VAULT_SALT_BYTES,
+  biometricDekStorageKey,
+  decodeBiometricDek,
+  encodeDekForBiometric,
   initializeVault,
   rewrapVaultPassphrase,
   unlockVaultWithPassphrase,
@@ -171,6 +180,21 @@ describe('App lock (B6 §4.2.4)', () => {
   });
 });
 
+describe('Biometric DEK parking (B6 §4.2.2)', () => {
+  it('namespaces the keystore key per user', () => {
+    expect(biometricDekStorageKey(USER_ID)).toBe(`bw.vault.dek.${USER_ID}`);
+  });
+
+  it('round-trips a 32-byte DEK through the base64url codec', () => {
+    const dek = vault.dek.slice();
+    expect(decodeBiometricDek(encodeDekForBiometric(dek))).toEqual(dek);
+  });
+
+  it('rejects a stored value that is not a 32-byte DEK', () => {
+    expect(() => decodeBiometricDek('AAAA')).toThrowError(/Biometric unlock/);
+  });
+});
+
 describe('Crockford Base32 recovery key codec (B6 §4.2)', () => {
   it('round-trips 32 bytes through encode/decode', () => {
     const bytes = new Uint8Array(32);
@@ -191,5 +215,39 @@ describe('Crockford Base32 recovery key codec (B6 §4.2)', () => {
   it('rejects invalid symbols and wrong lengths', () => {
     expect(() => decodeCrockfordBase32('U')).toThrow(RangeError);
     expect(() => parseRecoveryKey('1234-5678')).toThrow(RangeError);
+  });
+});
+
+describe('Recovery-Key QR code (B6 §4.2)', () => {
+  it('namespaces the payload so a scanner can recognise it', () => {
+    expect(recoveryKeyQrPayload('ABCD-EFGH')).toBe(`${RECOVERY_QR_PREFIX}ABCD-EFGH`);
+    expect(parseRecoveryQrPayload(`${RECOVERY_QR_PREFIX}ABCD-EFGH`)).toBe('ABCD-EFGH');
+  });
+
+  it('ignores payloads that are not Recovery-Key codes', () => {
+    expect(parseRecoveryQrPayload('https://example.com')).toBeNull();
+    expect(parseRecoveryQrPayload(RECOVERY_QR_PREFIX)).toBeNull();
+  });
+
+  it('renders a square module matrix of a valid QR size', () => {
+    const qr = generateRecoveryQr(vault.recoveryKeyDisplay);
+    expect(qr.matrix).toHaveLength(qr.size);
+    for (const row of qr.matrix) expect(row).toHaveLength(qr.size);
+    // QR versions 1..40 are 21..177 modules; each version adds 4.
+    expect(qr.size).toBeGreaterThanOrEqual(21);
+    expect((qr.size - 21) % 4).toBe(0);
+    // A real code mixes dark and light modules.
+    expect(qr.matrix.some((row) => row.some(Boolean))).toBe(true);
+    expect(qr.matrix.some((row) => row.some((module) => !module))).toBe(true);
+  });
+
+  it('is deterministic for the same recovery key', () => {
+    const a = generateRecoveryQr(vault.recoveryKeyDisplay);
+    const b = generateRecoveryQr(vault.recoveryKeyDisplay);
+    expect(b).toEqual(a);
+  });
+
+  it('refuses to render an empty recovery key', () => {
+    expect(() => generateRecoveryQr('  ')).toThrowError(/Recovery Key/);
   });
 });
