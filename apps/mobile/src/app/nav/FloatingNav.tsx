@@ -14,6 +14,7 @@ import { MIN_TOUCH_TARGET, SPACING } from '@breath-and-word/tokens';
 
 import { makeStyles, useTheme } from '../../theme/ThemeProvider';
 
+import { useFocusMode } from './chrome';
 import { Icon, type IconName } from './Icon';
 
 const PILL_HEIGHT = 64;
@@ -37,6 +38,7 @@ export function FloatingNav({ state, navigateToTab }: BottomTabBarProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [keyboardOpen, setKeyboardOpen] = useState(false);
+  const focusMode = useFocusMode();
 
   // The pill would sit on top of the keyboard and cover what the reader is typing: hide it.
   useEffect(() => {
@@ -48,7 +50,8 @@ export function FloatingNav({ state, navigateToTab }: BottomTabBarProps) {
     };
   }, []);
 
-  if (keyboardOpen) return null;
+  // Hidden while typing (it would cover the field) and in Focus Mode (FR-104: only the text).
+  if (keyboardOpen || focusMode) return null;
 
   return (
     <View pointerEvents="box-none" style={[styles.dock, { bottom: insets.bottom + PILL_GAP }]}>

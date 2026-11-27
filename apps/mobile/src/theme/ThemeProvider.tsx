@@ -4,7 +4,7 @@
 // `appearance` store) and the device colour scheme ("Lamplight when the device is dark"), and
 // hands screens `useTheme()` plus `makeStyles()`: a per-theme cached `StyleSheet`, so switching
 // theme re-renders with new colours without rebuilding styles on every render.
-import { createContext, useContext, useMemo, useSyncExternalStore, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useSyncExternalStore, type ReactNode } from 'react';
 import { StyleSheet, useColorScheme, type ImageStyle, type TextStyle, type ViewStyle } from 'react-native';
 
 import {
@@ -58,6 +58,13 @@ export function ThemeProvider({ store, children }: { store: AppearanceStore | nu
   const source = store ?? NO_STORE;
   const prefs = useSyncExternalStore(source.subscribe, () => source.getState().prefs, () => source.getState().prefs);
   const scheme = useColorScheme();
+  // Stable across preference changes, so effects that save a preference never re-trigger themselves.
+  const update = useCallback(
+    (patch: Partial<AppearancePreferences>) => {
+      if (store !== null) void store.getState().update(patch);
+    },
+    [store],
+  );
 
   const value = useMemo<AppTheme>(() => {
     const chosen: ThemeName = isThemeName(prefs.theme) ? prefs.theme : DEFAULT_THEME;
@@ -74,12 +81,10 @@ export function ThemeProvider({ store, children }: { store: AppearanceStore | nu
         scriptureSize * (name === 'selah' ? LINE_HEIGHTS.scriptureCalm : LINE_HEIGHTS.scripture),
       ),
       prefs,
-      update: (patch) => {
-        if (store !== null) void store.getState().update(patch);
-      },
+      update,
       key: `${name}:${scriptureSize}`,
     };
-  }, [prefs, scheme, store]);
+  }, [prefs, scheme, update]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

@@ -226,3 +226,14 @@ describe('Repository error contract', () => {
     });
   });
 });
+
+describe('FR-101 / FR-105 installed translations', () => {
+  it('lists every attached translation pack by name', async () => {
+    const translations = await reader.listTranslations();
+    expect(translations.map((t) => [t.packId, t.translationCode, t.name])).toEqual([
+      ['core_bsb', 'BSB', 'Berean Standard Bible'],
+      ['trans_web', 'WEB', 'World English Bible'],
+    ]);
+    expect(translations.every((t) => t.hasWordAlignments === false)).toBe(true);
+  });
+});

@@ -28,6 +28,26 @@ export interface AppearancePreferences {
   readonly leftPanelOpen: boolean;
   /** Desktop: the floating study card is expanded. */
   readonly studyPanelOpen: boolean;
+  /** Where the reader was last, so the app reopens there (device-local reading state). */
+  readonly lastPassage: LastPassage | null;
+}
+
+export interface LastPassage {
+  readonly packId: string;
+  readonly translationCode: string;
+  readonly bookNumber: number;
+  readonly chapter: number;
+}
+
+function normalizeLastPassage(raw: unknown): LastPassage | null {
+  if (raw === null || typeof raw !== 'object') return null;
+  const v = raw as Record<string, unknown>;
+  const { packId, translationCode, bookNumber, chapter } = v;
+  if (typeof packId !== 'string' || !/^[a-z][a-z0-9_]*$/.test(packId)) return null;
+  if (typeof translationCode !== 'string' || !/^[A-Z0-9]{2,12}$/.test(translationCode)) return null;
+  if (typeof bookNumber !== 'number' || !Number.isInteger(bookNumber) || bookNumber < 1 || bookNumber > 66) return null;
+  if (typeof chapter !== 'number' || !Number.isInteger(chapter) || chapter < 1 || chapter > 150) return null;
+  return { packId, translationCode, bookNumber, chapter };
 }
 
 export const DEFAULT_APPEARANCE: AppearancePreferences = {
@@ -37,6 +57,7 @@ export const DEFAULT_APPEARANCE: AppearancePreferences = {
   scriptureSize: null,
   leftPanelOpen: true,
   studyPanelOpen: true,
+  lastPassage: null,
 };
 
 /** Coerce anything read from storage (or passed by a caller) into valid preferences. */
@@ -52,6 +73,7 @@ export function normalizeAppearance(raw: unknown): AppearancePreferences {
     scriptureSize: typeof size === 'number' && Number.isFinite(size) && size >= 8 && size <= 64 ? size : null,
     leftPanelOpen: bool('leftPanelOpen'),
     studyPanelOpen: bool('studyPanelOpen'),
+    lastPassage: normalizeLastPassage(value.lastPassage),
   };
 }
 

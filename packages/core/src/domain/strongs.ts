@@ -39,3 +39,23 @@ export function isRtlStrongsId(strongsId: string): boolean {
   const normalized = normalizeStrongsId(strongsId);
   return normalized !== null && normalized.startsWith('H');
 }
+
+/**
+ * Strong's numbers that name the SAME lexeme under different numbering traditions. Strong's
+ * concordance (and so the KJV's word tags) gave many forms of εἰμί ("to be") their own numbers —
+ * ἦν G2258, ἐστί G2076, ὤν G5607 … — while STEPBible's tagged Greek files every form under the
+ * lemma G1510 (εἶναι as G1511). Without this map an English "was" (G2258) can never find its ἦν.
+ */
+const EIMI_FORMS = ['G1488', 'G1498', 'G1510', 'G1511', 'G1526', 'G2070', 'G2071', 'G2075', 'G2076', 'G2077', 'G2252', 'G2258', 'G5600', 'G5607'];
+const EQUIVALENCE_CLASS = new Map<string, string>(EIMI_FORMS.map((id) => [id, 'G1510']));
+
+/** The lexeme class a Strong's ID belongs to (itself unless it is a known legacy form number). */
+export function strongsClass(strongsId: string): string {
+  return EQUIVALENCE_CLASS.get(strongsId) ?? strongsId;
+}
+
+/** Every Strong's ID in the same lexeme class (the ID alone when it has no equivalents). */
+export function strongsEquivalents(strongsId: string): string[] {
+  const cls = strongsClass(strongsId);
+  return cls === strongsId && !EQUIVALENCE_CLASS.has(strongsId) ? [strongsId] : EIMI_FORMS.filter((id) => EQUIVALENCE_CLASS.get(id) === cls);
+}

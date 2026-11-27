@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { InterlinearToken, VerseWordAlignment } from '../src/domain/types';
+import { strongsClass, strongsEquivalents } from '../src/domain/strongs';
 import { segmentSpanText, selectAlignedToken, strongsOccurrenceRank } from '../src/domain/word-alignment';
 
 function align(spanIndex: number, charStart: number, charEnd: number, strongsId: string, id = charStart): VerseWordAlignment {
@@ -46,5 +47,17 @@ describe('token selection by Strong’s occurrence (FR-301)', () => {
     expect(selectAlignedToken(tokens, { strongsId: 'G5485', wordPosition: 1 })?.wordPosition).toBe(1);
     expect(selectAlignedToken(tokens, { strongsId: 'G5485', rank: 7 })?.wordPosition).toBe(11);
     expect(selectAlignedToken(tokens, { strongsId: 'G9' })).toBeUndefined();
+  });
+});
+
+describe('Strong’s equivalence classes (KJV legacy forms ↔ STEPBible lemmas)', () => {
+  it('maps the KJV “was” (G2258, ἦν) onto STEPBible’s εἰμί tokens (G1510)', () => {
+    const rows = [align(0, 25, 28, 'G2258'), align(0, 40, 43, 'G2258'), align(0, 60, 63, 'G2258')];
+    const tokens = [token(3, 'G1510'), token(4, 'G3588'), token(9, 'G1510'), token(15, 'G1510')];
+    expect(strongsClass('G2258')).toBe('G1510');
+    expect(strongsEquivalents('G26')).toEqual(['G26']);
+    expect(strongsEquivalents('G2258')).toContain('G1510');
+    const second = rows[1]!;
+    expect(selectAlignedToken(tokens, { strongsId: 'G2258', rank: strongsOccurrenceRank(rows, second) })?.wordPosition).toBe(9);
   });
 });

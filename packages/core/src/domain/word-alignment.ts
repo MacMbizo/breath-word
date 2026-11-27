@@ -3,6 +3,7 @@
 // Shared by the desktop and mobile readers so both split verse text and pick the interlinear
 // token the same way. No I/O here: alignments and tokens arrive from `ExegesisRepository`.
 
+import { strongsClass } from './strongs';
 import type { InterlinearToken, VerseWordAlignment } from './types';
 
 /** One run of a span's text: plain text, or an aligned (tappable) English word. */
@@ -48,9 +49,11 @@ export function strongsOccurrenceRank(
   alignment: VerseWordAlignment,
 ): number {
   if (alignment.strongsId === undefined) return 0;
+  const cls = strongsClass(alignment.strongsId);
   return alignments.filter(
     (a) =>
-      a.strongsId === alignment.strongsId &&
+      a.strongsId !== undefined &&
+      strongsClass(a.strongsId) === cls &&
       (a.spanIndex < alignment.spanIndex || (a.spanIndex === alignment.spanIndex && a.charStart < alignment.charStart)),
   ).length;
 }
@@ -69,8 +72,9 @@ export function selectAlignedToken(
     if (exact !== undefined) return exact;
   }
   if (target.strongsId === undefined) return undefined;
+  const cls = strongsClass(target.strongsId);
   const matches = tokens
-    .filter((t) => t.strongsId === target.strongsId)
+    .filter((t) => t.strongsId !== undefined && strongsClass(t.strongsId) === cls)
     .sort((a, b) => a.wordPosition - b.wordPosition);
   if (matches.length === 0) return undefined;
   return matches[Math.min(target.rank ?? 0, matches.length - 1)];

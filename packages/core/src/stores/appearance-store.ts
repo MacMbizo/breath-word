@@ -49,7 +49,10 @@ export function createAppearanceStore(repository: AppearanceRepository): Appeara
     },
 
     async update(patch) {
-      const prefs = normalizeAppearance({ ...get().prefs, ...patch });
+      const current = get().prefs;
+      const prefs = normalizeAppearance({ ...current, ...patch });
+      // A no-op change (same values) neither re-renders subscribers nor writes to disk.
+      if (JSON.stringify(prefs) === JSON.stringify(current)) return;
       set({ prefs });
       // Serialise writes so a quick run of toggles always lands the last one.
       writes = writes

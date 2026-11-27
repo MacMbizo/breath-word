@@ -17,6 +17,7 @@ import type {
   SearchHit,
   SearchQuery,
   TranslationRef,
+  TranslationSummary,
 } from '../repositories/reader-repository';
 
 import type { AsyncStatus } from './types';
@@ -44,6 +45,8 @@ export interface ReaderStoreState {
   readonly error: AppError | null;
   /** FR-101 — the navigable books of the active translation (canon-wide book picker). */
   readonly books: readonly BookSummary[];
+  /** Installed translations (all attached TRANSLATION packs). */
+  readonly translations: readonly TranslationSummary[];
   readonly booksStatus: AsyncStatus;
   /** FR-102 — the last chapter compare: one `Chapter` per requested column, in column order. */
   readonly comparisonColumns: readonly Chapter[];
@@ -60,6 +63,8 @@ export interface ReaderStoreState {
 export interface ReaderStoreActions {
   /** FR-101 — load a chapter into the store. */
   openChapter(location: ReaderLocation): Promise<void>;
+  /** FR-101 / FR-105 — load the installed translations for the passage picker. */
+  loadTranslations(): Promise<readonly TranslationSummary[]>;
   /** FR-101 — load the translation's navigable books for the book picker. */
   loadBooks(packId: string, translationCode: string): Promise<readonly BookSummary[]>;
   /** FR-102 — load one chapter across several translations for verse-synchronized columns. */
@@ -82,6 +87,7 @@ const INITIAL_STATE: ReaderStoreState = {
   status: 'idle',
   error: null,
   books: [],
+  translations: [],
   booksStatus: 'idle',
   comparisonColumns: [],
   comparisonRows: [],
@@ -108,6 +114,17 @@ export function createReaderStore(reader: ReaderRepository): ReaderStore {
         set({ chapter, status: 'ready' });
       } catch (error) {
         set({ chapter: null, status: 'error', error: asAppError(error, READER_FAILURE) });
+      }
+    },
+
+    async loadTranslations() {
+      try {
+        const translations = await reader.listTranslations();
+        set({ translations });
+        return translations;
+      } catch {
+        set({ translations: [] });
+        return [];
       }
     },
 

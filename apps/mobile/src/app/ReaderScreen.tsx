@@ -1,43 +1,54 @@
-// FR-101 structured reader (mobile) + FR-104 Focus Mode — B3 §4.1.
+// FR-101 structured reader (mobile) + FR-104 Focus Mode + FR-301 word card — design round 2026-11-28.
 //
-// Renders a chapter from the headless reader store; no SQL here (AGENTS.md rule 1). A book picker
-// drives canon-wide navigation (Genesis..Revelation) from the pack's own book list, and Prev/Next
-// stay inside the current book. Focus Mode hides every control so only the scripture typography
-// remains, with a low-contrast exit control as the discoverable way back (the desktop shell
-// additionally binds Escape).
-
-import { useCallback, useEffect, useMemo, useState } from 'react';
+// Renders a chapter from the headless reader store; no SQL here (AGENTS.md rule 1).
+//
+//   header   — search · passage pill ("John 3 · KJV", opens book/chapter/translation) · "Aa"
+//   page     — book name, the chapter numeral as a rubric, verses with rubric verse numbers;
+//              chapter navigation sits at the end of the chapter, where the reader arrives
+//   floating — above the pill nav: the word card when an aligned word is tapped, otherwise the
+//              audio bar
+//
+// The reader reopens where it was last (device-local `lastPassage`), falls back to an installed
+// translation, and shows a gentle way to the Library when no Bible is installed yet.
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   bookName,
   strongsOccurrenceRank,
-  type BookSummary,
   type Footnote,
   type SymbolTag,
+  type TranslationSummary,
+  type Verse,
   type VerseWordAlignment,
 } from '@breath-and-word/core';
-import { FONT_FACES, FONT_SIZES, INDUCTIVE_HIGHLIGHTS, inductiveWash, LINE_HEIGHTS, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
+import { FONT_SIZES, INDUCTIVE_HIGHLIGHTS, inductiveWash, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
+
+import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
 import { AudioMiniPlayer } from './AudioMiniPlayer';
 import { CaptureSheet } from './CaptureSheet';
 import { useCoreRuntime } from './CoreRuntime';
+import { setFocusMode, useFocusMode } from './nav/chrome';
+import { useNavClearance } from './nav/FloatingNav';
+import { Icon } from './nav/Icon';
+import { PassageSheet } from './reader/PassageSheet';
+import { ReadingSettingsSheet } from './reader/ReadingSettingsSheet';
+import { WordCard } from './reader/WordCard';
 import { useCurrentUserId } from './study/useCurrentUserId';
-import { useCoreStore } from './useCoreStore';
+import { useCoreStore, useCoreStoreSelector } from './useCoreStore';
 import { VerseSpans } from './VerseSpans';
-import { makeStyles, useTheme } from '../theme/ThemeProvider';
 
-/** The default (daylight) theme; theme switching lands with the appearance settings. */
+/** A first open with nothing remembered starts at John 1 — "In the beginning was the Word". */
+const FIRST_BOOK = 43;
+const FIRST_CHAPTER = 1;
+/** Preferred default translation pack when several are installed. */
+const PREFERRED_PACK = 'core_bsb';
 
-// Defaults open Romans 8 in the `core_bsb` pack (book numbers are canonical BBCCCVVV).
-const DEFAULT_PACK_ID = 'core_bsb';
-const DEFAULT_TRANSLATION = 'BSB';
-const DEFAULT_BOOK = 45;
-const DEFAULT_CHAPTER = 8;
-
-/** Where the reader opens; every field falls back to the Romans 8 / BSB default. */
+/** Where the reader opens; any field left out comes from the last passage or the defaults. */
 export interface ReaderStart {
   readonly packId?: string;
   readonly translationCode?: string;
@@ -50,43 +61,114 @@ export interface ReaderScreenProps {
   readonly start?: ReaderStart;
 }
 
+interface ActiveWord {
+  readonly alignment: VerseWordAlignment;
+  readonly text: string;
+}
+
 export function ReaderScreen({ start }: ReaderScreenProps = {}) {
   const styles = useStyles();
-  const { name: themeName } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const runtime = useCoreRuntime();
-  const { location, chapter, status, error, books } = useCoreStore(runtime.stores.reader);
-  const [focusMode, setFocusMode] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
-  /** FR-201 — whether the ≤2-tap capture sheet is open over the reader. */
-  const [captureOpen, setCaptureOpen] = useState(false);
-  /** FR-101 — the footnote whose sheet is open, or `null` when the sheet is closed. */
-  const [activeFootnote, setActiveFootnote] = useState<Footnote | null>(null);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const userId = useCurrentUserId();
-  const { highlights, wordAlignments } = useCoreStore(runtime.stores.study);
-  const { activeVerseId: narratedVerseId } = useCoreStore(runtime.stores.audio);
+  const clearance = useNavClearance();
+  const focusMode = useFocusMode();
+  const { location, chapter, status, error, books, translations } = useCoreStore(runtime.stores.reader);
+  // Select only the slices the page draws: a word lookup's loading flags must not re-render
+  // every verse of the chapter.
+  const highlights = useCoreStoreSelector(runtime.stores.study, (state) => state.highlights);
+  const wordAlignments = useCoreStoreSelector(runtime.stores.study, (state) => state.wordAlignments);
+  const narratedVerseId = useCoreStoreSelector(runtime.stores.audio, (state) => state.activeVerseId);
 
-  // The store is idle until asked, so open the start passage and its book list on mount (and
-  // again whenever a deep link names a different start).
-  const startPack = start?.packId ?? DEFAULT_PACK_ID;
-  const startTranslation = start?.translationCode ?? DEFAULT_TRANSLATION;
-  const startBook = start?.bookNumber ?? DEFAULT_BOOK;
-  const startChapter = start?.chapter ?? DEFAULT_CHAPTER;
+  const [translationsReady, setTranslationsReady] = useState(false);
+  const [passageOpen, setPassageOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  /** FR-201 — the ≤2-tap capture sheet (from "Pray it" or a long press on a verse). */
+  const [captureOpen, setCaptureOpen] = useState(false);
+  const [activeFootnote, setActiveFootnote] = useState<Footnote | null>(null);
+  const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
+
+  // Focus Mode is a reader state: leaving the reader always brings the chrome back.
+  useEffect(() => () => setFocusMode(false), []);
+
   useEffect(() => {
-    void runtime.stores.reader.getState().openChapter({
-      packId: startPack,
-      translationCode: startTranslation,
-      bookNumber: startBook,
-      chapter: startChapter,
-    });
-    void runtime.stores.reader.getState().loadBooks(startPack, startTranslation);
-  }, [runtime, startPack, startTranslation, startBook, startChapter]);
+    let live = true;
+    void runtime.stores.reader
+      .getState()
+      .loadTranslations()
+      .finally(() => {
+        if (live) setTranslationsReady(true);
+      });
+    return () => {
+      live = false;
+    };
+  }, [runtime]);
 
-  // FR-101 — tap-to-open footnote sheet: markers in the text resolve to the chapter's note bodies.
-  const footnotesById = useMemo(
-    () => new Map((chapter?.footnotes ?? []).map((note) => [note.footnoteId, note])),
-    [chapter],
+  // Decide where to open: an explicit deep link wins, then the remembered passage, then an
+  // installed translation at John 1. Applied once per distinct start request.
+  const lastPassage = theme.prefs.lastPassage;
+  const target = useMemo(() => {
+    if (!translationsReady) return null;
+    const installed = (packId: string, code: string) => translations.some((t) => t.packId === packId && t.translationCode === code);
+    if (start?.packId !== undefined && start.translationCode !== undefined) {
+      return { packId: start.packId, translationCode: start.translationCode, bookNumber: start.bookNumber ?? FIRST_BOOK, chapter: start.chapter ?? FIRST_CHAPTER };
+    }
+    if (lastPassage !== null && installed(lastPassage.packId, lastPassage.translationCode) && start?.bookNumber === undefined) {
+      return lastPassage;
+    }
+    const fallback = translations.find((t) => t.packId === PREFERRED_PACK) ?? translations[0];
+    if (fallback === undefined) return null;
+    return { packId: fallback.packId, translationCode: fallback.translationCode, bookNumber: start?.bookNumber ?? FIRST_BOOK, chapter: start?.chapter ?? FIRST_CHAPTER };
+  }, [translationsReady, translations, start, lastPassage]);
+
+  const appliedStart = useRef<string | null>(null);
+  const startKey = JSON.stringify(start ?? {});
+  useEffect(() => {
+    if (target === null || appliedStart.current === startKey) return;
+    appliedStart.current = startKey;
+    void runtime.stores.reader.getState().openChapter(target);
+    void runtime.stores.reader.getState().loadBooks(target.packId, target.translationCode);
+  }, [runtime, target, startKey]);
+
+  // Remember the passage each time a chapter opens successfully.
+  const update = theme.update;
+  const locationKey = location === null ? null : `${location.packId}|${location.translationCode}|${location.bookNumber}|${location.chapter}`;
+  useEffect(() => {
+    if (status !== 'ready' || location === null) return;
+    const last = lastPassage;
+    const lastKey = last === null ? null : `${last.packId}|${last.translationCode}|${last.bookNumber}|${last.chapter}`;
+    if (lastKey !== locationKey) update({ lastPassage: location });
+    // `location` is captured via its key; re-run only when the passage (or load status) changes.
+  }, [status, locationKey, update]);
+
+  const packId = location?.packId ?? target?.packId ?? PREFERRED_PACK;
+  const translationCode = location?.translationCode ?? target?.translationCode ?? '';
+  const bookNumber = location?.bookNumber ?? target?.bookNumber ?? FIRST_BOOK;
+  const chapterNumber = location?.chapter ?? target?.chapter ?? FIRST_CHAPTER;
+  const chapterCount = books.find((book) => book.bookNumber === bookNumber)?.chapterCount;
+  const reference = `${bookName(bookNumber)} ${chapterNumber}`;
+
+  const openChapter = useCallback(
+    (nextBook: number, nextChapter: number, translation?: TranslationSummary) => {
+      if (nextChapter < 1) return;
+      setActiveWord(null);
+      const next = {
+        packId: translation?.packId ?? packId,
+        translationCode: translation?.translationCode ?? translationCode,
+        bookNumber: nextBook,
+        chapter: nextChapter,
+      };
+      void runtime.stores.reader.getState().openChapter(next);
+      if (translation !== undefined) void runtime.stores.reader.getState().loadBooks(next.packId, next.translationCode);
+    },
+    [runtime, packId, translationCode],
   );
+
+  // FR-101 — footnote markers resolve to the chapter's note bodies.
+  const footnotesById = useMemo(() => new Map((chapter?.footnotes ?? []).map((note) => [note.footnoteId, note])), [chapter]);
   const openFootnote = useCallback(
     (footnoteId: string) => {
       const note = footnotesById.get(footnoteId);
@@ -95,46 +177,13 @@ export function ReaderScreen({ start }: ReaderScreenProps = {}) {
     [footnotesById],
   );
 
-  const bookNumber = location?.bookNumber ?? DEFAULT_BOOK;
-  const chapterNumber = location?.chapter ?? DEFAULT_CHAPTER;
-  const chapterCount = books.find((book) => book.bookNumber === bookNumber)?.chapterCount;
-  const reference = `${bookName(bookNumber)} ${chapterNumber}`;
-
-  const openChapter = useCallback(
-    (nextBook: number, nextChapter: number) => {
-      if (nextChapter < 1) return;
-      void runtime.stores.reader.getState().openChapter({
-        packId: location?.packId ?? DEFAULT_PACK_ID,
-        translationCode: location?.translationCode ?? DEFAULT_TRANSLATION,
-        bookNumber: nextBook,
-        chapter: nextChapter,
-      });
-    },
-    [runtime, location],
-  );
-
-  const selectBook = useCallback(
-    (book: BookSummary) => {
-      setPickerOpen(false);
-      openChapter(book.bookNumber, 1);
-    },
-    [openChapter],
-  );
-
-  const atFirstChapter = chapterNumber <= 1;
-  const atLastChapter = chapterCount !== undefined && chapterNumber >= chapterCount;
-  const packId = location?.packId ?? DEFAULT_PACK_ID;
-  const translationCode = location?.translationCode ?? DEFAULT_TRANSLATION;
-
-  // FR-304 — load the chapter's highlights so verses carry their inductive washes and badges.
+  // FR-304 highlights and FR-301 word alignments for the open chapter.
   const firstVerseId = chapter?.verses[0]?.canonicalVerseId;
   const lastVerseId = chapter?.verses[chapter.verses.length - 1]?.canonicalVerseId;
   useEffect(() => {
     if (userId === null || firstVerseId === undefined || lastVerseId === undefined) return;
     void runtime.stores.study.getState().loadRangeStudy(userId, firstVerseId, lastVerseId, translationCode);
   }, [runtime, userId, firstVerseId, lastVerseId, translationCode]);
-
-  // FR-301 — aligned English words for the chapter (empty when the translation carries none).
   useEffect(() => {
     if (firstVerseId === undefined || lastVerseId === undefined) return;
     void runtime.stores.study.getState().loadRangeAlignments(packId, translationCode, firstVerseId, lastVerseId);
@@ -156,143 +205,172 @@ export function ReaderScreen({ start }: ReaderScreenProps = {}) {
   // FR-301..305 — a verse number opens that verse's study tools.
   const openStudy = useCallback(
     (canonicalVerseId: number) => {
-      router.push({
-        pathname: '/study',
-        params: { verse: String(canonicalVerseId), pack: packId, translation: translationCode },
-      });
+      router.push({ pathname: '/study', params: { verse: String(canonicalVerseId), pack: packId, translation: translationCode } });
     },
     [router, packId, translationCode],
   );
 
-  // FR-301 — tapping an aligned English word opens study focused on that word's original token.
   const openWord = useCallback(
     (alignment: VerseWordAlignment) => {
-      const verseAlignments = wordAlignments.get(alignment.canonicalVerseId) ?? [];
-      router.push({
-        pathname: '/study',
-        params: {
-          verse: String(alignment.canonicalVerseId),
-          pack: packId,
-          translation: translationCode,
-          ...(alignment.strongsId !== undefined ? { strongs: alignment.strongsId } : {}),
-          ...(alignment.interlinearWordPos !== undefined ? { wordPos: String(alignment.interlinearWordPos) } : {}),
-          rank: String(strongsOccurrenceRank(verseAlignments, alignment)),
-        },
-      });
+      const verse = chapter?.verses.find((v) => v.canonicalVerseId === alignment.canonicalVerseId);
+      const text = verse?.spans[alignment.spanIndex]?.text.slice(alignment.charStart, alignment.charEnd) ?? '';
+      setActiveWord({ alignment, text });
     },
-    [router, packId, translationCode, wordAlignments],
+    [chapter],
   );
+
+  const openCapture = useCallback(() => setCaptureOpen(true), []);
+
+  const openWordStudy = useCallback(() => {
+    if (activeWord === null) return;
+    const { alignment } = activeWord;
+    const verseAlignments = wordAlignments.get(alignment.canonicalVerseId) ?? [];
+    setActiveWord(null);
+    router.push({
+      pathname: '/study',
+      params: {
+        verse: String(alignment.canonicalVerseId),
+        pack: packId,
+        translation: translationCode,
+        ...(alignment.strongsId !== undefined ? { strongs: alignment.strongsId } : {}),
+        ...(alignment.interlinearWordPos !== undefined ? { wordPos: String(alignment.interlinearWordPos) } : {}),
+        rank: String(strongsOccurrenceRank(verseAlignments, alignment)),
+      },
+    });
+  }, [activeWord, wordAlignments, router, packId, translationCode]);
+
+  const atFirstChapter = chapterNumber <= 1;
+  const atLastChapter = chapterCount !== undefined && chapterNumber >= chapterCount;
+  const noBibleInstalled = translationsReady && translations.length === 0;
+  const floatingBottom = clearance - SPACING.lg + SPACING.sm;
 
   return (
     <View style={styles.root}>
       {!focusMode && (
         <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <Text style={styles.reference}>{reference}</Text>
-            <View style={styles.headerActions}>
-              <Pressable
-                onPress={() => setCaptureOpen(true)}
-                accessibilityRole="button"
-                accessibilityLabel="Capture passage"
-                style={styles.focusButton}
-              >
-                <Text style={styles.focusButtonText}>Capture</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => setPickerOpen(true)}
-                accessibilityRole="button"
-                accessibilityLabel="Choose a book"
-                style={styles.focusButton}
-              >
-                <Text style={styles.focusButtonText}>Books</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => setFocusMode(true)}
-                accessibilityRole="button"
-                style={styles.focusButton}
-              >
-                <Text style={styles.focusButtonText}>Focus</Text>
-              </Pressable>
-            </View>
-          </View>
-          <View style={styles.navRow}>
-            <Pressable
-              disabled={atFirstChapter}
-              onPress={() => openChapter(bookNumber, chapterNumber - 1)}
-              accessibilityRole="button"
-              style={[styles.navButton, atFirstChapter && styles.navButtonDisabled]}
-            >
-              <Text style={styles.navButtonText}>‹ Prev</Text>
-            </Pressable>
-            <Pressable
-              disabled={atLastChapter}
-              onPress={() => openChapter(bookNumber, chapterNumber + 1)}
-              accessibilityRole="button"
-              style={[styles.navButton, atLastChapter && styles.navButtonDisabled]}
-            >
-              <Text style={styles.navButtonText}>Next ›</Text>
-            </Pressable>
-          </View>
+          <Pressable onPress={() => router.push('/search')} accessibilityRole="button" accessibilityLabel="Search scripture" style={styles.iconButton}>
+            <Icon name="search" color={colors.text.secondary} />
+          </Pressable>
+          <Pressable
+            onPress={() => setPassageOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={`${reference}${translationCode !== '' ? `, ${translationCode}` : ''}. Change passage`}
+            style={styles.passagePill}
+          >
+            <Text style={styles.passageText} numberOfLines={1}>
+              {reference}
+              {translationCode !== '' && <Text style={styles.passageCode}>{`  ·  ${translationCode}`}</Text>}
+            </Text>
+          </Pressable>
+          <Pressable onPress={() => setSettingsOpen(true)} accessibilityRole="button" accessibilityLabel="Reading settings" style={styles.iconButton}>
+            <Text style={styles.aa}>Aa</Text>
+          </Pressable>
         </View>
       )}
 
-      <ScrollView contentContainerStyle={styles.content}>
-        {status === 'loading' && <Text style={styles.muted}>Loading…</Text>}
-        {error !== null && (
-          <Text accessibilityRole="alert" style={styles.error}>
-            {error.userMessage}
-          </Text>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: focusMode ? insets.bottom + SPACING.xxxl : clearance + 76 }]}>
+        {noBibleInstalled && (
+          <View style={styles.empty}>
+            <Text style={styles.emptyTitle}>Let’s add a Bible</Text>
+            <Text style={styles.emptyBody}>
+              Breath & Word reads entirely on your device. Download a translation once from the Library and it stays with you, even offline.
+            </Text>
+            <Pressable onPress={() => router.navigate('/library')} accessibilityRole="button" style={styles.primary}>
+              <Text style={styles.primaryText}>Open the Library</Text>
+            </Pressable>
+          </View>
         )}
-        {chapter !== null && chapter.verses.length === 0 && error === null && (
-          <Text style={styles.muted}>{`No text is available for ${reference}.`}</Text>
+
+        {!noBibleInstalled && chapter === null && status !== 'error' && (
+          <View style={styles.skeleton} accessibilityLabel="Loading chapter">
+            <View style={[styles.skeletonLine, { width: '30%', height: 48 }]} />
+            {[92, 100, 86, 97, 70].map((w, i) => (
+              <View key={i} style={[styles.skeletonLine, { width: `${w}%` }]} />
+            ))}
+          </View>
         )}
-        {chapter !== null &&
-          chapter.verses.map((verse) => {
-            const symbols = symbolsByVerse.get(verse.canonicalVerseId) ?? [];
-            const wash = symbols[0];
-            const narrated = narratedVerseId === verse.canonicalVerseId;
-            return (
-              <Text
-                key={verse.canonicalVerseId}
-                style={[
-                  styles.verse,
-                  wash !== undefined && { backgroundColor: inductiveWash(wash, themeName) },
-                  narrated && styles.verseNarrated,
-                ]}
-              >
-                <Text
-                  style={styles.verseNumber}
-                  onPress={focusMode ? undefined : () => openStudy(verse.canonicalVerseId)}
-                  accessibilityRole={focusMode ? undefined : 'button'}
-                  accessibilityLabel={focusMode ? undefined : `Study verse ${verse.verse}`}
-                  suppressHighlighting={false}
-                >{`${verse.verse}  `}</Text>
-                <VerseSpans
-                  verseId={verse.canonicalVerseId}
-                  spans={verse.spans}
-                  onFootnotePress={openFootnote}
-                  {...(focusMode
-                    ? {}
-                    : { alignments: wordAlignments.get(verse.canonicalVerseId), onWordPress: openWord })}
-                />
-                {symbols.length > 0 && (
-                  <Text style={styles.verseNumber} accessibilityLabel={symbols.map((sym) => INDUCTIVE_HIGHLIGHTS[sym].meaning).join(', ')}>
-                    {`  ${symbols.map((sym) => INDUCTIVE_HIGHLIGHTS[sym].badge).join(' ')}`}
-                  </Text>
-                )}
+
+        {error !== null && !noBibleInstalled && (
+          <View style={styles.notice} accessibilityRole="alert">
+            <Text style={styles.noticeText}>{error.userMessage}</Text>
+            <Pressable onPress={() => setPassageOpen(true)} accessibilityRole="button">
+              <Text style={styles.link}>Choose another passage</Text>
+            </Pressable>
+          </View>
+        )}
+
+        {chapter !== null && (
+          <>
+            <View style={styles.opening}>
+              <Text style={styles.bookLabel}>{bookName(bookNumber)}</Text>
+              <Text style={styles.numeral} accessibilityLabel={`Chapter ${chapterNumber}`}>
+                {chapterNumber}
               </Text>
-            );
-          })}
+            </View>
+
+            {chapter.verses.length === 0 && <Text style={styles.muted}>{`No text is available for ${reference}.`}</Text>}
+
+            {chapter.verses.map((verse) => (
+              <VerseRow
+                key={verse.canonicalVerseId}
+                verse={verse}
+                symbols={symbolsByVerse.get(verse.canonicalVerseId)}
+                narrated={narratedVerseId === verse.canonicalVerseId}
+                focusMode={focusMode}
+                alignments={wordAlignments.get(verse.canonicalVerseId)}
+                activeAlignmentId={activeWord?.alignment.canonicalVerseId === verse.canonicalVerseId ? activeWord.alignment.id : undefined}
+                onStudyVerse={openStudy}
+                onWord={openWord}
+                onFootnote={openFootnote}
+                onCapture={openCapture}
+              />
+            ))}
+
+            {!focusMode && (
+              <View style={styles.chapterNav}>
+                <Pressable
+                  disabled={atFirstChapter}
+                  onPress={() => openChapter(bookNumber, chapterNumber - 1)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Previous chapter, ${bookName(bookNumber)} ${chapterNumber - 1}`}
+                  style={[styles.chapterButton, atFirstChapter && styles.hidden]}
+                >
+                  <Icon name="back" size={16} color={colors.text.secondary} />
+                  <Text style={styles.chapterButtonText}>{`${bookName(bookNumber)} ${chapterNumber - 1}`}</Text>
+                </Pressable>
+                <Pressable
+                  disabled={atLastChapter}
+                  onPress={() => openChapter(bookNumber, chapterNumber + 1)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Next chapter, ${bookName(bookNumber)} ${chapterNumber + 1}`}
+                  style={[styles.chapterButton, styles.chapterButtonNext, atLastChapter && styles.hidden]}
+                >
+                  <Text style={styles.chapterButtonNextText}>{`${bookName(bookNumber)} ${chapterNumber + 1}`}</Text>
+                  <Icon name="chevronRight" size={16} color={colors.text.onAccent} />
+                </Pressable>
+              </View>
+            )}
+          </>
+        )}
       </ScrollView>
 
       {!focusMode && chapter !== null && (
-        <AudioMiniPlayer
-          packId={packId}
-          translationCode={translationCode}
-          bookNumber={bookNumber}
-          chapter={chapterNumber}
-          reference={reference}
-        />
+        <View style={[styles.floating, { bottom: floatingBottom }]} pointerEvents="box-none">
+          {activeWord !== null ? (
+            <WordCard
+              alignment={activeWord.alignment}
+              englishWord={activeWord.text}
+              packId={packId}
+              translationCode={translationCode}
+              mode={theme.prefs.wordView}
+              onOpenStudy={openWordStudy}
+              onPray={() => setCaptureOpen(true)}
+              onClose={() => setActiveWord(null)}
+            />
+          ) : (
+            <AudioMiniPlayer floating packId={packId} translationCode={translationCode} bookNumber={bookNumber} chapter={chapterNumber} reference={reference} />
+          )}
+        </View>
       )}
 
       {focusMode && (
@@ -300,225 +378,230 @@ export function ReaderScreen({ start }: ReaderScreenProps = {}) {
           onPress={() => setFocusMode(false)}
           accessibilityRole="button"
           accessibilityLabel="Exit focus mode"
-          style={styles.exitFocus}
+          style={[styles.exitFocus, { top: SPACING.md }]}
         >
           <Text style={styles.exitFocusText}>Exit focus</Text>
         </Pressable>
       )}
 
-      <Modal
-        visible={pickerOpen}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setPickerOpen(false)}
-      >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalSheet}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Choose a book</Text>
-              <Pressable
-                onPress={() => setPickerOpen(false)}
-                accessibilityRole="button"
-                accessibilityLabel="Close book picker"
-                style={styles.navButton}
-              >
-                <Text style={styles.navButtonText}>Close</Text>
-              </Pressable>
-            </View>
-            <ScrollView contentContainerStyle={styles.bookGrid}>
-              {books.length === 0 && (
-                <Text style={styles.muted}>Install a Bible pack to browse the books.</Text>
-              )}
-              {books.map((book) => {
-                const active = book.bookNumber === bookNumber;
-                return (
-                  <Pressable
-                    key={book.bookNumber}
-                    onPress={() => selectBook(book)}
-                    accessibilityRole="button"
-                    style={[styles.bookChip, active && styles.bookChipActive]}
-                  >
-                    <Text style={[styles.bookChipText, active && styles.bookChipTextActive]}>
-                      {book.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        visible={activeFootnote !== null}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setActiveFootnote(null)}
-      >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalSheet}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{`Note ${activeFootnote?.marker ?? ''}`}</Text>
-              <Pressable
-                onPress={() => setActiveFootnote(null)}
-                accessibilityRole="button"
-                accessibilityLabel="Close footnote"
-                style={styles.navButton}
-              >
-                <Text style={styles.navButtonText}>Close</Text>
-              </Pressable>
-            </View>
-            <ScrollView contentContainerStyle={styles.footnoteBody}>
-              <Text style={styles.footnoteText}>{activeFootnote?.bodyText ?? ''}</Text>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
-      <CaptureSheet
-        visible={captureOpen}
-        onClose={() => setCaptureOpen(false)}
-        chapter={chapter}
-        reference={reference}
+      <PassageSheet
+        visible={passageOpen}
+        onClose={() => setPassageOpen(false)}
+        translations={translations}
+        packId={packId}
+        translationCode={translationCode}
+        books={books}
+        bookNumber={bookNumber}
+        chapter={chapterNumber}
+        onSelectTranslation={(t) => {
+          openChapter(bookNumber, chapterNumber, t);
+        }}
+        onSelectChapter={(b, c) => {
+          setPassageOpen(false);
+          openChapter(b, c);
+        }}
+        onCompare={() => {
+          setPassageOpen(false);
+          router.push('/compare');
+        }}
       />
+
+      <ReadingSettingsSheet visible={settingsOpen} onClose={() => setSettingsOpen(false)} onFocusMode={() => setFocusMode(true)} />
+
+      <Modal visible={activeFootnote !== null} animationType="slide" transparent onRequestClose={() => setActiveFootnote(null)}>
+        <View style={styles.noteBackdrop}>
+          <View style={[styles.noteSheet, { paddingBottom: insets.bottom + SPACING.xl }]}>
+            <View style={styles.noteHeader}>
+              <Text style={styles.noteTitle}>{`Note ${activeFootnote?.marker ?? ''}`}</Text>
+              <Pressable onPress={() => setActiveFootnote(null)} accessibilityRole="button" accessibilityLabel="Close footnote" style={styles.closeChip}>
+                <Text style={styles.closeChipText}>Done</Text>
+              </Pressable>
+            </View>
+            <Text style={styles.noteText}>{activeFootnote?.bodyText ?? ''}</Text>
+          </View>
+        </View>
+      </Modal>
+
+      <CaptureSheet visible={captureOpen} onClose={() => setCaptureOpen(false)} chapter={chapter} reference={reference} />
     </View>
   );
 }
 
-const useStyles = makeStyles((THEME) => ({
-  root: { flex: 1, backgroundColor: THEME.bg.canvas },
+interface VerseRowProps {
+  readonly verse: Verse;
+  readonly symbols: readonly SymbolTag[] | undefined;
+  readonly narrated: boolean;
+  readonly focusMode: boolean;
+  readonly alignments: readonly VerseWordAlignment[] | undefined;
+  readonly activeAlignmentId: number | undefined;
+  readonly onStudyVerse: (canonicalVerseId: number) => void;
+  readonly onWord: (alignment: VerseWordAlignment) => void;
+  readonly onFootnote: (footnoteId: string) => void;
+  readonly onCapture: () => void;
+}
+
+/** One verse paragraph. Memoised: tapping a word re-renders only the verse it touched. */
+const VerseRow = memo(function VerseRow({
+  verse,
+  symbols,
+  narrated,
+  focusMode,
+  alignments,
+  activeAlignmentId,
+  onStudyVerse,
+  onWord,
+  onFootnote,
+  onCapture,
+}: VerseRowProps) {
+  const styles = useStyles();
+  const { name: themeName } = useTheme();
+  const wash = symbols?.[0];
+  return (
+    <Text
+      style={[styles.verse, wash !== undefined && { backgroundColor: inductiveWash(wash, themeName) }, narrated && styles.verseNarrated]}
+      onLongPress={focusMode ? undefined : onCapture}
+    >
+      <Text
+        style={styles.verseNumber}
+        onPress={focusMode ? undefined : () => onStudyVerse(verse.canonicalVerseId)}
+        accessibilityRole={focusMode ? undefined : 'button'}
+        accessibilityLabel={focusMode ? undefined : `Study verse ${verse.verse}`}
+        suppressHighlighting={false}
+      >{`${verse.verse}\u2009 `}</Text>
+      <VerseSpans
+        verseId={verse.canonicalVerseId}
+        spans={verse.spans}
+        onFootnotePress={onFootnote}
+        {...(focusMode ? {} : { alignments, onWordPress: onWord, ...(activeAlignmentId !== undefined ? { activeAlignmentId } : {}) })}
+      />
+      {symbols !== undefined && symbols.length > 0 && (
+        <Text style={styles.verseNumber} accessibilityLabel={symbols.map((sym) => INDUCTIVE_HIGHLIGHTS[sym].meaning).join(', ')}>
+          {`  ${symbols.map((sym) => INDUCTIVE_HIGHLIGHTS[sym].badge).join(' ')}`}
+        </Text>
+      )}
+    </Text>
+  );
+});
+
+const useStyles = makeStyles((c, t) => ({
+  root: { flex: 1, backgroundColor: c.bg.canvas },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     gap: SPACING.sm,
-    paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.xl,
-    paddingBottom: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: THEME.border.subtle,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.sm,
+    paddingBottom: SPACING.xs,
   },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  headerActions: { flexDirection: 'row', gap: SPACING.sm },
-  reference: {
-    fontFamily: FONT_FACES.ui.regular,
-    fontSize: FONT_SIZES.uiLg,
-    color: THEME.text.primary,
+  iconButton: {
+    width: MIN_TOUCH_TARGET,
+    height: MIN_TOUCH_TARGET,
+    borderRadius: MIN_TOUCH_TARGET / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  focusButton: {
+  aa: { fontFamily: t.fonts.scripture.regular, fontSize: 18, color: c.text.secondary },
+  passagePill: {
+    flexShrink: 1,
     minHeight: MIN_TOUCH_TARGET,
     justifyContent: 'center',
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.lg + 2,
     borderRadius: RADII.pill,
-    borderWidth: 1,
-    borderColor: THEME.border.subtle,
+    backgroundColor: c.bg.elevated,
   },
-  focusButtonText: {
-    fontFamily: FONT_FACES.ui.regular,
-    fontSize: FONT_SIZES.uiSm,
-    color: THEME.text.secondary,
+  passageText: { fontFamily: t.fonts.ui.semibold, fontSize: FONT_SIZES.uiSm + 1, color: c.text.primary },
+  passageCode: { fontFamily: t.fonts.ui.medium, color: c.text.secondary },
+  content: { paddingHorizontal: SPACING.xl + 2, paddingTop: SPACING.sm, gap: SPACING.sm + 2 },
+  opening: { gap: 2, marginTop: SPACING.md, marginBottom: SPACING.sm },
+  bookLabel: {
+    fontFamily: t.fonts.ui.medium,
+    fontSize: FONT_SIZES.uiXs,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    color: c.text.secondary,
   },
-  navRow: { flexDirection: 'row', gap: SPACING.sm },
-  navButton: {
-    minHeight: MIN_TOUCH_TARGET,
-    justifyContent: 'center',
-    paddingHorizontal: SPACING.lg,
-    borderRadius: RADII.pill,
-    backgroundColor: THEME.bg.elevated,
-  },
-  navButtonDisabled: { opacity: 0.4 },
-  navButtonText: {
-    fontFamily: FONT_FACES.ui.regular,
-    fontSize: FONT_SIZES.uiSm,
-    color: THEME.text.primary,
-  },
-  content: {
-    paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.xxxl,
-    gap: SPACING.sm,
+  numeral: {
+    // Literata, not Cormorant: the bundled Cormorant build draws an old-style "1" that reads as a
+    // Roman "I" and Android ignores its lining-figure feature. Cormorant stays for titles.
+    fontFamily: t.fonts.scripture.medium,
+    fontSize: FONT_SIZES.chapterNumeral - 6,
+    lineHeight: (FONT_SIZES.chapterNumeral - 6) * 1.1,
+    color: c.accent.rubric,
   },
   verse: {
-    fontFamily: FONT_FACES.scripture.regular,
-    fontSize: FONT_SIZES.scriptureDefault,
-    lineHeight: FONT_SIZES.scriptureDefault * LINE_HEIGHTS.scripture,
-    color: THEME.text.primary,
+    fontFamily: t.fonts.scripture.regular,
+    fontSize: t.scriptureSize,
+    lineHeight: t.scriptureLineHeight,
+    color: c.text.primary,
   },
-  verseNarrated: {
-    // FR-106 — the verse being narrated: a soft accent wash readers can follow by eye.
-    backgroundColor: THEME.bg.elevated,
-    color: THEME.text.primary,
-  },
+  verseNarrated: { backgroundColor: c.bg.elevated },
   verseNumber: {
-    fontFamily: FONT_FACES.ui.regular,
-    fontSize: FONT_SIZES.uiXs,
-    color: THEME.text.verseNum,
+    fontFamily: t.fonts.ui.semibold,
+    fontSize: Math.max(10, Math.round(t.scriptureSize * 0.55)),
+    color: c.text.verseNum,
   },
-  muted: {
-    fontFamily: FONT_FACES.ui.regular,
-    fontSize: FONT_SIZES.uiSm,
-    color: THEME.text.secondary,
+  chapterNav: { flexDirection: 'row', justifyContent: 'space-between', gap: SPACING.sm, marginTop: SPACING.xl },
+  chapterButton: {
+    minHeight: MIN_TOUCH_TARGET,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+    paddingHorizontal: SPACING.lg,
+    borderRadius: RADII.pill,
+    backgroundColor: c.bg.elevated,
   },
-  error: {
-    fontFamily: FONT_FACES.ui.regular,
-    fontSize: FONT_SIZES.uiSm,
-    color: THEME.text.redLetter,
+  chapterButtonText: { fontFamily: t.fonts.ui.medium, fontSize: FONT_SIZES.uiSm, color: c.text.primary },
+  chapterButtonNext: { backgroundColor: c.accent.primary },
+  chapterButtonNextText: { fontFamily: t.fonts.ui.semibold, fontSize: FONT_SIZES.uiSm, color: c.text.onAccent },
+  hidden: { opacity: 0 },
+  floating: { position: 'absolute', left: SPACING.md, right: SPACING.md },
+  muted: { fontFamily: t.fonts.ui.regular, fontSize: FONT_SIZES.uiSm, color: c.text.secondary },
+  link: { fontFamily: t.fonts.ui.semibold, fontSize: FONT_SIZES.uiSm, color: c.accent.primary },
+  notice: { gap: SPACING.sm, padding: SPACING.lg, borderRadius: 16, backgroundColor: c.bg.sunken, marginTop: SPACING.lg },
+  noticeText: { fontFamily: t.fonts.ui.regular, fontSize: FONT_SIZES.uiSm + 1, color: c.text.primary },
+  empty: { gap: SPACING.md, marginTop: SPACING.xxl },
+  emptyTitle: { fontFamily: t.fonts.display.semibold, fontSize: 34, color: c.text.primary },
+  emptyBody: { fontFamily: t.fonts.scripture.regular, fontSize: FONT_SIZES.uiMd, lineHeight: FONT_SIZES.uiMd * 1.6, color: c.text.secondary },
+  primary: {
+    alignSelf: 'flex-start',
+    minHeight: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.xl,
+    borderRadius: RADII.pill,
+    backgroundColor: c.accent.primary,
   },
+  primaryText: { fontFamily: t.fonts.ui.semibold, fontSize: FONT_SIZES.uiSm + 1, color: c.text.onAccent },
+  skeleton: { gap: SPACING.md, marginTop: SPACING.lg },
+  skeletonLine: { height: 16, borderRadius: 8, backgroundColor: c.bg.sunken },
   exitFocus: {
     position: 'absolute',
-    top: SPACING.xl,
     right: SPACING.lg,
     minHeight: MIN_TOUCH_TARGET,
     justifyContent: 'center',
     paddingHorizontal: SPACING.md,
     borderRadius: RADII.pill,
-    borderWidth: 1,
-    borderColor: THEME.border.subtle,
-    backgroundColor: THEME.bg.surface,
-    opacity: 0.4,
+    backgroundColor: c.bg.elevated,
+    opacity: 0.55,
   },
-  exitFocusText: {
-    fontFamily: FONT_FACES.ui.regular,
-    fontSize: FONT_SIZES.uiXs,
-    color: THEME.text.secondary,
-  },
-  modalBackdrop: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: THEME.bg.elevated,
-  },
-  modalSheet: {
-    maxHeight: '80%',
+  exitFocusText: { fontFamily: t.fonts.ui.medium, fontSize: FONT_SIZES.uiXs, color: c.text.secondary },
+  noteBackdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'transparent' },
+  noteSheet: {
     padding: SPACING.xl,
     gap: SPACING.md,
-    borderTopLeftRadius: RADII.lg,
-    borderTopRightRadius: RADII.lg,
-    backgroundColor: THEME.bg.surface,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    backgroundColor: c.bg.surface,
+    borderTopWidth: 1,
+    borderColor: c.border.strong,
+    shadowColor: c.shadow,
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    elevation: 16,
   },
-  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  modalTitle: {
-    fontFamily: FONT_FACES.ui.regular,
-    fontSize: FONT_SIZES.uiLg,
-    color: THEME.text.primary,
-  },
-  bookGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, paddingBottom: SPACING.xl },
-  bookChip: {
-    minHeight: MIN_TOUCH_TARGET,
-    justifyContent: 'center',
-    paddingHorizontal: SPACING.lg,
-    borderRadius: RADII.pill,
-    borderWidth: 1,
-    borderColor: THEME.border.subtle,
-  },
-  bookChipActive: { backgroundColor: THEME.accent.primary, borderColor: THEME.accent.primary },
-  bookChipText: {
-    fontFamily: FONT_FACES.ui.regular,
-    fontSize: FONT_SIZES.uiSm,
-    color: THEME.text.primary,
-  },
-  bookChipTextActive: { color: THEME.bg.canvas },
-  footnoteBody: { paddingBottom: SPACING.xl },
-  footnoteText: {
-    fontFamily: FONT_FACES.scripture.regular,
-    fontSize: FONT_SIZES.uiMd,
-    lineHeight: FONT_SIZES.uiMd * LINE_HEIGHTS.ui,
-    color: THEME.text.primary,
-  },
+  noteHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  noteTitle: { fontFamily: t.fonts.ui.semibold, fontSize: FONT_SIZES.uiMd, color: c.text.primary },
+  closeChip: { minHeight: 36, justifyContent: 'center', paddingHorizontal: SPACING.lg, borderRadius: RADII.pill, backgroundColor: c.bg.elevated },
+  closeChipText: { fontFamily: t.fonts.ui.medium, fontSize: FONT_SIZES.uiSm, color: c.text.primary },
+  noteText: { fontFamily: t.fonts.scripture.regular, fontSize: FONT_SIZES.uiMd, lineHeight: FONT_SIZES.uiMd * 1.6, color: c.text.primary },
 }));

@@ -7,7 +7,7 @@
 import type { ContentDbAdapter } from '../adapters';
 import { formatCanonicalRange, fromCanonicalVerseId } from '../domain/bbcccvvv';
 import { BOOKS } from '../domain/books';
-import { normalizeStrongsId } from '../domain/strongs';
+import { normalizeStrongsId, strongsClass, strongsEquivalents } from '../domain/strongs';
 import type {
   InterlinearToken,
   LexiconEntry,
@@ -157,9 +157,11 @@ export class ExegesisRepository {
       if (alignment !== undefined && alignment.interlinearWordPos === undefined && alignment.strongsId !== undefined) {
         // Packs leave the cross-pack word position NULL; resolve it by Strong's occurrence instead.
         const strongs = alignment.strongsId;
+        const cls = strongsClass(strongs);
         const rank = alignments.filter(
           (a) =>
-            a.strongsId === strongs &&
+            a.strongsId !== undefined &&
+            strongsClass(a.strongsId) === cls &&
             (a.spanIndex < alignment!.spanIndex || (a.spanIndex === alignment!.spanIndex && a.charStart < alignment!.charStart)),
         ).length;
         const resolved = await this.resolveWordPositionByStrongs(canonicalVerseId, strongs, rank);
@@ -231,11 +233,13 @@ export class ExegesisRepository {
     rank: number,
   ): Promise<number | undefined> {
     const pack = await this.requirePack(this.exegesisPackId);
+    // Legacy form numbers (KJV "was" = G2258) match their lexeme class (STEPBible G1510).
+    const ids = strongsEquivalents(strongsId);
     const { rows } = await this.contentDb.query<{ word_position: number }>(
       `SELECT word_position FROM ${pack}.interlinear_tokens
-        WHERE canonical_verse_id = ? AND strongs_id = ?
+        WHERE canonical_verse_id = ? AND strongs_id IN (${ids.map(() => '?').join(', ')})
         ORDER BY word_position ASC`,
-      [canonicalVerseId, strongsId],
+      [canonicalVerseId, ...ids],
     );
     if (rows.length === 0) return undefined;
     // An English translation may repeat a word the original says once: clamp to the last token.

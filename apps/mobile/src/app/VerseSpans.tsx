@@ -28,9 +28,11 @@ interface VerseSpansProps {
   readonly alignments?: readonly VerseWordAlignment[];
   /** FR-301 — opens word study for a tapped aligned word. */
   readonly onWordPress?: (alignment: VerseWordAlignment) => void;
+  /** FR-301 — the word whose card is open, drawn with the theme's tapped-word wash. */
+  readonly activeAlignmentId?: number;
 }
 
-export function VerseSpans({ verseId, spans, onFootnotePress, alignments, onWordPress }: VerseSpansProps) {
+export function VerseSpans({ verseId, spans, onFootnotePress, alignments, onWordPress, activeAlignmentId }: VerseSpansProps) {
   const styles = useStyles();
   const { colors: THEME } = useTheme();
   return (
@@ -62,7 +64,7 @@ export function VerseSpans({ verseId, spans, onFootnotePress, alignments, onWord
           span.type === 'red_letter'
             ? { color: THEME.text.redLetter }
             : span.type === 'heading'
-              ? { color: THEME.text.secondary, fontStyle: 'italic' as const }
+              ? { color: THEME.text.secondary, fontFamily: styles.heading.fontFamily }
               : undefined;
         const prefix = `${span.type === 'poetry' && index > 0 ? '\n' : ''}${indent}`;
         if (onWordPress === undefined || span.type === 'heading') {
@@ -86,10 +88,12 @@ export function VerseSpans({ verseId, spans, onFootnotePress, alignments, onWord
               </Text>
             );
           }
+          const active = alignment.id === activeAlignmentId;
           return (
             <Text
               key={`${verseId}-${index}-${part}`}
-              style={spanStyle}
+              style={active ? [spanStyle, styles.activeWord] : spanStyle}
+              accessibilityState={{ selected: active }}
               accessibilityRole="button"
               accessibilityLabel={`Study the word ${segment.text}`}
               suppressHighlighting={false}
@@ -104,9 +108,12 @@ export function VerseSpans({ verseId, spans, onFootnotePress, alignments, onWord
   );
 }
 
-const useStyles = makeStyles((THEME) => ({
+const useStyles = makeStyles((THEME, t) => ({
   footnoteMarker: {
+    fontFamily: t.fonts.ui.semibold,
     fontSize: FONT_SIZES.uiXs,
     color: THEME.accent.primary,
   },
+  heading: { fontFamily: t.fonts.scripture.italic },
+  activeWord: { backgroundColor: THEME.accent.wash, color: THEME.accent.onWash },
 }));

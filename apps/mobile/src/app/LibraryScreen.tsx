@@ -17,7 +17,10 @@ import {
 import { FONT_FACES, FONT_SIZES, MIN_TOUCH_TARGET, RADII, SPACING } from '@breath-and-word/tokens';
 
 import { packDownloadUrl, packManifestUrl } from '../config/pack-server';
+import { useRouter } from 'expo-router';
+
 import { useCoreRuntime } from './CoreRuntime';
+import { useNavClearance } from './nav/FloatingNav';
 import { useCoreStore } from './useCoreStore';
 import { makeStyles } from '../theme/ThemeProvider';
 
@@ -48,6 +51,8 @@ function describeError(error: unknown): string {
 
 export function LibraryScreen() {
   const styles = useStyles();
+  const router = useRouter();
+  const clearance = useNavClearance();
   const runtime = useCoreRuntime();
   const packs = runtime.stores.packs;
   const { installed, storageBytes, status, error, progress } = useCoreStore(packs);
@@ -116,9 +121,9 @@ export function LibraryScreen() {
       : 0;
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.root} contentContainerStyle={[styles.content, { paddingBottom: clearance }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Content Library</Text>
+        <Text accessibilityRole="header" style={styles.title}>Library</Text>
         <Text style={styles.subtitle}>{`Offline storage · ${formatBytes(storageBytes)}`}</Text>
       </View>
 
@@ -212,6 +217,17 @@ export function LibraryScreen() {
             </View>
           );
         })}
+      <View style={styles.more}>
+        <Text style={styles.moreLabel}>More</Text>
+        <Pressable onPress={() => router.push('/account')} accessibilityRole="link" style={styles.moreRow}>
+          <Text style={styles.moreText}>Account & sync</Text>
+        </Pressable>
+        {__DEV__ && (
+          <Pressable onPress={() => router.push('/diagnostics')} accessibilityRole="link" style={styles.moreRow}>
+            <Text style={styles.moreText}>Developer diagnostics</Text>
+          </Pressable>
+        )}
+      </View>
     </ScrollView>
   );
 }
@@ -220,9 +236,13 @@ const useStyles = makeStyles((THEME) => ({
   root: { flex: 1, backgroundColor: THEME.bg.canvas },
   content: { padding: SPACING.xl, gap: SPACING.sm },
   header: { gap: SPACING.xs, marginBottom: SPACING.sm },
+  more: { gap: SPACING.xs, marginTop: SPACING.xl },
+  moreLabel: { fontFamily: FONT_FACES.ui.semibold, fontSize: FONT_SIZES.uiXs, letterSpacing: 1.2, textTransform: 'uppercase', color: THEME.text.secondary },
+  moreRow: { minHeight: MIN_TOUCH_TARGET, justifyContent: 'center', paddingHorizontal: SPACING.lg, borderRadius: RADII.md, backgroundColor: THEME.bg.surface },
+  moreText: { fontFamily: FONT_FACES.ui.medium, fontSize: FONT_SIZES.uiSm + 1, color: THEME.text.primary },
   title: {
-    fontFamily: FONT_FACES.ui.regular,
-    fontSize: FONT_SIZES.uiLg,
+    fontFamily: FONT_FACES.display.semibold,
+    fontSize: 40,
     color: THEME.text.primary,
   },
   subtitle: {

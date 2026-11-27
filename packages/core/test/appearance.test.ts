@@ -75,3 +75,12 @@ describe('appearance store', () => {
     expect((await repo.get()).leftPanelOpen).toBe(false);
   });
 });
+
+describe('last passage', () => {
+  it('round-trips a valid passage and rejects malformed ones', async () => {
+    const passage = { packId: 'trans_kjv', translationCode: 'KJV', bookNumber: 43, chapter: 3 };
+    expect((await repo.update({ lastPassage: passage })).lastPassage).toEqual(passage);
+    expect(normalizeAppearance({ lastPassage: { ...passage, packId: 'DROP TABLE' } }).lastPassage).toBeNull();
+    expect(normalizeAppearance({ lastPassage: { ...passage, bookNumber: 67 } }).lastPassage).toBeNull();
+  });
+});

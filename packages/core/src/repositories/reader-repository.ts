@@ -76,6 +76,13 @@ export interface TranslationRef {
   readonly translationCode: string;
 }
 
+/** FR-101 / FR-105 — an installed, readable translation (for the passage & translation picker). */
+export interface TranslationSummary extends TranslationRef {
+  readonly name: string;
+  /** FR-301 — the pack carries English-word → Strong's alignments (tap any word). */
+  readonly hasWordAlignments: boolean;
+}
+
 export interface Footnote {
   readonly footnoteId: string;
   readonly canonicalVerseId: number;
@@ -184,6 +191,33 @@ export class ReaderRepository {
     );
 
     return rows.map(toBookSummary);
+  }
+
+  /**
+   * FR-101 / FR-105 — every translation in the currently attached TRANSLATION packs, ordered by
+   * name. Exegesis and study packs are skipped by their `pack_metadata.pack_type`.
+   */
+  async listTranslations(): Promise<TranslationSummary[]> {
+    const attached = (await this.contentDb.getAttachedPacks()).filter((id) => SAFE_PACK_ID.test(id));
+    const found: TranslationSummary[] = [];
+    for (const packId of attached) {
+      const meta = await this.contentDb.query<{ pack_type: string }>(
+        `SELECT pack_type FROM "${packId}".pack_metadata LIMIT 1`,
+      );
+      if (meta.rows[0]?.pack_type !== 'TRANSLATION') continue;
+      const { rows } = await this.contentDb.query<{ translation_code: string; name: string; has_word_alignments: number }>(
+        `SELECT translation_code, name, has_word_alignments FROM "${packId}".translations`,
+      );
+      for (const row of rows) {
+        found.push({
+          packId,
+          translationCode: row.translation_code,
+          name: row.name,
+          hasWordAlignments: row.has_word_alignments === 1,
+        });
+      }
+    }
+    return found.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   /** FR-102 — a single canonical verse from one translation, or `null` when absent. */

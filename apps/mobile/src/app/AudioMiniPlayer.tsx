@@ -55,9 +55,11 @@ export interface AudioMiniPlayerProps {
   readonly bookNumber: number;
   readonly chapter: number;
   readonly reference: string;
+  /** Render as a rounded floating bar (above the pill nav) instead of a docked strip. */
+  readonly floating?: boolean;
 }
 
-export function AudioMiniPlayer({ packId, translationCode, bookNumber, chapter, reference }: AudioMiniPlayerProps) {
+export function AudioMiniPlayer({ packId, translationCode, bookNumber, chapter, reference, floating = false }: AudioMiniPlayerProps) {
   const study = useStudy();
   const { colors: THEME } = useTheme();
   const { stores } = useCoreRuntime();
@@ -90,14 +92,32 @@ export function AudioMiniPlayer({ packId, translationCode, bookNumber, chapter, 
 
   return (
     <View
-      style={{
-        gap: SPACING.sm,
-        paddingHorizontal: SPACING.xl,
-        paddingVertical: SPACING.sm,
-        borderTopWidth: 1,
-        borderTopColor: THEME.border.subtle,
-        backgroundColor: THEME.bg.surface,
-      }}
+      style={
+        floating
+          ? {
+              // Floats above the pill nav as a quiet rounded bar (design round 2026-11-28).
+              gap: SPACING.sm,
+              paddingHorizontal: SPACING.lg,
+              paddingVertical: SPACING.sm,
+              borderRadius: 22,
+              borderWidth: 1,
+              borderColor: THEME.border.subtle,
+              backgroundColor: THEME.bg.surface,
+              shadowColor: THEME.shadow,
+              shadowOpacity: 0.12,
+              shadowRadius: 12,
+              shadowOffset: { width: 0, height: 6 },
+              elevation: 6,
+            }
+          : {
+              gap: SPACING.sm,
+              paddingHorizontal: SPACING.xl,
+              paddingVertical: SPACING.sm,
+              borderTopWidth: 1,
+              borderTopColor: THEME.border.subtle,
+              backgroundColor: THEME.bg.surface,
+            }
+      }
       accessibilityLabel="Audio player"
     >
       <View style={[study.row, { justifyContent: 'space-between' }]}>
