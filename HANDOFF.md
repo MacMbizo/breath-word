@@ -2,8 +2,8 @@
 
 > **Read this first** when resuming work in a fresh session or on a new machine. It is a concise
 > orientation, **not** a replacement for the specs. Authoritative specs live in `docs/` — start at
-> `docs/G1-index.md`. The living changelog is `docs/G3-changelog.md` (currently `v1.0.44`); the
-> requirements register is `docs/G5-requirements-register.md` (currently `1.0.4`).
+> `docs/G1-index.md`. The living changelog is `docs/G3-changelog.md` (currently `v1.0.46`); the
+> requirements register is `docs/G5-requirements-register.md` (currently `1.0.5`).
 
 ---
 
@@ -54,7 +54,7 @@ breath-word/
 6. **UI & a11y:** tokens only (no hex), UI-thread animations with Reduced Motion fallbacks, Hebrew/Aramaic
    wrapped in `dir="rtl"` + `unicode-bidi: isolate` (mobile: RLI/LRI…PDI isolates + `writingDirection`).
 7. **Errors & gate:** every thrown error is a canonical C3 `AppError`.
-   **Gate: `pnpm turbo lint typecheck test` → must be 12/12** (core 276 tests, pack-builder 87).
+   **Gate: `pnpm turbo lint typecheck test` → must be 13/13** (core 294 tests, pack-builder 90, tokens 47).
 
 ## 4. Dev environment
 
@@ -65,9 +65,32 @@ breath-word/
   CRLF files: prefer the Edit tool.
 - `tools/pack-builder` CLIs run through **`tsx`**.
 
-## 5. Status snapshot (as of 2026-11-27)
+## 5. Status snapshot (as of 2026-11-28)
 
-**Phases 1, 2 and 3 are built, committed and pushed to `main`** (latest: `ca10864`).
+**Phases 1–3 built; FR-301 tap-any-English-word done; design round 1 (Parchment · Selah · Lamplight) built on both
+apps.** Latest commits are local on `main` (not pushed): `558db37`, `50fb7e2` (word alignments), `c1b8912`, `e940f82`,
+`3e053ed` (design) + docs.
+
+### Design round 2026-11-28 (`D1` 1.1.0, canvas https://claude.ai/artifact/GmWvY58mTdAuEXh2wGxRJx rows D/E)
+- **Themes:** Parchment (warm day), **Selah** (calm, default), Lamplight (night; follows OS dark mode). Colour *roles*
+  in `packages/tokens/src/colors.ts`: `accent.primary` = the only interactive colour, `accent.rubric` = chapter numeral
+  and wordmark "&" only, `accent.wash/onWash` = tapped word, `nav.*` = pill. Contrast test guards all pairs.
+- **Fonts bundled** (OFL): Literata, Inter, Cormorant Garamond, Gentium Book Plus, Noto Serif Hebrew. Mobile picks faces
+  by NAME (`FONT_FACES`), never `fontWeight`.
+- **Mobile:** `ThemeProvider` + `makeStyles` everywhere; Expo Router `(tabs)` = Read · Pray · Journal · Library behind
+  `FloatingNav` (pill); reader with passage pill, word card (Card/Interlinear), passage + reading-settings sheets.
+  Device-verified on the Android emulator.
+- **Desktop:** collapsible `SidePanel`, floating `StudyPanel` ↔ `StudyRail`, inline `QuickLook`. **Not visually
+  verified yet** — a stale `breath-and-word-desktop.exe` (no window, started 2026-11-27 20:05) holds the WebView2
+  profile so a second instance can't start; close it, then `pnpm --filter @breath-and-word/desktop tauri dev`.
+- **Device-local preferences:** `workspace_state.appearance` (theme, followSystemDark, wordView, scriptureSize,
+  leftPanelOpen, studyPanelOpen, lastPassage).
+
+### FR-301 word alignments (`G3` v1.0.45)
+- `tools/pack-builder/src/usfm.ts` keeps `\w …|strong="…"` tags → `verse_word_alignments` (KJV/WEB only; BSB USFM has
+  no tags). Real `trans_kjv`/`trans_web` **1.1.0** packs are in `tools/pack-builder/out/` (git-ignored).
+- Word position is resolved at READ time by Strong's occurrence; `strongsClass` maps KJV legacy εἰμί numbers
+  (G2258 "was" …) onto STEPBible's G1510.
 
 ### Phase 3 delivered (`c340564`, docs `ca10864`)
 - **Packs:** `exegesis_step` (STEPBible TAGNT/TAHOT/TBESG/TBESH) and `study_refs` (OpenBible cross-refs +
@@ -94,10 +117,11 @@ breath-word/
 - **Data:** full STEPBible build from all TAGNT/TAHOT files; Factbook map is a grid + dot (no coastline source yet).
 
 ### Next up
-1. Mobile native build + device run of the Phase 3 screens and two-stream mixer.
-2. English-word alignments in translation packs (unblocks FR-301 tap-on-English).
-3. Full STEPBible exegesis pack build.
-4. Decide which research candidates (§7) enter `A2`/`G5` and when.
+1. Visually verify the desktop redesign (close the stale desktop process first) and fix what the screenshots show.
+2. Restyle the remaining secondary screens to the new design language (prayer session, guided prayer, pools, vault,
+   habits, account, compare, search) — they are themed but still use the older layouts.
+3. Merge the audio bar into the mobile pill while audio plays (design note); narration timestamps (FR-106, Aeneas).
+4. Full STEPBible exegesis build; decide which research candidates (§7) enter `A2`/`G5`.
 
 ## 6. How to run
 
@@ -107,6 +131,11 @@ pnpm turbo lint typecheck test                                  # THE GATE -> 12
 
 pnpm --filter @breath-and-word/desktop tauri dev                 # desktop
 pnpm --filter @breath-and-word/mobile run:android                # mobile dev build (Expo Go won't work)
+#   Android tips (2026-11-28): if repo.maven.apache.org is unreachable, build with a Gradle init script that rewrites
+#   it to repo1.maven.org; the debug app loads its bundle from host :8081 directly (not via adb reverse) — to use
+#   another Metro, set `debug_http_host` in the app's shared_prefs. Deep link:
+#   breathandword://read?pack=trans_kjv&translation=KJV&book=43&chapter=3
+#   Style edits need a cold restart in dev (per-theme style cache survives fast refresh).
 
 # Packs
 pnpm --filter @breath-and-word/pack-builder pack:sample          # synthetic translation fixture

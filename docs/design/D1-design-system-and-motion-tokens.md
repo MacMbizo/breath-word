@@ -1,15 +1,15 @@
 # D1: Design System & Motion Tokens (`packages/tokens`)
 
 **Document ID:** `D1`  
-**Version:** `1.0.0`  
+**Version:** `1.1.0`  
 **Status:** `Approved`  
 **Owner:** Founder / Design  
-**Last Updated:** `2026-11-24`  
+**Last Updated:** `2026-11-28`  
 **Related Docs:** `A1`, `B3`, `B7`, `B8` (`ADR-001`), `D3`
 
 ## Purpose & Scope
 
-Defines the visual identity, 4-theme color palette, sacred editorial typography (including Hebrew RTL & polytonic Greek), spacing scale, inductive highlight semantics, and shared 120Hz animation spring presets exported from `packages/tokens` to both `apps/mobile` and `apps/desktop`.
+Defines the visual identity, 3-theme color palette (Parchment · Selah · Lamplight), sacred editorial typography (including Hebrew RTL & polytonic Greek), spacing scale, inductive highlight semantics, and shared 120Hz animation spring presets exported from `packages/tokens` to both `apps/mobile` and `apps/desktop`.
 
 ## Audience
 
@@ -22,22 +22,34 @@ Developer and AI coding partner styling React Native (Expo) and Tailwind CSS (Ta
 - Feels like a finely bound linen study Bible merged with an atmospheric evening prayer sanctuary—**zero** neon gamification, noisy streak flames, or cluttered toolbars.
 - High typographic craft: generous line heights (`1.65–1.8`), optimal measure (`60–68ch` centered column on iPad/Desktop), delicate verse superscripts, and tactile, unhurried spring physics.
 
-### 4.2 Four Semantic Themes (`packages/tokens/src/colors.ts`)
+### 4.2 Three Semantic Themes (`packages/tokens/src/colors.ts`) — design round 2026-11-28
 
-| Token | Daylight (Crisp Paper) | Parchment (Warm Study) | Midnight (OLED Study) | Sanctuary (Prayer Ambient) |
-| --- | :---: | :---: | :---: | :---: |
-| `bg.canvas` | `#FAF9F6` | `#F5EFE4` | `#0F1115` | `#090D16` |
-| `bg.surface` | `#FFFFFF` | `#FBF7F0` | `#171A21` | `#111827` |
-| `bg.elevated` | `#F2EFE9` | `#EAE0CE` | `#202530` | `#1B2436` |
-| `text.primary` | `#1C1917` | `#2B2118` | `#E8E6E1` | `#EDF2F7` |
-| `text.secondary` | `#57534E` | `#6B5B4B` | `#9CA3AF` | `#94A3B8` |
-| `text.verseNum` | `#A8A29E` | `#9C8873` | `#64748B` | `#64748B` |
-| `text.redLetter` | `#991B1B` | `#8F2424` | `#F87171` | `#FCA5A5` |
-| `accent.primary` | `#2B5B6C` *(Deep Teal)* | `#7C4D2B` *(Warm Cedar)* | `#60A5FA` *(Calm Sky)* | `#818CF8` *(Twilight Indigo)* |
-| `accent.breathGlow` | `#3B82F6` | `#B45309` | `#38BDF8` | `#6366F1` → `#38BDF8` |
-| `border.subtle` | `#E7E5E4` | `#DFD3BE` | `#262B36` | `#1E293B` |
+Chosen by the founder from three explored directions (design canvas rows D/E): **Parchment** (warm day page, from "Vellum"), **Selah** (the calm theme: cool, airy, quiet ornament — the default for new installs) and **Lamplight** (night study). "Lamplight when my device is dark" (on by default) follows the OS colour scheme. The previous Daylight/Midnight/Sanctuary themes are retired; a stored retired name falls back to the default.
 
-### 4.3 Inductive Observation Highlight Palette (WCAG AA Safe Over All 4 Themes)
+Every theme carries the same **colour roles**, so screens never branch on the theme:
+
+| Role | Used for | Parchment | Selah | Lamplight |
+| --- | --- | :---: | :---: | :---: |
+| `bg.canvas` | page | `#F4EEE3` | `#F7F7F4` | `#12100E` |
+| `bg.surface` | cards, sheets, floating study card | `#FBF8F2` | `#FFFFFF` | `#1F1B17` |
+| `bg.elevated` | chips, passage pill, secondary buttons | `#EBE2D3` | `#ECEEE9` | `#2A2520` |
+| `bg.sunken` | segmented tracks, wells | `#EFE7DA` | `#F0F2EE` | `#15120F` |
+| `text.primary` | body | `#2A211A` | `#1E2320` | `#EDE6DA` |
+| `text.secondary` | secondary text | `#6B5A49` | `#5D6660` | `#A89D8E` |
+| `text.verseNum` | verse numbers | `#7A2E24` | `#5F6B65` | `#E8806B` |
+| `text.redLetter` | words of Christ | `#8C2B20` | `#9A3B2E` | `#E8806B` |
+| `text.onAccent` | text on an accent fill | `#FFFFFF` | `#FFFFFF` | `#12100E` |
+| `accent.primary` | **the one interactive colour** | `#3E6B5E` *(sage)* | `#3E6B5E` *(sage)* | `#E0A458` *(amber)* |
+| `accent.wash` / `onWash` | tapped / selected word | `#D6E3DC` / `#1F3A32` | `#D6E6DF` / `#1F3A32` | `#E0A458` / `#12100E` |
+| `accent.rubric` | **rubrics only**: chapter numeral, wordmark "&" | `#7A2E24` *(oxblood)* | `#3E6B5E` | `#E8806B` *(coral)* |
+| `border.subtle` / `strong` | hairlines | `#DCCFB9` / `#C9B79C` | `#E2E5E1` / `#CBD1CC` | `#2B2621` / `#3A332B` |
+| `nav.*` | floating pill nav (bg · icon · active bg · active icon) | `#2A211A` · `#D9CCB6` · `#3E6B5E` · `#FFFFFF` | `#1E2320` · `#C9D3CE` · `#3E6B5E` · `#FFFFFF` | `#2A2520` · `#C9BEAF` · `#E0A458` · `#12100E` |
+
+`packages/tokens/test/contrast.test.ts` asserts WCAG 2.2 AA for 15 role pairs in every theme (45 checks); a palette change that breaks one fails the gate.
+
+**Layout principles (same round):** mobile uses a floating pill navigation (Read · Pray · Journal · Library) and a floating word card above it; desktop uses a collapsible side panel (wordmark, navigation, translation · compare · focus, theme picker) and a floating study card that collapses to a tool strip (with an inline quick look for tapped words). Panel state, theme, word view (Card · Interlinear), text size and the last passage are device-local preferences (`workspace_state.appearance`, never synced).
+
+### 4.3 Inductive Observation Highlight Palette (WCAG AA Safe Over All 3 Themes)
 
 | Symbol Tag (`B4`) | Meaning | Light/Parchment Wash | Dark/Sanctuary Wash | Symbolic Margin Badge |
 | --- | --- | :---: | :---: | :---: |
@@ -51,11 +63,15 @@ Developer and AI coding partner styling React Native (Expo) and Tailwind CSS (Ta
 
 | Role | Font Family | Size Scale | Line Height | Notes |
 | --- | --- | :---: | :---: | --- |
-| **Scripture Body** | `Literata` (Variable Serif) *(toggleable to `Inter` Sans)* | `16–28px` (user slider, default `19px`) | `1.72` | Supports optical sizing, crisp italics, small-caps for `LORD`. |
-| **Section Headings** | `Literata SemiBold` | `1.15× body` | `1.35` | `marginTop: 24px`, `marginBottom: 8px`. |
-| **UI Chrome & Controls** | `Inter` (Variable Sans) | `12 / 14 / 16 / 20px` | `1.4` | Tabular numerals (`tnum`) for verse counts & timers. |
-| **Hebrew / Aramaic** | `SBL Hebrew` (bundled `.ttf`) | `1.35× body` | `1.9` | **Mandatory `direction: rtl` + `unicode-bidi: isolate`** so nikud/cantillation marks never clip. |
-| **Polytonic Greek** | `Gentium Plus` / `SBL Greek` (bundled `.ttf`) | `1.15× body` | `1.75` | Full breathing marks, accents, and iota subscripts. |
+| **Scripture Body** | `Literata` *(toggleable to `Inter` Sans)* | `16–28px` (user setting, default `19px`) | `1.72` (`1.82` in Selah) | Optical sizing, crisp italics. |
+| **Chapter numeral** | `Cormorant Garamond` SemiBold (desktop, `font-variant-numeric: lining-nums`); `Literata` Medium on mobile | `58–72px` | `1.05` | Coloured `accent.rubric`. Mobile uses Literata because the bundled Cormorant build's old-style "1" reads as "I" and Android ignores `lnum`. |
+| **Display & wordmark** | `Cormorant Garamond` | `27–44px` | `1.1` | Hub titles, "Breath & Word" wordmark (rubric "&"). |
+| **Section Headings** | `Literata` Italic | `1× body` | `1.35` | Inline in the verse flow. |
+| **UI Chrome & Controls** | `Inter` 400 / 500 / 600 | `12 / 14 / 16 / 20px` | `1.4` | React Native selects weights by face name (`FONT_FACES`), not `fontWeight`. |
+| **Hebrew / Aramaic** | `Noto Serif Hebrew` | `1.35× body` | `1.9` | **Mandatory `direction: rtl` + `unicode-bidi: isolate`** (mobile: RLI…PDI isolates). Replaces `SBL Hebrew`, whose licence does not permit app bundling. |
+| **Polytonic Greek** | `Gentium Book Plus` | `1.15× body` | `1.75` | Full breathing marks, accents, and iota subscripts. |
+
+All five families are SIL OFL and **bundled** (never fetched at runtime): desktop via `@fontsource/*`, mobile via `@expo-google-fonts/*` per-weight imports loaded at boot (`apps/mobile/src/theme/fonts.ts`).
 
 ### 4.5 Shared Animation & Spring Physics (`packages/tokens/src/motion.ts`)
 
@@ -84,7 +100,7 @@ export const BREATH_EASING = {
 
 ## Acceptance / Done Criteria
 
-- All text/background and highlight/text pairings pass WCAG 2.2 AA contrast (`≥4.5:1` normal text, `≥3:1` large text/icons) across all 4 themes.
+- All text/background and highlight/text pairings pass WCAG 2.2 AA contrast (`≥4.5:1` normal text, `≥3:1` large text/icons) across all 3 themes (enforced by `packages/tokens/test/contrast.test.ts`).
 - Hebrew nikud vowels and Greek polytonic accents render cleanly without clipping on Android, iPadOS, Windows 11, and macOS.
 - `packages/tokens` exports both plain TS objects (for Expo RN) and generated CSS custom properties (for Tauri Tailwind).
 
@@ -94,10 +110,11 @@ export const BREATH_EASING = {
 
 ## Assumptions
 
-- `[ASSUMPTION]` `Literata`, `Inter`, `SBL Hebrew`, and `Gentium Plus` (all SIL OFL / free redistribution) are bundled in app assets (~2.5 MB total subsetted).
+- `Literata`, `Inter`, `Cormorant Garamond`, `Gentium Book Plus` and `Noto Serif Hebrew` (all SIL OFL) are bundled in app assets — only the weights in `FONT_FACES` on mobile.
 
 ## Change Log
 
+- `1.1.0` | `2026-11-28` | Claude | Design round 2026-11-28: three themes (Parchment · Selah · Lamplight) with shared colour roles (accent = interactive, rubric = chapter numeral and "&", wash = tapped word, nav = pill), contrast test, Cormorant display face, Noto Serif Hebrew replaces SBL Hebrew, fonts bundled, layout principles (pill nav, floating study card, collapsible panels).
 - `1.0.0` | `2026-11-24` | Athena | Complete Sacred Editorial Calm design system, 4 themes, inductive highlight palette, Hebrew/Greek typography, and shared spring/breath motion tokens.
 
 ## Traceability
