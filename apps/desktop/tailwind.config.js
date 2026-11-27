@@ -40,6 +40,16 @@ export default {
         lg: 'var(--bw-radius-lg)',
         pill: 'var(--bw-radius-pill)',
       },
+      // `text-uiXs` … `text-scriptureMax` map onto the D1 type scale (FONT_SIZES).
+      fontSize: {
+        uiXs: 'var(--bw-font-size-uiXs)',
+        uiSm: 'var(--bw-font-size-uiSm)',
+        uiMd: 'var(--bw-font-size-uiMd)',
+        uiLg: 'var(--bw-font-size-uiLg)',
+        scriptureMin: 'var(--bw-font-size-scriptureMin)',
+        scriptureDefault: 'var(--bw-font-size-scriptureDefault)',
+        scriptureMax: 'var(--bw-font-size-scriptureMax)',
+      },
       fontFamily: {
         scripture: 'var(--bw-font-scripture)',
         ui: 'var(--bw-font-ui)',

@@ -1,43 +1,38 @@
-// AudioEngineAdapter — narration over react-native-track-player (B3 §4.3, B4 §4.7).
+// AudioEngineAdapter — narration over react-native-track-player + ambient bed over expo-audio
+// (B3 §4.3, B4 §4.7, FR-106).
 //
-// Narration rides the native player (TrackPlayer), which also drives the lock-screen / notification
-// controls. react-native-track-player owns a single active track, so the ambient beds
-// (rain/piano/pad) — which must play *simultaneously* with narration — are recorded but not yet
-// rendered: a two-stream native mixer is out of Gate-1 scope (the desktop HTML5 adapter runs two
-// `Audio` elements instead). `ErrorDomain` (C3) has no `AUDIO` member, so playback-policy failures
-// are swallowed rather than surfaced — audio is non-critical.
+// Two independent streams make the Ambient Mixer: narration rides the native TrackPlayer (which also
+// drives the lock-screen / notification controls) and the looping rain/piano/pad bed plays on its own
+// `expo-audio` player, so each has its own volume. The sleep timer fades BOTH streams along the shared
+// core curve (`sleepFadeGain`) before pausing. `ErrorDomain` (C3) has no `AUDIO` member, so
+// playback-policy failures are swallowed rather than surfaced — audio is non-critical.
 //
-// The module is loaded LAZILY. `react-native-track-player@4.1.2` ships a legacy native module that
-// RN 0.88's New-Architecture interop cannot translate (`TurboModuleInteropUtils` rejects its
-// `@ReactMethod` annotations), so merely importing it aborts the JS runtime at boot. Audio is a
-// Phase-3 concern (FR-106, gated by `ENABLE_AUDIO_MIXER`), so Phase-1 never touches it and the
-// import is deferred to the first playback call.
+// Both native modules load LAZILY. `react-native-track-player@4.1.2` ships a legacy native module
+// that RN 0.88's New-Architecture interop cannot translate (`TurboModuleInteropUtils` rejects its
+// `@ReactMethod` annotations), so merely importing it aborts the JS runtime at boot; deferring the
+// imports keeps every non-audio screen independent of the audio stack.
 
+import type { AudioPlayer } from 'expo-audio';
 import type { PlaybackProgressUpdatedEvent, Track } from 'react-native-track-player';
-import type { AudioEngineAdapter } from '@breath-and-word/core';
+
+import { SLEEP_FADE_STEP_MS, sleepFadeGain, type AudioEngineAdapter } from '@breath-and-word/core';
+
+import padLoop from '../../assets/audio/ambient/pad.wav';
+import pianoLoop from '../../assets/audio/ambient/piano.wav';
+import rainLoop from '../../assets/audio/ambient/rain.wav';
 
 type TrackPlayerModule = typeof import('react-native-track-player');
-
-let trackPlayerPromise: Promise<TrackPlayerModule> | null = null;
-
-/** Resolve the TrackPlayer module on demand; the first successful load is memoised. */
-function loadTrackPlayer(): Promise<TrackPlayerModule> {
-  if (trackPlayerPromise === null) {
-    trackPlayerPromise = import('react-native-track-player').catch((error: unknown) => {
-      trackPlayerPromise = null;
-      throw error;
-    });
-  }
-  return trackPlayerPromise;
-}
-
+type ExpoAudioModule = typeof import('expo-audio');
 type AmbientTrack = 'none' | 'rain' | 'piano' | 'pad';
 
-/** Ambient bed assets shipped in the app bundle (B3 §4.1 `apps/mobile/assets`). */
-const AMBIENT_SOURCES: Record<Exclude<AmbientTrack, 'none'>, string> = {
-  rain: 'asset:/audio/ambient/rain.mp3',
-  piano: 'asset:/audio/ambient/piano.mp3',
-  pad: 'asset:/audio/ambient/pad.mp3',
+/**
+ * Ambient beds bundled in the app (B3 §4.1 `apps/mobile/assets`), generated as seamless loops by
+ * `tools/pack-builder/scripts/generate-ambient.mjs`.
+ */
+const AMBIENT_SOURCES: Record<Exclude<AmbientTrack, 'none'>, number> = {
+  rain: rainLoop,
+  piano: pianoLoop,
+  pad: padLoop,
 };
 
 function clamp01(volume: number): number {
@@ -46,49 +41,91 @@ function clamp01(volume: number): number {
   return volume;
 }
 
-let setupPromise: Promise<TrackPlayerModule> | null = null;
-
-/** Load TrackPlayer and bring it up once; repeated calls reuse the same setup (B7 cold-start). */
-function ensurePlayer(): Promise<TrackPlayerModule> {
-  if (setupPromise === null) {
-    setupPromise = loadTrackPlayer()
-      .then(async (trackPlayer) => {
-        await trackPlayer.default.setupPlayer();
-        return trackPlayer;
-      })
-      .catch((error: unknown) => {
-        setupPromise = null;
+/** Memoise a lazy native import; a failed load is retried on the next call. */
+function lazy<T>(load: () => Promise<T>): () => Promise<T> {
+  let pending: Promise<T> | null = null;
+  return () => {
+    if (pending === null) {
+      pending = load().catch((error: unknown) => {
+        pending = null;
         throw error;
       });
-  }
-  return setupPromise;
+    }
+    return pending;
+  };
 }
 
-/**
- * The requested ambient bed. Held for the future native two-stream mixer; narration is unaffected
- * meanwhile (react-native-track-player drives only one active track).
- */
-const ambient: { source: string | null; volume: number } = { source: null, volume: 0 };
+/** Load TrackPlayer and bring it up once; repeated calls reuse the same setup (B7 cold-start). */
+const ensurePlayer = lazy<TrackPlayerModule>(async () => {
+  const trackPlayer = await import('react-native-track-player');
+  await trackPlayer.default.setupPlayer();
+  return trackPlayer;
+});
+
+/** expo-audio, with the session set to mix with TrackPlayer's narration instead of interrupting it. */
+const ensureExpoAudio = lazy<ExpoAudioModule>(async () => {
+  const expoAudio = await import('expo-audio');
+  await expoAudio.setAudioModeAsync({
+    playsInSilentMode: true,
+    shouldPlayInBackground: true,
+    interruptionMode: 'mixWithOthers',
+  });
+  return expoAudio;
+});
 
 export function createAudioAdapter(): AudioEngineAdapter {
-  let sleepTimer: ReturnType<typeof setTimeout> | null = null;
   const positionListeners = new Set<(positionMs: number) => void>();
+  let ambientPlayer: AudioPlayer | null = null;
+  let ambientTrack: AmbientTrack = 'none';
+  let narrationPlaying = false;
+  /** User-chosen levels; the applied volume is `level × fade gain`. */
+  let narrationLevel = 1;
+  let ambientLevel = 0;
+  let fadeGain = 1;
+  let sleepFade: ReturnType<typeof setInterval> | null = null;
+
+  async function applyVolumes(): Promise<void> {
+    if (ambientPlayer !== null) ambientPlayer.volume = clamp01(ambientLevel * fadeGain);
+    try {
+      const trackPlayer = await ensurePlayer();
+      await trackPlayer.default.setVolume(clamp01(narrationLevel * fadeGain));
+    } catch {
+      // Narration not available (no player yet); the level is applied on the next load.
+    }
+  }
+
+  function clearSleepFade(): void {
+    if (sleepFade !== null) {
+      clearInterval(sleepFade);
+      sleepFade = null;
+    }
+    fadeGain = 1;
+  }
+
+  async function pauseAll(): Promise<void> {
+    narrationPlaying = false;
+    ambientPlayer?.pause();
+    const trackPlayer = await ensurePlayer();
+    await trackPlayer.default.pause();
+  }
 
   return {
     async loadChapter(urlOrPath, title, subtitle): Promise<void> {
       const trackPlayer = await ensurePlayer();
       const track: Track = { url: urlOrPath, title, artist: subtitle };
       await trackPlayer.default.load(track);
+      await applyVolumes();
     },
 
     async play(): Promise<void> {
       const trackPlayer = await ensurePlayer();
       await trackPlayer.default.play();
+      narrationPlaying = true;
+      ambientPlayer?.play();
     },
 
     async pause(): Promise<void> {
-      const trackPlayer = await ensurePlayer();
-      await trackPlayer.default.pause();
+      await pauseAll();
     },
 
     async seekTo(ms): Promise<void> {
@@ -102,27 +139,55 @@ export function createAudioAdapter(): AudioEngineAdapter {
     },
 
     async setAmbientTrack(trackId, volume): Promise<void> {
-      ambient.source = trackId === 'none' ? null : AMBIENT_SOURCES[trackId];
-      ambient.volume = clamp01(volume);
+      ambientLevel = clamp01(volume);
+      if (trackId === 'none') {
+        ambientPlayer?.remove();
+        ambientPlayer = null;
+        ambientTrack = 'none';
+        return;
+      }
+      try {
+        const expoAudio = await ensureExpoAudio();
+        if (ambientPlayer === null) {
+          ambientPlayer = expoAudio.createAudioPlayer(AMBIENT_SOURCES[trackId]);
+        } else if (ambientTrack !== trackId) {
+          ambientPlayer.replace(AMBIENT_SOURCES[trackId]);
+        }
+        ambientPlayer.loop = true;
+        ambientTrack = trackId;
+        ambientPlayer.volume = clamp01(ambientLevel * fadeGain);
+        // The bed follows narration: it only sounds while the passage is playing.
+        if (narrationPlaying) ambientPlayer.play();
+      } catch {
+        // Ambient is decorative; a missing audio module leaves narration untouched.
+      }
     },
 
     async setNarrationVolume(volume): Promise<void> {
-      const trackPlayer = await ensurePlayer();
-      await trackPlayer.default.setVolume(clamp01(volume));
+      narrationLevel = clamp01(volume);
+      await applyVolumes();
     },
 
     async setSleepTimer(minutes): Promise<void> {
-      if (sleepTimer !== null) {
-        clearTimeout(sleepTimer);
-        sleepTimer = null;
-      }
+      clearSleepFade();
+      await applyVolumes();
       if (minutes === null) return;
-      sleepTimer = setTimeout(() => {
-        void ensurePlayer()
-          .then((trackPlayer) => trackPlayer.default.pause())
-          .catch(() => undefined);
-        sleepTimer = null;
-      }, minutes * 60_000);
+      const timerMs = minutes * 60_000;
+      const armedAt = Date.now();
+      // Full volume until the final stretch, then an even ramp to silence on both streams, then
+      // pause and restore the levels so the next listen starts at the chosen volume.
+      sleepFade = setInterval(() => {
+        const elapsed = Date.now() - armedAt;
+        fadeGain = sleepFadeGain(elapsed, timerMs);
+        if (elapsed >= timerMs) {
+          clearSleepFade();
+          void pauseAll()
+            .then(applyVolumes)
+            .catch(() => undefined);
+          return;
+        }
+        void applyVolumes();
+      }, SLEEP_FADE_STEP_MS);
     },
 
     onPositionUpdate(cb): () => void {

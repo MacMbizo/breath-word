@@ -146,3 +146,12 @@ export function inkStrokeToSvgPath(
   commands.push(`L ${round2(last.x)} ${round2(last.y)}`);
   return commands.join(' ');
 }
+
+/**
+ * Pixel width for a normalized stroke width (`1..20`) on a canvas `canvasWidth` px wide. Scaling by
+ * the canvas width (not a fixed px value) keeps line weight proportional on every device (ADR-003).
+ */
+export function inkStrokeWidthToPixels(width: number, canvasWidth: number): number {
+  const clamped = clamp(width, INK_MIN_WIDTH, INK_MAX_WIDTH);
+  return round2((clamped / INK_CANVAS_MAX) * Math.max(canvasWidth, 0) * 2.5);
+}

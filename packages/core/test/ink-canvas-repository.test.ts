@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { isEncryptedEnvelope } from '../src/crypto/envelope';
 import {
   inkStrokeToSvgPath,
+  inkStrokeWidthToPixels,
   normalizedToPixelPoint,
   pixelToNormalizedPoint,
 } from '../src/ink/strokes';
@@ -63,6 +64,15 @@ describe('Portable Ink Geometry (ADR-003)', () => {
       100,
     );
     expect(path).toBe('M 0 0 Q 0 0 50 25 Q 100 50 150 75 L 200 100');
+  });
+});
+
+describe('inkStrokeWidthToPixels (ADR-003)', () => {
+  it('scales line weight with the canvas so proportions match across devices', () => {
+    expect(inkStrokeWidthToPixels(4, 400)).toBe(4);
+    expect(inkStrokeWidthToPixels(4, 800)).toBe(8);
+    expect(inkStrokeWidthToPixels(0, 400)).toBe(1);
+    expect(inkStrokeWidthToPixels(99, 400)).toBe(20);
   });
 });
 

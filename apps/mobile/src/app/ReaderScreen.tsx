@@ -9,19 +9,25 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { bookName, type BookSummary, type Footnote } from '@breath-and-word/core';
+import { useRouter } from 'expo-router';
+
+import { bookName, type BookSummary, type Footnote, type SymbolTag } from '@breath-and-word/core';
 import {
   COLORS,
   FONT_FAMILIES,
   FONT_SIZES,
+  INDUCTIVE_HIGHLIGHTS,
   LINE_HEIGHTS,
   MIN_TOUCH_TARGET,
   RADII,
   SPACING,
+  inductiveWash,
 } from '@breath-and-word/tokens';
 
+import { AudioMiniPlayer } from './AudioMiniPlayer';
 import { CaptureSheet } from './CaptureSheet';
 import { useCoreRuntime } from './CoreRuntime';
+import { useCurrentUserId } from './study/useCurrentUserId';
 import { useCoreStore } from './useCoreStore';
 import { VerseSpans } from './VerseSpans';
 
@@ -43,6 +49,10 @@ export function ReaderScreen() {
   const [captureOpen, setCaptureOpen] = useState(false);
   /** FR-101 — the footnote whose sheet is open, or `null` when the sheet is closed. */
   const [activeFootnote, setActiveFootnote] = useState<Footnote | null>(null);
+  const router = useRouter();
+  const userId = useCurrentUserId();
+  const { highlights } = useCoreStore(runtime.stores.study);
+  const { activeVerseId: narratedVerseId } = useCoreStore(runtime.stores.audio);
 
   // The store is idle until asked, so open the default passage and its book list once on mount.
   useEffect(() => {
@@ -96,6 +106,40 @@ export function ReaderScreen() {
 
   const atFirstChapter = chapterNumber <= 1;
   const atLastChapter = chapterCount !== undefined && chapterNumber >= chapterCount;
+  const packId = location?.packId ?? DEFAULT_PACK_ID;
+  const translationCode = location?.translationCode ?? DEFAULT_TRANSLATION;
+
+  // FR-304 — load the chapter's highlights so verses carry their inductive washes and badges.
+  const firstVerseId = chapter?.verses[0]?.canonicalVerseId;
+  const lastVerseId = chapter?.verses[chapter.verses.length - 1]?.canonicalVerseId;
+  useEffect(() => {
+    if (userId === null || firstVerseId === undefined || lastVerseId === undefined) return;
+    void runtime.stores.study.getState().loadRangeStudy(userId, firstVerseId, lastVerseId, translationCode);
+  }, [runtime, userId, firstVerseId, lastVerseId, translationCode]);
+
+  const symbolsByVerse = useMemo(() => {
+    const map = new Map<number, SymbolTag[]>();
+    for (const h of highlights) {
+      if (h.symbolTag === undefined) continue;
+      for (let id = h.startVerseId; id <= h.endVerseId; id += 1) {
+        const list = map.get(id) ?? [];
+        if (!list.includes(h.symbolTag)) list.push(h.symbolTag);
+        map.set(id, list);
+      }
+    }
+    return map;
+  }, [highlights]);
+
+  // FR-301..305 — a verse number opens that verse's study tools.
+  const openStudy = useCallback(
+    (canonicalVerseId: number) => {
+      router.push({
+        pathname: '/study',
+        params: { verse: String(canonicalVerseId), pack: packId, translation: translationCode },
+      });
+    },
+    [router, packId, translationCode],
+  );
 
   return (
     <View style={styles.root}>
@@ -161,17 +205,50 @@ export function ReaderScreen() {
           <Text style={styles.muted}>{`No text is available for ${reference}.`}</Text>
         )}
         {chapter !== null &&
-          chapter.verses.map((verse) => (
-            <Text key={verse.canonicalVerseId} style={styles.verse}>
-              <Text style={styles.verseNumber}>{`${verse.verse}  `}</Text>
-              <VerseSpans
-                verseId={verse.canonicalVerseId}
-                spans={verse.spans}
-                onFootnotePress={openFootnote}
-              />
-            </Text>
-          ))}
+          chapter.verses.map((verse) => {
+            const symbols = symbolsByVerse.get(verse.canonicalVerseId) ?? [];
+            const wash = symbols[0];
+            const narrated = narratedVerseId === verse.canonicalVerseId;
+            return (
+              <Text
+                key={verse.canonicalVerseId}
+                style={[
+                  styles.verse,
+                  wash !== undefined && { backgroundColor: inductiveWash(wash, 'daylight') },
+                  narrated && styles.verseNarrated,
+                ]}
+              >
+                <Text
+                  style={styles.verseNumber}
+                  onPress={focusMode ? undefined : () => openStudy(verse.canonicalVerseId)}
+                  accessibilityRole={focusMode ? undefined : 'button'}
+                  accessibilityLabel={focusMode ? undefined : `Study verse ${verse.verse}`}
+                  suppressHighlighting={false}
+                >{`${verse.verse}  `}</Text>
+                <VerseSpans
+                  verseId={verse.canonicalVerseId}
+                  spans={verse.spans}
+                  onFootnotePress={openFootnote}
+                />
+                {symbols.length > 0 && (
+                  <Text style={styles.verseNumber} accessibilityLabel={symbols.map((sym) => INDUCTIVE_HIGHLIGHTS[sym].meaning).join(', ')}>
+                    {`  ${symbols.map((sym) => INDUCTIVE_HIGHLIGHTS[sym].badge).join(' ')}`}
+                  </Text>
+                )}
+              </Text>
+            );
+          })}
       </ScrollView>
+
+      {!focusMode && chapter !== null && (
+        <AudioMiniPlayer
+          packId={packId}
+          translationCode={translationCode}
+          bookNumber={bookNumber}
+          chapter={chapterNumber}
+          reference={reference}
+        />
+      )}
 
       {focusMode && (
         <Pressable
@@ -317,6 +394,11 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILIES.scriptureSerif,
     fontSize: FONT_SIZES.scriptureDefault,
     lineHeight: FONT_SIZES.scriptureDefault * LINE_HEIGHTS.scripture,
+    color: THEME.text.primary,
+  },
+  verseNarrated: {
+    // FR-106 — the verse being narrated: a soft accent wash readers can follow by eye.
+    backgroundColor: THEME.bg.elevated,
     color: THEME.text.primary,
   },
   verseNumber: {

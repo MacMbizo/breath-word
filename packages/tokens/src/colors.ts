@@ -125,3 +125,33 @@ export const INDUCTIVE_HIGHLIGHTS: Record<InductiveSymbol, InductiveHighlight> =
     badge: '✓',
   },
 };
+
+/** Display order of the inductive symbols in toolbars and legends (D1 §4.3). */
+export const INDUCTIVE_SYMBOLS: readonly InductiveSymbol[] = ['KEY_TERM', 'GOD_REF', 'TRANSITION', 'PROMISE', 'COMMAND'];
+
+/** Themes whose canvas is dark, so highlight washes use the deeper `darkWash` at its own alpha. */
+export const DARK_THEMES: readonly ThemeName[] = ['midnight', 'sanctuary'];
+
+export function isDarkTheme(theme: ThemeName): boolean {
+  return DARK_THEMES.includes(theme);
+}
+
+/** `#RRGGBB` + alpha → `rgba(r, g, b, a)`; the only colour maths the UI needs for washes. */
+export function hexWithAlpha(hex: string, alpha: number): string {
+  const value = hex.replace('#', '');
+  const r = Number.parseInt(value.slice(0, 2), 16);
+  const g = Number.parseInt(value.slice(2, 4), 16);
+  const b = Number.parseInt(value.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/** Translucent background wash for an inductive highlight in the given theme (D1 §4.3). */
+export function inductiveWash(symbol: InductiveSymbol, theme: ThemeName): string {
+  const h = INDUCTIVE_HIGHLIGHTS[symbol];
+  return isDarkTheme(theme) ? hexWithAlpha(h.darkWash, h.darkAlpha) : hexWithAlpha(h.lightWash, h.lightAlpha);
+}
+
+/** CSS custom-property name carrying a symbol's wash, e.g. `--bw-inductive-key-term`. */
+export function inductiveCssVariable(symbol: InductiveSymbol): string {
+  return `--bw-inductive-${symbol.toLowerCase().replace(/_/g, '-')}`;
+}

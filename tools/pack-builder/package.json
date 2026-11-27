@@ -13,6 +13,8 @@
     "pack:sample": "tsx src/build-pack.ts --sample --out out",
     "pack:spike": "tsx src/build-pack.ts --sample --out out && tsx src/build-pack.ts --sample --out out --pack-id trans_kjv --code KJV && tsx src/build-pack.ts --sample --out out --pack-id trans_web --code WEB",
     "pack:sample-exegesis": "tsx src/build-pack.ts --sample-exegesis --out out",
+    "pack:sample-study-refs": "tsx src/build-pack.ts --sample-study-refs --out out",
+    "parse:datasets": "tsx src/parse-datasets.ts",
     "parse:usfm": "tsx src/usfm.ts",
     "serve:packs": "node scripts/serve-packs.mjs"
   },

@@ -6,6 +6,7 @@ export * from './domain/verse-alignment';
 export * from './ink/strokes';
 export * from './prayer/prompt-templates';
 export * from './errors/AppError';
+export * from './audio/sleep-fade';
 export * from './events';
 export * from './adapters';
 export * from './sync';

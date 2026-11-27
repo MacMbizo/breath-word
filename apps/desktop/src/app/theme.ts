@@ -4,6 +4,7 @@
 
 import {
   FONT_FAMILIES,
+  FONT_SIZES,
   RADII,
   SPACING,
   themeToCssVariables,
@@ -24,6 +25,9 @@ export function applyTheme(theme: ThemeName, root: HTMLElement = document.docume
   root.style.setProperty('--bw-font-ui', FONT_FAMILIES.ui);
   root.style.setProperty('--bw-font-hebrew', FONT_FAMILIES.hebrew);
   root.style.setProperty('--bw-font-greek', FONT_FAMILIES.greek);
+  for (const [key, value] of Object.entries(FONT_SIZES)) {
+    root.style.setProperty(`--bw-font-size-${key}`, `${value}px`);
+  }
   for (const [key, value] of Object.entries(SPACING)) {
     root.style.setProperty(`--bw-space-${key}`, `${value}px`);
   }

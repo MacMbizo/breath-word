@@ -20,6 +20,13 @@ import {
   type ExegesisPackSource,
 } from './exegesis-pack';
 import {
+  STUDY_REFS_PACK_ID,
+  buildStudyRefsPackArtifacts,
+  createSampleStudyRefsPackSource,
+  isStudyRefsPackSource,
+  type StudyRefsPackSource,
+} from './study-refs-pack';
+import {
   assertPackMetadata,
   closeAndDiscard,
   closeQuietly,
@@ -216,9 +223,11 @@ export function loadPackSource(jsonPath: string): PackSource {
   return JSON.parse(readFileSync(jsonPath, 'utf8')) as PackSource;
 }
 
+export type AnyPackSource = PackSource | ExegesisPackSource | StudyRefsPackSource;
+
 /** Load any normalized source JSON; the builder is chosen by `metadata.packType`. */
-export function loadAnyPackSource(jsonPath: string): PackSource | ExegesisPackSource {
-  return JSON.parse(readFileSync(jsonPath, 'utf8')) as PackSource | ExegesisPackSource;
+export function loadAnyPackSource(jsonPath: string): AnyPackSource {
+  return JSON.parse(readFileSync(jsonPath, 'utf8')) as AnyPackSource;
 }
 
 /** Synthetic chapter/verse shape used only by `createSamplePackSource` (see below). */
@@ -390,13 +399,16 @@ export const SAMPLE_SEARCH_QUERY = 'work together for good';
 const USAGE = `Usage: pack-builder --source <pack-source.json> --out <dir> [--base-url <url>] [--min-app-version <v>]
        pack-builder --sample --out <dir> [--pack-id <id>] [--code <CODE>] [--name <text>]
        pack-builder --sample-exegesis --out <dir>
+       pack-builder --sample-study-refs --out <dir>
 
 Builds a modular static content pack (.sqlite + .sqlite.gz + manifest.json, B4 §4.6).
 
   --source <file>          Normalized source JSON (produced by a dataset parser). A source whose
-                           metadata.packType is EXEGESIS is built as an exegesis pack.
+                           metadata.packType is EXEGESIS or STUDY_REFS is built by that pack's builder.
   --sample-exegesis        Build the tiny ${EXEGESIS_PACK_ID} sample fixture (Gen 1:1, 1 John 4:8; NOT a
                            release pack) for FR-301/302 device testing.
+  --sample-study-refs      Build the tiny ${STUDY_REFS_PACK_ID} sample fixture (Romans 8 cross-refs, Ephesus
+                           dossier, one reading plan; NOT a release pack) for FR-303/FR-104 testing.
   --sample                 Build the synthetic Gate-1 spike fixture instead of a parsed source
                            (generated filler text — NOT scripture; ~31k verses for latency timing).
   --pack-id <id>           Sample fixture pack id (default: core_bsb).
@@ -417,6 +429,7 @@ interface ParsedArgs {
   source?: string;
   sample: boolean;
   sampleExegesis: boolean;
+  sampleStudyRefs: boolean;
   out?: string;
   baseUrl: string;
   minAppVersion: string;
@@ -430,6 +443,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
   const parsed: ParsedArgs = {
     sample: false,
     sampleExegesis: false,
+    sampleStudyRefs: false,
     baseUrl: 'https://packs.breathandword.app/v1',
     minAppVersion: '0.1.0',
   };
@@ -439,6 +453,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
     if (flag === '--source' && value !== undefined) parsed.source = value;
     else if (flag === '--sample') parsed.sample = true;
     else if (flag === '--sample-exegesis') parsed.sampleExegesis = true;
+    else if (flag === '--sample-study-refs') parsed.sampleStudyRefs = true;
     else if (flag === '--out' && value !== undefined) parsed.out = value;
     else if (flag === '--base-url' && value !== undefined) parsed.baseUrl = value;
     else if (flag === '--min-app-version' && value !== undefined) parsed.minAppVersion = value;
@@ -469,9 +484,11 @@ function mergeManifestEntries(outDir: string, entry: ManifestPackEntry): Manifes
 export function main(argv: readonly string[]): void {
   const args = parseArgs(argv);
 
-  let source: PackSource | ExegesisPackSource;
+  let source: AnyPackSource;
   if (args.sampleExegesis) {
     source = createSampleExegesisPackSource();
+  } else if (args.sampleStudyRefs) {
+    source = createSampleStudyRefsPackSource();
   } else if (args.sample) {
     source = createSamplePackSource({
       ...(args.packId !== undefined ? { packId: args.packId } : {}),
@@ -509,6 +526,13 @@ export function main(argv: readonly string[]): void {
 `,
       );
     }
+  } else if (isStudyRefsPackSource(source)) {
+    const built = buildStudyRefsPackArtifacts(source, args.out, options);
+    artifacts = built;
+    const { stats } = built;
+    summary =
+      `${stats.crossReferenceCount} cross-references, ${stats.entityCount} factbook entities, ` +
+      `${stats.readingPlanCount} reading plans`;
   } else {
     artifacts = buildPackArtifacts(source, args.out, options);
     summary = `${source.verses.length} verses`;
