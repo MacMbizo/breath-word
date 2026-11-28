@@ -27,6 +27,7 @@ apps/desktop/src-tauri/gen/schemas/
 
 # Content pack ETL output
 tools/pack-builder/out/
+tools/pack-builder/sources/
 
 # Expo
 .expo/

@@ -1,0 +1,3236 @@
+{
+  "generated": "2026-11-28",
+  "about": "English Bible versions found in the sources catalogued by docs/integrations/bible-content-sources-and-external-datasets.md (EXTRAS-SRC). Research data, not an approved B5 matrix: only versions whose \"redistribution\" is public-domain or open may be stored or considered for packs, and each still needs B5 review before any pack build.",
+  "sourcesChecked": {
+    "Free Use Bible API (bible.helloao.org)": "https://bible.helloao.org/api/available_translations.json",
+    "scrollmapper/bible_databases": "https://github.com/scrollmapper/bible_databases (sources/en, sources/enm)",
+    "CrossWire SWORD": "https://www.crosswire.org/ftpmirror/pub/sword/raw/mods.d.tar.gz (English Bible-text modules)",
+    "bible-api.com": "https://bible-api.com/data",
+    "wldeh/bible-api": "https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/bibles.json",
+    "API.Bible / Crossway ESV": "keyed APIs — copyrighted versions named in EXTRAS-SRC §1.1, listed without access"
+  },
+  "sourcesNotFound": {
+    "beandog/bible-sqlite": "GitHub 404 on 2026-11-28; the user beandog has no Bible repositories.",
+    "fofgof/Bible-Database": "GitHub 404 on 2026-11-28; no such user.",
+    "YouVersion Platform": "Version list requires a developer key; not queried.",
+    "Biblia.com API": "Registration closed; not queried."
+  },
+  "versions": [
+    {
+      "key": "KJV",
+      "name": "King James Version (1769 Oxford standard)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_kjv",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_kjv/complete.json"
+      },
+      "licenceConflict": null,
+      "note": "Current Breath & Word pack (trans_kjv) is built from eBible USFM with Strong's tags.",
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_kjv",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31102,
+          "download": "https://bible.helloao.org/api/eng_kjv/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "KJV",
+          "licence": "GPL",
+          "class": "open",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/KJV.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/KJV"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "KJV",
+          "licence": "GPL",
+          "class": "open",
+          "moduleVersion": "3.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/KJV.zip",
+          "format": "sword-module-zip"
+        },
+        {
+          "source": "bible-api.com",
+          "id": "kjv",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": null,
+          "format": "rest-api"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-kjv",
+          "licence": "PUBLIC DOMAIN",
+          "class": "public-domain",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "KJVA",
+      "name": "King James Version with Apocrypha",
+      "scope": "Bible + Apocrypha",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_kja",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_kja/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_kja",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31102,
+          "download": "https://bible.helloao.org/api/eng_kja/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "KJVA",
+          "licence": "GPL",
+          "class": "open",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/KJVA.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/KJVA"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "KJVA",
+          "licence": "GPL",
+          "class": "open",
+          "moduleVersion": "3.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/KJVA.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "KJVPCE",
+      "name": "King James Version: Pure Cambridge Edition",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "KJVPCE",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/KJVPCE.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "KJVPCE",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/KJVPCE.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/KJVPCE"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "KJVPCE",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/KJVPCE.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "KJVCPB",
+      "name": "KJV Cambridge Paragraph Bible (Scrivener, 1873)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_cpb",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_cpb/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_cpb",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31102,
+          "download": "https://bible.helloao.org/api/eng_cpb/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-US-kjvcpb",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "AKJV",
+      "name": "American King James Version (1999)",
+      "scope": "Bible",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Author placed it in the public domain, but both carrying sources label it non-commercial; treated conservatively.",
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "AKJV",
+          "licence": "Copyrighted; Free non-commercial distribution",
+          "class": "non-commercial",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/AKJV.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/AKJV"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "AKJV",
+          "licence": "Copyrighted; Free non-commercial distribution",
+          "class": "non-commercial",
+          "moduleVersion": "2.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/AKJV.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "UKJV",
+      "name": "Updated King James Version (2000)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "UKJV",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/UKJV.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "UKJV",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/UKJV.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/UKJV"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "UKJV",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/UKJV.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "RNKJV",
+      "name": "Restored Name King James Version",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "RNKJV",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/RNKJV.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "RNKJV",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/RNKJV.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/RNKJV"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "RNKJV",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.5",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/RNKJV.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "RKJNT",
+      "name": "Revised King James New Testament",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "CrossWire SWORD",
+        "id": "RKJNT",
+        "format": "sword-module-zip",
+        "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/RKJNT.zip"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "RKJNT",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/RKJNT.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "MKJV",
+      "name": "Green's Modern King James Version",
+      "scope": "Bible",
+      "redistribution": "crosswire-permission",
+      "storeFrom": null,
+      "licenceConflict": "sources disagree: non-commercial vs crosswire-permission",
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "MKJV",
+          "licence": "Copyrighted; Non-commercial distribution",
+          "class": "non-commercial",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/MKJV.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/MKJV"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "MKJV",
+          "licence": "Copyrighted; Permission to distribute granted to CrossWire",
+          "class": "crosswire-permission",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MKJV.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "LITV",
+      "name": "Green's Literal Translation",
+      "scope": "Bible",
+      "redistribution": "crosswire-permission",
+      "storeFrom": null,
+      "licenceConflict": "sources disagree: non-commercial vs crosswire-permission",
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "LITV",
+          "licence": "Copyrighted; Free non-commercial distribution",
+          "class": "non-commercial",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/LITV.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/LITV"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "LITV",
+          "licence": "Copyrighted; Permission to distribute granted to CrossWire",
+          "class": "crosswire-permission",
+          "moduleVersion": "1.4",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/LITV.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "RLT",
+      "name": "Revised Literal Translation (2018) of the KJV",
+      "scope": "Bible",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "RLT",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/RLT.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "RLT",
+          "licence": "GPL",
+          "class": "open",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/RLT.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/RLT"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "RLT",
+          "licence": "GPL",
+          "class": "open",
+          "moduleVersion": "1.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/RLT.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "AFV",
+      "name": "A Faithful Version (2020)",
+      "scope": "Bible",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "AFV2020",
+          "licence": "Copyrighted; Free non-commercial distribution",
+          "class": "non-commercial",
+          "moduleVersion": "1.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/AFV2020.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Jubilee2000",
+      "name": "English Jubilee 2000 Bible",
+      "scope": "Bible",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Jubilee2000",
+          "licence": "Copyrighted; Free non-commercial distribution",
+          "class": "non-commercial",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Jubilee2000.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/Jubilee2000"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Jubilee2000",
+          "licence": "Copyrighted; Free non-commercial distribution",
+          "class": "non-commercial",
+          "moduleVersion": "1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Jubilee2000.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Webster",
+      "name": "Webster Bible (1833)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_wbs",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_wbs/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_wbs",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31102,
+          "download": "https://bible.helloao.org/api/eng_wbs/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Webster",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Webster.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/Webster"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Webster",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.2",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Webster.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "RWebster",
+      "name": "Revised Webster Version (1833)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "RWebster",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/RWebster.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "RWebster",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/RWebster.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/RWebster"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "RWebster",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.3",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/RWebster.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "RV",
+      "name": "Revised Version (1885)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_rv5",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_rv5/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_rv5",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31102,
+          "download": "https://bible.helloao.org/api/eng_rv5/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-rv",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "ASV",
+      "name": "American Standard Version (1901)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_asv",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_asv/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_asv",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31102,
+          "download": "https://bible.helloao.org/api/eng_asv/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "ASV",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/ASV.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/ASV"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "ASV",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/ASV.zip",
+          "format": "sword-module-zip"
+        },
+        {
+          "source": "bible-api.com",
+          "id": "asv",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": null,
+          "format": "rest-api"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-asv",
+          "licence": "PUBLIC DOMAIN",
+          "class": "public-domain",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "ASVBT",
+      "name": "American Standard Version, Byzantine Text (with Apocrypha)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_abt",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_abt/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_abt",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31099,
+          "download": "https://bible.helloao.org/api/eng_abt/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-US-asvbt",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "WEB",
+      "name": "World English Bible (American, protestant canon)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "ENGWEBP",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/ENGWEBP/complete.json"
+      },
+      "licenceConflict": null,
+      "note": "Current Breath & Word pack (trans_web) is built from eBible USFM.",
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "ENGWEBP",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31103,
+          "download": "https://bible.helloao.org/api/ENGWEBP/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "bible-api.com",
+          "id": "web",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": null,
+          "format": "rest-api"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-web",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "WEB-classic",
+      "name": "World English Bible Classic",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_web",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_web/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_web",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31103,
+          "download": "https://bible.helloao.org/api/eng_web/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-webus",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "WEBU",
+      "name": "World English Bible Updated",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_webu",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_webu/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_webu",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31103,
+          "download": "https://bible.helloao.org/api/eng_webu/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "WEBBE",
+      "name": "World English Bible, British Edition",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_webpb",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_webpb/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_webpb",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31103,
+          "download": "https://bible.helloao.org/api/eng_webpb/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "bible-api.com",
+          "id": "webbe",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": null,
+          "format": "rest-api"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-webbe",
+          "licence": "PUBLIC DOMAIN",
+          "class": "public-domain",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "WEBBE-DC",
+      "name": "World English Bible, British Edition with Deuterocanon",
+      "scope": "Bible + Deuterocanon",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_weu",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_weu/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_weu",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31103,
+          "download": "https://bible.helloao.org/api/eng_weu/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "WEBC",
+      "name": "World English Bible, Catholic Edition",
+      "scope": "Catholic Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_webc",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_webc/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_webc",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 64,
+          "verses": 30579,
+          "download": "https://bible.helloao.org/api/eng_webc/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "WMB",
+      "name": "World Messianic Bible",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_wmb",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_wmb/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_wmb",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31103,
+          "download": "https://bible.helloao.org/api/eng_wmb/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-wmb",
+          "licence": "PUBLIC DOMAIN",
+          "class": "public-domain",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "WMBBE",
+      "name": "World Messianic Bible, British Edition",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_wmu",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_wmu/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_wmu",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31103,
+          "download": "https://bible.helloao.org/api/eng_wmu/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-wmbbe",
+          "licence": "PUBLIC DOMAIN",
+          "class": "public-domain",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "BSB",
+      "name": "Berean Standard Bible",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "BSB",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/BSB/complete.json"
+      },
+      "licenceConflict": null,
+      "note": "Current Breath & Word pack (core_bsb). Placed in the public domain (CC0) in 2023.",
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "BSB",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31086,
+          "download": "https://bible.helloao.org/api/BSB/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "BSB",
+          "licence": "Creative Commons CC0",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/BSB.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/BSB"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "BSB",
+          "licence": "Creative Commons: CC0",
+          "class": "public-domain",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/BSB.zip",
+          "format": "sword-module-zip"
+        },
+        {
+          "source": "bible-api.com",
+          "id": "bsb",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": null,
+          "format": "rest-api"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-bsb",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "MSB",
+      "name": "Majority Standard Bible",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_msb",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_msb/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_msb",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31102,
+          "download": "https://bible.helloao.org/api/eng_msb/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "NHEB",
+      "name": "New Heart English Bible",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "NHEB",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/NHEB.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "NHEB",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/NHEB.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/NHEB"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "NHEB",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/NHEB.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "NHEBJE",
+      "name": "New Heart English Bible: Jehovah Edition",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "NHEBJE",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/NHEBJE.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "NHEBJE",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/NHEBJE.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/NHEBJE"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "NHEBJE",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/NHEBJE.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "NHEBME",
+      "name": "New Heart English Bible: Messianic Edition",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "NHEBME",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/NHEBME.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "NHEBME",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/NHEBME.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/NHEBME"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "NHEBME",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/NHEBME.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "OEB",
+      "name": "Open English Bible (US spelling)",
+      "scope": "Partial Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "OEB",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/OEB.json"
+      },
+      "licenceConflict": null,
+      "note": "Translation in progress; not every book is complete.",
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "OEB",
+          "licence": "Creative Commons: CC0",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/OEB.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/OEB"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "OEB",
+          "licence": "Creative Commons: CC0",
+          "class": "public-domain",
+          "moduleVersion": "1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/OEB.zip",
+          "format": "sword-module-zip"
+        },
+        {
+          "source": "bible-api.com",
+          "id": "oeb-us",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": null,
+          "format": "rest-api"
+        }
+      ]
+    },
+    {
+      "key": "OEBcth",
+      "name": "Open English Bible (Commonwealth spelling)",
+      "scope": "Partial Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "OEBcth",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/OEBcth.json"
+      },
+      "licenceConflict": null,
+      "note": "Translation in progress; not every book is complete.",
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "OEBcth",
+          "licence": "Creative Commons: CC0",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/OEBcth.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/OEBcth"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "OEBcth",
+          "licence": "Creative Commons: CC0",
+          "class": "public-domain",
+          "moduleVersion": "1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/OEBcth.zip",
+          "format": "sword-module-zip"
+        },
+        {
+          "source": "bible-api.com",
+          "id": "oeb-cw",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": null,
+          "format": "rest-api"
+        }
+      ]
+    },
+    {
+      "key": "LSV",
+      "name": "Literal Standard Version",
+      "scope": "Bible",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_lsv",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_lsv/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_lsv",
+          "licence": "commercial use allowed, derivatives allowed, attribution required",
+          "class": "open",
+          "books": 66,
+          "verses": 31104,
+          "download": "https://bible.helloao.org/api/eng_lsv/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-lsv",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "FBV",
+      "name": "Free Bible Version",
+      "scope": "Bible",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_fbv",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_fbv/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_fbv",
+          "licence": "commercial use allowed, derivatives allowed, attribution required",
+          "class": "open",
+          "books": 66,
+          "verses": 31104,
+          "download": "https://bible.helloao.org/api/eng_fbv/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-fbv",
+          "licence": "Version 4.1.",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "T4T",
+      "name": "Translation for Translators",
+      "scope": "Bible",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_t4t",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_t4t/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_t4t",
+          "licence": "commercial use allowed, derivatives allowed, attribution required",
+          "class": "open",
+          "books": 66,
+          "verses": 30640,
+          "download": "https://bible.helloao.org/api/eng_t4t/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-t4t",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "ULB",
+      "name": "Unlocked Literal Bible",
+      "scope": "Bible",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_ulb",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_ulb/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_ulb",
+          "licence": "commercial use allowed, derivatives allowed, attribution required",
+          "class": "open",
+          "books": 66,
+          "verses": 31094,
+          "download": "https://bible.helloao.org/api/eng_ulb/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "AAB",
+      "name": "Accessible Ancients Bible",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "AAB",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/AAB/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "AAB",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31087,
+          "download": "https://bible.helloao.org/api/AAB/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "ACV",
+      "name": "A Conservative Version",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "ACV",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/ACV.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "ACV",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/ACV.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/ACV"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "ACV",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/ACV.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "BBE",
+      "name": "Bible in Basic English (1949/1964)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_bbe",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_bbe/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_bbe",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31102,
+          "download": "https://bible.helloao.org/api/eng_bbe/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "BBE",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/BBE.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/BBE"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "BBE",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.3",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/BBE.zip",
+          "format": "sword-module-zip"
+        },
+        {
+          "source": "bible-api.com",
+          "id": "bbe",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": null,
+          "format": "rest-api"
+        }
+      ]
+    },
+    {
+      "key": "LEB",
+      "name": "Lexham English Bible",
+      "scope": "Bible",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_leb",
+          "licence": "commercial use not-allowed, derivatives not-allowed, attribution required",
+          "class": "non-commercial",
+          "books": 66,
+          "verses": 31083,
+          "download": "https://bible.helloao.org/api/eng_leb/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "LEB",
+          "licence": "Copyrighted; Free non-commercial distribution",
+          "class": "non-commercial",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/LEB.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/LEB"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "LEB",
+          "licence": "Copyrighted; Free non-commercial distribution",
+          "class": "non-commercial",
+          "moduleVersion": "3.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/LEB.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "NET",
+      "name": "NET Bible (New English Translation)",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "SWORD also carries \"nettext\" (text only with footnote markers).",
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_net",
+          "licence": "not stated (see https://ebible.org/Scriptures/details.php?id=engnet)",
+          "class": "unknown",
+          "books": 66,
+          "verses": 31102,
+          "download": "https://bible.helloao.org/api/eng_net/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "NETfree",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "moduleVersion": "1.0.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/NETfree.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "ISV",
+      "name": "International Standard Version",
+      "scope": "Bible",
+      "redistribution": "crosswire-permission",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "ISV",
+          "licence": "Copyrighted; Permission to distribute granted to CrossWire",
+          "class": "crosswire-permission",
+          "moduleVersion": "1.5",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/ISV.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "GW",
+      "name": "GOD'S WORD to the Nations",
+      "scope": "Bible",
+      "redistribution": "crosswire-permission",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "GodsWord",
+          "licence": "Copyrighted; Permission to distribute granted to CrossWire",
+          "class": "crosswire-permission",
+          "moduleVersion": "1.3.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/GodsWord.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "BWE",
+      "name": "Bible in Worldwide English",
+      "scope": "Bible",
+      "redistribution": "crosswire-permission",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "BWE",
+          "licence": "Copyrighted; Permission to distribute granted to CrossWire",
+          "class": "crosswire-permission",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/BWE.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "NMV",
+      "name": "New Messianic Version",
+      "scope": "Bible",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_nmv",
+          "licence": "commercial use not-allowed, derivatives not-allowed, attribution required",
+          "class": "non-commercial",
+          "books": 66,
+          "verses": 31100,
+          "download": "https://bible.helloao.org/api/eng_nmv/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "OJB",
+      "name": "The Orthodox Jewish Bible",
+      "scope": "Bible",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_ojb",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_ojb/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_ojb",
+          "licence": "commercial use allowed, derivatives allowed, attribution required",
+          "class": "open",
+          "books": 66,
+          "verses": 31165,
+          "download": "https://bible.helloao.org/api/eng_ojb/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "OJBC",
+      "name": "The Orthodox Jewish Brit Chadasha",
+      "scope": "New Testament",
+      "redistribution": "crosswire-permission",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "OrthJBC",
+          "licence": "Copyrighted; Permission to distribute granted to CrossWire",
+          "class": "crosswire-permission",
+          "moduleVersion": "1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/OrthJBC.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "RcV",
+      "name": "Recovery Version (text only)",
+      "scope": "Bible",
+      "redistribution": "crosswire-permission",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "RecVer",
+          "licence": "Copyrighted; Permission to distribute granted to CrossWire",
+          "class": "crosswire-permission",
+          "moduleVersion": "1.0.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/RecVer.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Common",
+      "name": "The Common Edition: New Testament",
+      "scope": "New Testament",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "Common",
+          "licence": "Copyrighted; Free non-commercial distribution",
+          "class": "non-commercial",
+          "moduleVersion": "1.3",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Common.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "EMTV",
+      "name": "English Majority Text Version",
+      "scope": "New Testament",
+      "redistribution": "crosswire-permission",
+      "storeFrom": null,
+      "licenceConflict": "sources disagree: non-commercial vs crosswire-permission",
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_emtv",
+          "licence": "commercial use not-allowed, derivatives not-allowed, attribution required",
+          "class": "non-commercial",
+          "books": 27,
+          "verses": 7954,
+          "download": "https://bible.helloao.org/api/eng_emtv/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "EMTV",
+          "licence": "Copyrighted; Permission to distribute granted to CrossWire",
+          "class": "crosswire-permission",
+          "moduleVersion": "2.2.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/EMTV.zip",
+          "format": "sword-module-zip"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-US-emtv",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "F35",
+      "name": "The English New Testament According to Family 35",
+      "scope": "New Testament",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_f35",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_f35/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_f35",
+          "licence": "commercial use allowed, derivatives allowed, attribution required",
+          "class": "open",
+          "books": 27,
+          "verses": 7953,
+          "download": "https://bible.helloao.org/api/eng_f35/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-US-f35",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "TCENT",
+      "name": "Text-Critical English New Testament",
+      "scope": "New Testament",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_tce",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_tce/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_tce",
+          "licence": "commercial use allowed, derivatives allowed, attribution required",
+          "class": "open",
+          "books": 27,
+          "verses": 7954,
+          "download": "https://bible.helloao.org/api/eng_tce/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-tcent",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "GHT",
+      "name": "Garth's Hyper-literal Translation",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "CrossWire SWORD",
+        "id": "GHT",
+        "format": "sword-module-zip",
+        "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/GHT.zip"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "GHT",
+          "licence": "not stated (see https://www.wiebefamily.org/GHT.htm)",
+          "class": "unknown",
+          "books": 27,
+          "verses": 7956,
+          "download": "https://bible.helloao.org/api/GHT/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "GHT",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.3",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/GHT.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "DRA",
+      "name": "Douay-Rheims 1899 American Edition",
+      "scope": "Catholic Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_dra",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_dra/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_dra",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31438,
+          "download": "https://bible.helloao.org/api/eng_dra/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "bible-api.com",
+          "id": "dra",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": null,
+          "format": "rest-api"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-dra",
+          "licence": "PUBLIC DOMAIN",
+          "class": "public-domain",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "DRC",
+      "name": "Douay-Rheims Bible, Challoner Revision",
+      "scope": "Catholic Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "DRC",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/DRC.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "DRC",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/DRC.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/DRC"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "DRC",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/DRC.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "CPDV",
+      "name": "Catholic Public Domain Version",
+      "scope": "Catholic Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "CPDV",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/CPDV.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "CPDV",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/CPDV.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/CPDV"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "CPDV",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.1.3",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/CPDV.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Wycliffe",
+      "name": "John Wycliffe Bible (c.1395, Middle English)",
+      "scope": "Bible",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "Wycliffe",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Wycliffe.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Wycliffe",
+          "licence": "Creative Commons: BY-SA 4.0",
+          "class": "open",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Wycliffe.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/enm/Wycliffe"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Wycliffe",
+          "licence": "Creative Commons: BY-SA 4.0",
+          "class": "open",
+          "moduleVersion": "2.4.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Wycliffe.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "W88",
+      "name": "Wycliffe Bible portions",
+      "scope": "Portions",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_w88",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_w88/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_w88",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 9,
+          "verses": 9622,
+          "download": "https://bible.helloao.org/api/eng_w88/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "WBMS",
+      "name": "Wycliffe's Bible, Modern Spelling (with Deuterocanon)",
+      "scope": "Bible + Deuterocanon",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_wyc2017",
+          "licence": "commercial use not-allowed, derivatives not-allowed, attribution required",
+          "class": "non-commercial",
+          "books": 66,
+          "verses": 31104,
+          "download": "https://bible.helloao.org/api/eng_wyc2017/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "WBMSE",
+      "name": "Wycliffe's Bible, Modern Spelling, Enhanced (with Deuterocanon)",
+      "scope": "Bible + Deuterocanon",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_wyc2018",
+          "licence": "commercial use not-allowed, derivatives not-allowed, attribution required",
+          "class": "non-commercial",
+          "books": 66,
+          "verses": 31104,
+          "download": "https://bible.helloao.org/api/eng_wyc2018/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "Tyndale",
+      "name": "William Tyndale Bible (1525/1530)",
+      "scope": "Partial Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_tnt",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_tnt/complete.json"
+      },
+      "licenceConflict": null,
+      "note": "Free Use Bible API carries the NT only.",
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_tnt",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 27,
+          "verses": 7957,
+          "download": "https://bible.helloao.org/api/eng_tnt/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Tyndale",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Tyndale.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/Tyndale"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Tyndale",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Tyndale.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Geneva1599",
+      "name": "Geneva Bible (1599)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_gnv",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_gnv/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_gnv",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31090,
+          "download": "https://bible.helloao.org/api/eng_gnv/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Geneva1599",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Geneva1599.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/Geneva1599"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Geneva1599",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Geneva1599.zip",
+          "format": "sword-module-zip"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-gnv",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "Darby",
+      "name": "Darby Bible (1889)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_dby",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_dby/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_dby",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31099,
+          "download": "https://bible.helloao.org/api/eng_dby/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Darby",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Darby.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/Darby"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Darby",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Darby.zip",
+          "format": "sword-module-zip"
+        },
+        {
+          "source": "bible-api.com",
+          "id": "darby",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": null,
+          "format": "rest-api"
+        }
+      ]
+    },
+    {
+      "key": "YLT",
+      "name": "Young's Literal Translation (1898)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_ylt",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_ylt/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_ylt",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 66,
+          "verses": 31102,
+          "download": "https://bible.helloao.org/api/eng_ylt/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "YLT",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/YLT.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/YLT"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "YLT",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/YLT.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Rotherham",
+      "name": "The Emphasised Bible (J. B. Rotherham)",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "Rotherham",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Rotherham.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Rotherham",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Rotherham.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/Rotherham"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Rotherham",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.7",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Rotherham.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Noyes",
+      "name": "Noyes Translation (1869)",
+      "scope": "Partial Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_noy",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_noy/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_noy",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 49,
+          "verses": 18231,
+          "download": "https://bible.helloao.org/api/eng_noy/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Noyes",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Noyes.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/Noyes"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Noyes",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.2",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Noyes.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Anderson",
+      "name": "Henry Tompkins Anderson's New Testament (1864)",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "Anderson",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Anderson.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Anderson",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Anderson.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/Anderson"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Anderson",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.0.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Anderson.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Haweis",
+      "name": "Thomas Haweis New Testament (1795)",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "Haweis",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Haweis.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Haweis",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Haweis.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/Haweis"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Haweis",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Haweis.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Worsley",
+      "name": "John Worsley New Testament (1770)",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "CrossWire SWORD",
+        "id": "Worsley",
+        "format": "sword-module-zip",
+        "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Worsley.zip"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "Worsley",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.6",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Worsley.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Twenty",
+      "name": "Twentieth Century New Testament",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "scrollmapper/bible_databases",
+        "id": "Twenty",
+        "format": "scrollmapper-json",
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Twenty.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "Twenty",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Twenty.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/Twenty"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "Twenty",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Twenty.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Godbey",
+      "name": "William Baxter Godbey New Testament (1902)",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "CrossWire SWORD",
+        "id": "Godbey",
+        "format": "sword-module-zip",
+        "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Godbey.zip"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "Godbey",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Godbey.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Montgomery",
+      "name": "Montgomery New Testament (1924)",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "CrossWire SWORD",
+        "id": "Montgomery",
+        "format": "sword-module-zip",
+        "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Montgomery.zip"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "Montgomery",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.3",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Montgomery.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Weymouth",
+      "name": "Weymouth New Testament (1912)",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "CrossWire SWORD",
+        "id": "Weymouth",
+        "format": "sword-module-zip",
+        "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Weymouth.zip"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "Weymouth",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Weymouth.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "LivingOracles",
+      "name": "The Living Oracles New Testament",
+      "scope": "New Testament",
+      "redistribution": "unknown",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "LO",
+          "licence": "not stated",
+          "class": "unknown",
+          "moduleVersion": "1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/LO.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Diaglott",
+      "name": "The Emphatic Diaglott",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "CrossWire SWORD",
+        "id": "Diaglott",
+        "format": "sword-module-zip",
+        "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Diaglott.zip"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "Diaglott",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Diaglott.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "JST",
+      "name": "Joseph Smith Translation",
+      "scope": "Bible",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "CrossWire SWORD",
+        "id": "JST",
+        "format": "sword-module-zip",
+        "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/JST.zip"
+      },
+      "licenceConflict": null,
+      "note": "Latter-day Saint revision of the KJV.",
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "JST",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/JST.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Etheridge",
+      "name": "Peshitta Syriac New Testament (J. W. Etheridge)",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "CrossWire SWORD",
+        "id": "Etheridge",
+        "format": "sword-module-zip",
+        "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Etheridge.zip"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "Etheridge",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.1.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Etheridge.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Murdock",
+      "name": "James Murdock's Translation of the Syriac Peshitta",
+      "scope": "New Testament",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "CrossWire SWORD",
+        "id": "Murdock",
+        "format": "sword-module-zip",
+        "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Murdock.zip"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "Murdock",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "1.2",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Murdock.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "Brenton",
+      "name": "Brenton English Septuagint",
+      "scope": "Old Testament (LXX)",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_bre",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_bre/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_bre",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 37,
+          "verses": 22971,
+          "download": "https://bible.helloao.org/api/eng_bre/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-engbrent",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "BrentonUpd",
+      "name": "Brenton English Septuagint, updated spelling",
+      "scope": "Old Testament (LXX)",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_boy",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_boy/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_boy",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 36,
+          "verses": 22603,
+          "download": "https://bible.helloao.org/api/eng_boy/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-US-lxxup",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "LXX2012",
+      "name": "LXX2012: Septuagint in American English",
+      "scope": "Old Testament (LXX)",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_lxx",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_lxx/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_lxx",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 39,
+          "verses": 22877,
+          "download": "https://bible.helloao.org/api/eng_lxx/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "LXX2012UK",
+      "name": "LXX2012: Septuagint in British English",
+      "scope": "Old Testament (LXX)",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_lxu",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_lxu/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_lxu",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 39,
+          "verses": 22877,
+          "download": "https://bible.helloao.org/api/eng_lxu/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "AB",
+      "name": "The Apostles' Bible (Septuagint-based)",
+      "scope": "Bible",
+      "redistribution": "crosswire-permission",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "AB",
+          "licence": "Copyrighted; Permission to distribute granted to CrossWire",
+          "class": "crosswire-permission",
+          "moduleVersion": "1.3.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/AB.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "ABP",
+      "name": "Apostolic Bible Polyglot English Text",
+      "scope": "Bible",
+      "redistribution": "crosswire-permission",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "ABP",
+          "licence": "Copyrighted; Permission to distribute granted to CrossWire",
+          "class": "crosswire-permission",
+          "moduleVersion": "1.2",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/ABP.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "JPS1917",
+      "name": "JPS Tanakh (1917)",
+      "scope": "Old Testament (Tanakh)",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_jps",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_jps/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_jps",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 39,
+          "verses": 23145,
+          "download": "https://bible.helloao.org/api/eng_jps/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "scrollmapper/bible_databases",
+          "id": "JPS",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "download": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/JPS.json",
+          "format": "scrollmapper-json",
+          "sourceNotes": "https://github.com/scrollmapper/bible_databases/tree/master/sources/en/JPS"
+        },
+        {
+          "source": "CrossWire SWORD",
+          "id": "JPS",
+          "licence": "Public Domain",
+          "class": "public-domain",
+          "moduleVersion": "2.1",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/JPS.zip",
+          "format": "sword-module-zip"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-ojps",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "Leeser",
+      "name": "Leeser Tanakh (1853)",
+      "scope": "Old Testament (Tanakh)",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_lee",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_lee/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_lee",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 39,
+          "verses": 23145,
+          "download": "https://bible.helloao.org/api/eng_lee/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "Onkelos",
+      "name": "Targum Onkelos (J. W. Etheridge)",
+      "scope": "Pentateuch (Targum)",
+      "redistribution": "public-domain",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_oke",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_oke/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_oke",
+          "licence": "Public domain",
+          "class": "public-domain",
+          "books": 5,
+          "verses": 5848,
+          "download": "https://bible.helloao.org/api/eng_oke/complete.json",
+          "format": "helloao-complete-json"
+        },
+        {
+          "source": "wldeh/bible-api",
+          "id": "en-oke",
+          "licence": "not stated",
+          "class": "unknown",
+          "download": null,
+          "format": "jsdelivr-json"
+        }
+      ]
+    },
+    {
+      "key": "SPE",
+      "name": "Samaritan Pentateuch in English",
+      "scope": "Pentateuch",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "CrossWire SWORD",
+          "id": "SPE",
+          "licence": "Copyrighted; Free non-commercial distribution",
+          "class": "non-commercial",
+          "moduleVersion": "2.0",
+          "download": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/SPE.zip",
+          "format": "sword-module-zip"
+        }
+      ]
+    },
+    {
+      "key": "AEB",
+      "name": "Anindilyakwa English Bible",
+      "scope": "Portions",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Australian regional English portions.",
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_aoi",
+          "licence": "commercial use not-allowed, derivatives not-allowed, attribution required",
+          "class": "non-commercial",
+          "books": 6,
+          "verses": 2957,
+          "download": "https://bible.helloao.org/api/eng_aoi/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "BBP",
+      "name": "Barkly Bible Portions",
+      "scope": "Portions",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Australian regional English portions.",
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_bar",
+          "licence": "commercial use not-allowed, derivatives not-allowed, attribution required",
+          "class": "non-commercial",
+          "books": 4,
+          "verses": 2145,
+          "download": "https://bible.helloao.org/api/eng_bar/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "NEB-Nyangumarta",
+      "name": "Nyangumarta English Bible",
+      "scope": "Portions",
+      "redistribution": "non-commercial",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Australian regional English portions; not the New English Bible.",
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_nna",
+          "licence": "commercial use not-allowed, derivatives not-allowed, attribution required",
+          "class": "non-commercial",
+          "books": 26,
+          "verses": 1378,
+          "download": "https://bible.helloao.org/api/eng_nna/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "GLW",
+      "name": "God's Living Word",
+      "scope": "Portions",
+      "redistribution": "no-derivatives",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_glw",
+          "licence": "commercial use allowed, derivatives not-allowed, attribution required",
+          "class": "no-derivatives",
+          "books": 4,
+          "verses": 1012,
+          "download": "https://bible.helloao.org/api/eng_glw/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "OURB",
+      "name": "One Unity Resource Bible",
+      "scope": "Portions",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_our",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_our/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_our",
+          "licence": "commercial use allowed, derivatives allowed, attribution required",
+          "class": "open",
+          "books": 12,
+          "verses": 14299,
+          "download": "https://bible.helloao.org/api/eng_our/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "E2T-Jonah",
+      "name": "E2T Jonah",
+      "scope": "Portions",
+      "redistribution": "open",
+      "storeFrom": {
+        "source": "Free Use Bible API (bible.helloao.org)",
+        "id": "eng_e2t",
+        "format": "helloao-complete-json",
+        "url": "https://bible.helloao.org/api/eng_e2t/complete.json"
+      },
+      "licenceConflict": null,
+      "note": null,
+      "sources": [
+        {
+          "source": "Free Use Bible API (bible.helloao.org)",
+          "id": "eng_e2t",
+          "licence": "commercial use allowed, derivatives allowed, attribution required",
+          "class": "open",
+          "books": 1,
+          "verses": 47,
+          "download": "https://bible.helloao.org/api/eng_e2t/complete.json",
+          "format": "helloao-complete-json"
+        }
+      ]
+    },
+    {
+      "key": "ESV",
+      "name": "English Standard Version",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Copyrighted; never bundled. Access: Crossway ESV API (api.esv.org) — already handled by B5 §4.1 (ephemeral cache, 500-verse cap)",
+      "sources": [
+        {
+          "source": "Crossway ESV API",
+          "id": "ESV",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "download": null,
+          "format": "keyed-api"
+        }
+      ]
+    },
+    {
+      "key": "NIV",
+      "name": "New International Version",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Copyrighted; never bundled. Access: API.Bible (per-translation licence required)",
+      "sources": [
+        {
+          "source": "API.Bible",
+          "id": "NIV",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "download": null,
+          "format": "keyed-api"
+        }
+      ]
+    },
+    {
+      "key": "NLT",
+      "name": "New Living Translation",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Copyrighted; never bundled. Access: API.Bible (per-translation licence required)",
+      "sources": [
+        {
+          "source": "API.Bible",
+          "id": "NLT",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "download": null,
+          "format": "keyed-api"
+        }
+      ]
+    },
+    {
+      "key": "NASB",
+      "name": "New American Standard Bible (1995 / 2020)",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Copyrighted; never bundled. Access: API.Bible (per-translation licence required)",
+      "sources": [
+        {
+          "source": "API.Bible",
+          "id": "NASB",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "download": null,
+          "format": "keyed-api"
+        }
+      ]
+    },
+    {
+      "key": "NKJV",
+      "name": "New King James Version",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Copyrighted; never bundled. Access: API.Bible (per-translation licence required)",
+      "sources": [
+        {
+          "source": "API.Bible",
+          "id": "NKJV",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "download": null,
+          "format": "keyed-api"
+        }
+      ]
+    },
+    {
+      "key": "CSB",
+      "name": "Christian Standard Bible",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Copyrighted; never bundled. Access: API.Bible (per-translation licence required)",
+      "sources": [
+        {
+          "source": "API.Bible",
+          "id": "CSB",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "download": null,
+          "format": "keyed-api"
+        }
+      ]
+    },
+    {
+      "key": "AMP",
+      "name": "Amplified Bible",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Copyrighted; never bundled. Access: API.Bible (per-translation licence required)",
+      "sources": [
+        {
+          "source": "API.Bible",
+          "id": "AMP",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "download": null,
+          "format": "keyed-api"
+        }
+      ]
+    },
+    {
+      "key": "MSG",
+      "name": "The Message",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Copyrighted; never bundled. Access: API.Bible (per-translation licence required)",
+      "sources": [
+        {
+          "source": "API.Bible",
+          "id": "MSG",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "download": null,
+          "format": "keyed-api"
+        }
+      ]
+    },
+    {
+      "key": "GNT",
+      "name": "Good News Translation",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Copyrighted; never bundled. Access: API.Bible (per-translation licence required)",
+      "sources": [
+        {
+          "source": "API.Bible",
+          "id": "GNT",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "download": null,
+          "format": "keyed-api"
+        }
+      ]
+    },
+    {
+      "key": "CEV",
+      "name": "Contemporary English Version",
+      "scope": "Bible",
+      "redistribution": "copyrighted",
+      "storeFrom": null,
+      "licenceConflict": null,
+      "note": "Copyrighted; never bundled. Access: API.Bible (per-translation licence required)",
+      "sources": [
+        {
+          "source": "API.Bible",
+          "id": "CEV",
+          "licence": "Copyrighted",
+          "class": "copyrighted",
+          "download": null,
+          "format": "keyed-api"
+        }
+      ]
+    }
+  ]
+}

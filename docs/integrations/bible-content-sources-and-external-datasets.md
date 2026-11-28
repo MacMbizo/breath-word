@@ -1,9 +1,9 @@
 # Bible Content Sources & External Datasets (Research Catalog)
 
 **Document ID:** `EXTRAS-SRC`  
-**Version:** `0.1.1`  
+**Version:** `0.1.2`  
 **Status:** `Draft — Research / Pre-Approval`  
-**Last Updated:** `2026-11-27`  
+**Last Updated:** `2026-11-28`  
 **Related Docs:** `A3`, `B4`, `B5`, `G1`, source: `extras.md` (root)
 
 ## Purpose & Scope
@@ -23,6 +23,10 @@ Founder, AI coding partner (`tools/pack-builder`), and anyone evaluating
 additional scripture or study-content sources.
 
 ## Body
+
+> **English versions:** every English Bible found across these sources (105 versions, with per-source licences,
+> 70 redistributable texts stored for evaluation) is catalogued in
+> [`english-bible-versions.md`](./english-bible-versions.md) (`EXTRAS-ENG`).
 
 ### 1. Online Bible APIs
 
@@ -69,8 +73,8 @@ additional scripture or study-content sources.
 | Repository | Content | Notes |
 | --- | --- | --- |
 | **`scrollmapper/bible_databases`** | Clean SQL/CSV/JSON for dozens of translations | Cross-check schema against `B4` verse tables; verify licensing per translation. |
-| **`beandog/bible-sqlite`** | Pre-built SQLite for major public-domain translations | Fast prototyping source; validate `BBCCCVVV` verse-ID coverage. |
-| **`fofgof/Bible-Database`** | XML/SQL, multilingual | Useful for future i18n packs (v1.1+). |
+| ~~`beandog/bible-sqlite`~~ | Pre-built SQLite for major public-domain translations | **Not found** (GitHub 404, 2026-11-28; the user has no Bible repositories). Drop unless a new URL turns up. |
+| ~~`fofgof/Bible-Database`~~ | XML/SQL, multilingual | **Not found** (GitHub 404, 2026-11-28; no such user). Drop unless a new URL turns up. |
 | **`vscandura/python-bible`** | Python reference parser, verse counts, integer IDs | Backend-side reference parsing reference implementation. |
 | **`nebulas/bible-reference`** | Go parsing/normalization lib | Alternative to `bcv-parser` for non-JS tooling. |
 
@@ -124,6 +128,7 @@ additional scripture or study-content sources.
 
 ## Change Log
 
+- `0.1.2` | `2026-11-28` | Claude | Linked `EXTRAS-ENG` (English versions catalog); `beandog/bible-sqlite` and `fofgof/Bible-Database` marked not found.
 - `0.1.0` | `2026-11-27` | Devin | Initial catalog distilled from `extras.md`.
 
 ## Traceability
