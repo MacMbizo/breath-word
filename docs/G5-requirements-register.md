@@ -1,7 +1,7 @@
 # G5: Requirements Register & Traceability Matrix
 
 **Document ID:** `G5`  
-**Version:** `1.1.0`  
+**Version:** `1.2.0`  
 **Status:** `Active`  
 **Last Updated:** `2026-11-28`  
 **Related Docs:** `G1`, `G3`, `F1`, `AGENTS.md`
@@ -23,12 +23,12 @@ This is the canonical register of every requirement, non-functional budget, cont
 | Phase 1 | 5 | 0 | 0 | 0 | 0 | 5 |
 | Phase 2 | 7 | 0 | 0 | 0 | 0 | 7 |
 | Phase 3 | 3 | 3 | 0 | 0 | 0 | 6 |
-| Phase 4 | 0 | 0 | 7 | 0 | 0 | 7 |
+| Phase 4 | 0 | 0 | 8 | 0 | 0 | 8 |
 | Phase 5 | 0 | 0 | 3 | 0 | 0 | 3 |
 | v1.1 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **15** | **3** | **10** | **0** | **0** | **28** |
+| **Total** | **15** | **3** | **11** | **0** | **0** | **29** |
 
-Notes: the 28 rows are FR-101–105 (Phase 1), FR-107 & FR-201–206 (Phase 2, with FR-204's Phase-5 AI mode tracked inside the FR-204 row), FR-106 & FR-301–305 (Phase 3), FR-501–507 (Phase 4) and FR-401–403 (Phase 5). Both Phase 1 (Section 13; `G3` `v1.0.39`–`v1.0.40`) and Phase 2 (`G3` `v1.0.41`–`v1.0.42`) have passed their exit gates, including live two-device PowerSync round-trip and shared-pool join-by-code verification. Phase 3 is built on the host and desktop-verified (`G3` `v1.0.44`); its device exit-gate clauses are open (Section 14). v1.1 carries no `FR-*` IDs (it is a deferral list, Section 3).
+Notes: the 29 rows are FR-101–105 (Phase 1), FR-107 & FR-201–206 (Phase 2, with FR-204's Phase-5 AI mode tracked inside the FR-204 row), FR-106 & FR-301–305 (Phase 3), FR-501–508 (Phase 4) and FR-401–403 (Phase 5). Both Phase 1 (Section 13; `G3` `v1.0.39`–`v1.0.40`) and Phase 2 (`G3` `v1.0.41`–`v1.0.42`) have passed their exit gates, including live two-device PowerSync round-trip and shared-pool join-by-code verification. Phase 3 is built on the host and desktop-verified (`G3` `v1.0.44`); its device exit-gate clauses are open (Section 14). v1.1 carries no `FR-*` IDs (it is a deferral list, Section 3).
 
 ## 2 — Functional Requirement inventory
 
@@ -62,6 +62,7 @@ Notes: the 28 rows are FR-101–105 (Phase 1), FR-107 & FR-201–206 (Phase 2, w
 | `FR-505` | Daily Promise & Recall | `A2` §4.5 | "On 1 March the home surface shows that day's entry offline; a promise captured last week reappears in the next 5-Minute Prayer Session ordered by `last_prayed_at`." | P4 | Not started | Not implemented |
 | `FR-506` | Personal Signals | `A2` §4.5 | "A personal Promise tag added on Android appears on iPad after sync; hiding the curated layer leaves only personal tags; Supabase shows only `e2ee:v1:` ciphertext for the note." | P4 | Not started | Not implemented |
 | `FR-507` | Truth Chain (Linked Passages) | `A2` §4.5 | "Opening the chain on 1 John 1:9 shows its condition and promise and at least one linked passage with its source named; tapping a link navigates there and back." | P4 | Not started | Not implemented |
+| `FR-508` | Unfolding Story (Chronological Reading Mode) | `A2` §4.5 | "Opening the David era shows 1 Samuel 22:1–2 followed by Psalm 142 with a "written here" marker and the Adullam place pin; every date names its source and reads "approx."; leaving the mode returns to the same verse in canonical order." | P4 | Not started | Not implemented |
 
 ## 3 — Phase boundaries & non-goals (`A3` §4.1–4.2)
 
@@ -71,7 +72,7 @@ Notes: the 28 rows are FR-101–105 (Phase 1), FR-107 & FR-201–206 (Phase 2, w
 
 **Phase 3 — Exegesis, Inductive, Ink & Audio.** FR-301, FR-302, FR-303, FR-304, FR-305, FR-106 + ETL for `exegesis_step` & `study_refs` packs. Target platforms: Android, iPadOS, Desktop. Exit gate: "Tap-to-Strong's, BDB/Thayer lexicon, TSK Passage Guide, Theographic Factbook, Inductive 5-step + Skia Ink, and synchronized BSB audio + ambient mixer ship cleanly."
 
-**Phase 4 — Scripture Signals & Promise Prayer.** FR-501–FR-507 + ETL for the `study_signals` pack from attributed public-domain compilations (no AI classification). Target platforms: Android, iPadOS, Desktop. Exit gate: signals, pills, circumstance index, "Pray this promise", daily promise and personal signals work offline on all three; every curated mark names its source; personal signals sync E2EE.
+**Phase 4 — Scripture Signals & Promise Prayer.** FR-501–FR-508 (incl. Unfolding Story) + ETL for the `study_signals` pack from attributed public-domain compilations (no AI classification). Target platforms: Android, iPadOS, Desktop. Exit gate: signals, pills, circumstance index, "Pray this promise", daily promise and personal signals work offline on all three; every curated mark names its source; personal signals sync E2EE.
 
 **Phase 5 — Grounded AI & Studio Polish.** FR-401, FR-204 (AI mode), FR-402, FR-403 + `commentary_pd` pack. Target platforms: Android, iPadOS, Desktop, Web. Exit gate: "RAG Smart Synopsis passes hallucination/citation test suite; Desktop `dockview` + shortcuts + Web Companion live for small church group."
 
@@ -396,12 +397,13 @@ Canonical registry (26 codes). Cross-checked against the `AppError` contract in 
 - **External open items:** Bible.org NET redistribution terms (`B5`); BSB verse-level audio timestamp availability (`B5` / `B4`).
 - **Pending verification:** nothing gating Phase 1 or Phase 2 — all four Gate-1 spikes (`B3` §4.5), Phase-1 `FR-101..105` on-device verification (`G3` `v1.0.37`–`v1.0.40`), and Phase-2 real-device two-device PowerSync round-trip + shared-pool join-by-code verification (`G3` `v1.0.42`) are complete. Phase 3 device clauses still open: on-device run of the mobile study screen and two-stream mixer (needs a new native build for `expo-audio`), iPad stroke → Android/Desktop rendering, cross-device sync of highlights/notes/ink, and the FR-106 ±250 ms check once an audio edition with timestamps exists.
 - **Rows currently `Partial`:** `FR-106` (no narration timestamps data), `FR-301` (no English word alignments; tap via the interlinear), `FR-304` (in-app reminder, no OS notification).
-- **Rows currently `Not started`:** `FR-501`–`FR-507` — Phase 4; `FR-401`–`FR-403` — Phase 5.
+- **Rows currently `Not started`:** `FR-501`–`FR-508` — Phase 4; `FR-401`–`FR-403` — Phase 5.
 
 ## Change Log
 
 | Version | Date | Author | Note |
 | --- | --- | --- | --- |
+| `1.2.0` | `2026-11-28` | Claude | Added `FR-508` Unfolding Story (Phase 4, `Not started`); 29 rows. |
 | `1.1.0` | `2026-11-28` | Claude | **New Phase 4 — Scripture Signals & Promise Prayer.** Added `FR-501`–`FR-507` (`A2` 1.1.0 §4.5) as `Not started`; former Phase-4 rows `FR-401`–`FR-403` and FR-204 AI mode move to Phase 5 (`A3` 1.1.0). Coverage 21 → 28 rows. |
 | `1.0.4` | `2026-11-27` | Claude | **Phase-3 build.** `FR-302`, `FR-303`, `FR-305` → `Implemented`; `FR-106`, `FR-301`, `FR-304` → `Partial` with the exact gap in each row (narration timestamps data; English word alignments; OS-level reminder). Coverage summary and Section 14 updated (`G3` `v1.0.44`). |
 | `1.0.3` | `2026-11-27` | Athena | **Phase-2 exit-gate PASSED.** Live two-device PowerSync sync round-trip and ≥2-device shared-pool join-by-code verified on real devices (`G3` `v1.0.42`). Cleared Phase-2 pending-device caveats on `FR-202`, `FR-205`, `FR-206` and Section 14; Phase 3 (`FR-106`, `FR-301`–`FR-305`) is now unblocked (`A3 §4.1`). |

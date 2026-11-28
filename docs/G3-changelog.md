@@ -1,7 +1,7 @@
 # G3: Living Changelog
 
 **Document ID:** `G3`  
-**Version:** `1.0.50`  
+**Version:** `1.0.51`  
 **Status:** `Active`  
 **Last Updated:** `2026-11-28`  
 **Related Docs:** `G1`, `G4`, `F1`
@@ -14,6 +14,7 @@ This changelog tracks approved changes to the Breath & Word documentation suite.
 
 | Version | Date | Author | Summary |
 | --- | --- | --- | --- |
+| `v1.0.51` | `2026-11-28` | Claude | **Unfolding Story joins Phase 4; mockup v2 adopted.** `A2` 1.2.0 adds `FR-508` Unfolding Story (chronological reading mode; sourced, approximate chronology); `A3` 1.1.2, `G5` 1.2.0 (29 rows), `F1`, `EXTRAS-FEAT` 0.4.0. `D1` 1.3.0 §4.8 adopts the Antigravity editorial mockup v2, now stored at `docs/design/mockups/`, as the Phase 4 visual reference, and lists what must change before build: invented source text, untyped Truth Chain links, sourced chronology, tokens only. |
 | `v1.0.50` | `2026-11-28` | Claude | **Phase 4 may start; Signals design chosen.** Owner waived the Phase 3 exit gate for starting Phase 4 (`A3` 1.1.1); Phase 3 device clauses are finished alongside and still gate Phase 5. `D1` 1.2.0 §4.7: the three mockup treatments ship as three depths of one system — quiet margin signs (default), labelled promise card with "Pray this promise", focus pills — plus a Signals style setting (Quiet · Labelled · Off) and meaningful category signs (rainbow arc, tablets, shofar, lamp). |
 | `v1.0.49` | `2026-11-28` | Claude | **New Phase 4 — Scripture Signals & Promise Prayer (owner decision).** The owner named these the reason the app exists: see the promises, commands and warnings already in Scripture, keep the ones that speak to one's circumstances, pray them, recall them. `A2` 1.1.0 adds Pillar 5 `FR-501`–`FR-507` (Signals overlay, pills & named collections, promises for my circumstance, "Pray this promise", daily promise & recall, personal signals, Truth Chain), sourced only from established attributed compilations (Clarke, Spurgeon's *Faith's Checkbook*, Maimonides' 613, Nave's/Torrey's, Beatitudes, Ten Commandments) — no AI classification. `A3` 1.1.0: the former Phase 4 (Grounded AI & Studio Polish) becomes Phase 5. `G5` 1.1.0 (28 rows), `F1` Phase 4/5 acceptance rows, `AGENTS.md` phase line, `EXTRAS-FEAT` 0.3.0 (§1, §2, §7, §8 promoted), `B3`/`C1` Phase references. |
 | `v1.0.48` | `2026-11-28` | Claude | **English version selection proposal (`EXTRAS-SEL` 0.1.0).** Rather than building all 70 redistributable English texts, a repeatable method: gates (licence, completeness, clean text, buildable USFM source, versification), one representative per family (KJV ×9, WEB ×6, NHEB, OEB, Douay-Rheims, Brenton), a 0–3 score on sources carrying it / recognition / distinct need / study richness, and one slot per reader need capped at ~11 English packs. Proposes ASV, YLT or LSV, BBE, DRA, JPS 1917, Geneva 1599, Darby and Brenton (updated) after the shipped BSB/KJV/WEB, pending owner sign-off. Post-launch demand comes from per-pack R2 download counts and an explicit "request a version" list, with no user tracking (`B6`). `G1` 1.3.0 registers `EXTRAS-ENG` and `EXTRAS-SEL`. |

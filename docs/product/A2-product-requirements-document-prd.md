@@ -1,7 +1,7 @@
 # A2: Product Requirements Document (PRD)
 
 **Document ID:** `A2`  
-**Version:** `1.1.0`  
+**Version:** `1.2.0`  
 **Status:** `Approved`  
 **Owner:** Founder  
 **Last Updated:** `2026-11-28`  
@@ -71,6 +71,7 @@ The reason Breath & Word exists: help believers **see** the promises, commands a
 | `FR-505` | **Daily Promise & Recall** | P4 | A daily promise (Spurgeon's *Faith's Checkbook*, 366 entries, keyed by day of year) on the home surface, plus gentle resurfacing of the user's own saved promises through `FR-203` smart rotation and an optional local reminder (`FR-107` tone: never punitive). | On 1 March the home surface shows that day's entry offline; a promise captured last week reappears in the next 5-Minute Prayer Session ordered by `last_prayed_at`. |
 | `FR-506` | **Personal Signals** | P4 | Users tag any verse with their own Promise / Command / Warning / Wisdom (or custom) signal and note; stored per user in `user_data.sqlite` (UUID `id`, soft delete `deleted_at`, notes E2EE per `ADR-004`), kept visually and structurally separate from the curated pack layer, which users can hide. | A personal Promise tag added on Android appears on iPad after sync; hiding the curated layer leaves only personal tags; Supabase shows only `e2ee:v1:` ciphertext for the note. |
 | `FR-507` | **Truth Chain (Linked Passages)** | P4 | Typed links between passages taken from the source data (Condition → Promise, Command → Promise, Prophecy → Fulfillment), shown as an inline expandable panel / sheet on mobile and a side card on iPad/Desktop; every link names its source. | Opening the chain on 1 John 1:9 shows its condition and promise and at least one linked passage with its source named; tapping a link navigates there and back. |
+| `FR-508` | **Unfolding Story (Chronological Reading Mode)** | P4 | A reader mode that interleaves passages in chronological order — e.g. Psalms 142 and 57 inside 1 Samuel 22 at the cave of Adullam, prophets inside Kings/Chronicles — with an era timeline and place pins from `factbook_entities`. Order, eras and dates come only from a sourced chronology (e.g. Theographic events, already in `study_refs`), are shown with their source and marked approximate. Every verse keeps its `BBCCCVVV` ID; the mode supplies only order and markers. | Opening the David era shows 1 Samuel 22:1–2 followed by Psalm 142 with a "written here" marker and the Adullam place pin; every date names its source and reads "approx."; leaving the mode returns to the same verse in canonical order. |
 
 ## Acceptance / Done Criteria
 
@@ -88,6 +89,7 @@ The reason Breath & Word exists: help believers **see** the promises, commands a
 
 - `1.0.0` | `2026-11-24` | Athena | Initial canonical PRD derived from `SPECIFICATION.md` and aligned to `B4`/`B8`.
 - `1.1.0` | `2026-11-28` | Claude | Owner decision: added Pillar 5 — Scripture Signals & Promise Prayer (`FR-501`–`FR-507`), promoted from `EXTRAS-FEAT` §1, §2, §7, §8, as the app's core differentiator; curated attributed sources only, no AI classification. Grounded AI & Studio features (`FR-401`–`FR-403`, `FR-204` AI mode) move to Phase 5.
+- `1.2.0` | `2026-11-28` | Claude | Owner decision: added `FR-508` Unfolding Story (from `EXTRAS-FEAT` §6) to Pillar 5 / Phase 4; chronology must be sourced and marked approximate.
 
 ## Traceability
 

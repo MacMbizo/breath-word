@@ -1,7 +1,7 @@
 # D1: Design System & Motion Tokens (`packages/tokens`)
 
 **Document ID:** `D1`  
-**Version:** `1.2.0`  
+**Version:** `1.3.0`  
 **Status:** `Approved`  
 **Owner:** Founder / Design  
 **Last Updated:** `2026-11-28`  
@@ -126,6 +126,31 @@ the dimmed text in focus mode must still pass 4.5:1; focus-mode dimming respects
 the curated layer can be hidden and personal signals (`FR-506`) are styled distinctly. Colours above are mockup values —
 add them to `packages/tokens` as `signal.*` roles and extend the contrast test before use.
 
+### 4.8 Reference mockup v2 (adopted 2026-11-28)
+
+[`mockups/breath-and-word-editorial-mockups-v2.html`](mockups/breath-and-word-editorial-mockups-v2.html) (made in
+Antigravity from boards A–F of §4.7 and the owner's reference images) is the **primary visual reference for Phase 4**.
+Open it in a browser; it has a 5-screen mobile board, a desktop/iPad studio view, theme switches and a greyscale check.
+
+Adopted from it:
+- **Quiet Page / Study Cards** switch on the reader (= the Signals style setting, placed on the page).
+- **Count chips under the chapter numeral** (All · N, then each sign with its count) as the category filter.
+- **Tappable blank in "A prayer to begin"** ("I acknowledge you in [this decision ✎] today") so the prayer becomes the
+  reader's own in one tap; "Type own" for free text.
+- **Desktop/iPad:** side rail → reading page → promise card in a third column.
+- **Truth Chain** as a vertical thread from the anchor verse to linked passages, each naming its source.
+- **Unfolding Story:** era timeline (Genesis → Exodus → David → Kings → Exile → Acts), "Written inside this cave"
+  markers for psalms placed in their narrative, place pin from `factbook_entities`.
+
+Not adopted / must change before build:
+1. Text attributed to real sources in the mockup is **invented** (the "Faith's Checkbook" reflection, Clarke section
+   names, OpenBible vote counts). Real text comes only from the sources.
+2. Truth Chain link **types** (Precedent, Contrast, Fruit) are not in OpenBible or TSK data, which are untyped. Show
+   untyped links plus the reader's own notes unless a source that types them is found.
+3. Unfolding Story dates and order must come from a sourced chronology, shown as approximate.
+4. The mockup loads Tailwind from a CDN and hard-codes colours: it is a picture to build from, not code. The apps use
+   `@breath-and-word/tokens` only.
+
 ## Acceptance / Done Criteria
 
 - All text/background and highlight/text pairings pass WCAG 2.2 AA contrast (`≥4.5:1` normal text, `≥3:1` large text/icons) across all 3 themes (enforced by `packages/tokens/test/contrast.test.ts`).
@@ -142,6 +167,7 @@ add them to `packages/tokens` as `signal.*` roles and extend the contrast test b
 
 ## Change Log
 
+- `1.3.0` | `2026-11-28` | Claude | §4.8 adopts the Antigravity editorial mockup v2 (stored in `docs/design/mockups/`) as the Phase 4 visual reference, with four corrections (invented attributions, untyped links, sourced chronology, tokens only).
 - `1.2.0` | `2026-11-28` | Claude | §4.7 Scripture Signals: quiet margin signs, labelled card and focus pills as three depths of one system; Signals style setting; category signs and mockup colours.
 - `1.1.0` | `2026-11-28` | Claude | Design round 2026-11-28: three themes (Parchment · Selah · Lamplight) with shared colour roles (accent = interactive, rubric = chapter numeral and "&", wash = tapped word, nav = pill), contrast test, Cormorant display face, Noto Serif Hebrew replaces SBL Hebrew, fonts bundled, layout principles (pill nav, floating study card, collapsible panels).
 - `1.0.0` | `2026-11-24` | Athena | Complete Sacred Editorial Calm design system, 4 themes, inductive highlight palette, Hebrew/Greek typography, and shared spring/breath motion tokens.

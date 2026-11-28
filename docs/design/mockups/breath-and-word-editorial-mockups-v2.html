@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Breath &amp; Word — Editorial Mockups v2</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    /* =========================================================================
+       SCOPED D1 1.1.0 + LITURGICAL SIGNAL TOKENS
+       ========================================================================= */
+    .bw-parchment {
+      --bw-canvas: #F4EEE3;
+      --bw-surface: #FBF8F2;
+      --bw-elevated: #EBE2D3;
+      --bw-sunken: #EFE7DA;
+      --bw-sanctum: #F3EAD9;
+      --bw-sanctum-border: #DFCFAF;
+      --bw-text: #2A211A;
+      --bw-secondary: #6B5A49;
+      --bw-verse: #7A2E24;
+      --bw-accent: #3E6B5E;
+      --bw-on-accent: #FFFFFF;
+      --bw-wash: #D6E3DC;
+      --bw-on-wash: #1F3A32;
+      --bw-rubric: #7A2E24;
+      --bw-border: #DFD4C0;
+      --bw-border-strong: #C9B79C;
+      --bw-nav-bg: #241D17;
+      --bw-nav-icon: #D9CCB6;
+      --bw-nav-active: #3E6B5E;
+      --bw-nav-active-text: #FFFFFF;
+      --bw-shadow: rgba(42, 33, 26, 0.22);
+
+      --sig-promise: #9A6B22;
+      --sig-promise-tint: rgba(154, 107, 34, 0.09);
+      --sig-command: #3E6B5E;
+      --sig-command-tint: rgba(62, 107, 94, 0.09);
+      --sig-warning: #9A3B2E;
+      --sig-warning-tint: rgba(154, 59, 46, 0.09);
+      --sig-wisdom: #4E627A;
+      --sig-wisdom-tint: rgba(78, 98, 122, 0.09);
+      --bw-lh: 1.74;
+    }
+
+    .bw-selah {
+      --bw-canvas: #F7F7F4;
+      --bw-surface: #FFFFFF;
+      --bw-elevated: #ECEEE9;
+      --bw-sunken: #F0F2EE;
+      --bw-sanctum: #F5F2EA;
+      --bw-sanctum-border: #E2DAC7;
+      --bw-text: #1E2320;
+      --bw-secondary: #5D6660;
+      --bw-verse: #5F6B65;
+      --bw-accent: #3E6B5E;
+      --bw-on-accent: #FFFFFF;
+      --bw-wash: #D6E6DF;
+      --bw-on-wash: #1F3A32;
+      --bw-rubric: #3E6B5E;
+      --bw-border: #E2E5E1;
+      --bw-border-strong: #CBD1CC;
+      --bw-nav-bg: #1E2320;
+      --bw-nav-icon: #C9D3CE;
+      --bw-nav-active: #3E6B5E;
+      --bw-nav-active-text: #FFFFFF;
+      --bw-shadow: rgba(30, 35, 32, 0.18);
+
+      --sig-promise: #9A6B22;
+      --sig-promise-tint: rgba(154, 107, 34, 0.085);
+      --sig-command: #3E6B5E;
+      --sig-command-tint: rgba(62, 107, 94, 0.085);
+      --sig-warning: #9A3B2E;
+      --sig-warning-tint: rgba(154, 59, 46, 0.085);
+      --sig-wisdom: #4E627A;
+      --sig-wisdom-tint: rgba(78, 98, 122, 0.085);
+      --bw-lh: 1.80;
+    }
+
+    .bw-lamplight {
+      --bw-canvas: #12100E;
+      --bw-surface: #1D1915;
+      --bw-elevated: #28221D;
+      --bw-sunken: #15120F;
+      --bw-sanctum: #2D2419;
+      --bw-sanctum-border: #4A3B29;
+      --bw-text: #EDE6DA;
+      --bw-secondary: #A89D8E;
+      --bw-verse: #E8806B;
+      --bw-accent: #E0A458;
+      --bw-on-accent: #12100E;
+      --bw-wash: rgba(224, 164, 88, 0.20);
+      --bw-on-wash: #F7DFB9;
+      --bw-rubric: #E8806B;
+      --bw-border: #2E2822;
+      --bw-border-strong: #423930;
+      --bw-nav-bg: #26211C;
+      --bw-nav-icon: #C9BEAF;
+      --bw-nav-active: #E0A458;
+      --bw-nav-active-text: #12100E;
+      --bw-shadow: rgba(0, 0, 0, 0.55);
+
+      --sig-promise: #E0A458;
+      --sig-promise-tint: rgba(224, 164, 88, 0.14);
+      --sig-command: #7FA89A;
+      --sig-command-tint: rgba(127, 168, 154, 0.14);
+      --sig-warning: #E8806B;
+      --sig-warning-tint: rgba(232, 128, 107, 0.14);
+      --sig-wisdom: #9EB4D1;
+      --sig-wisdom-tint: rgba(158, 180, 209, 0.14);
+      --bw-lh: 1.76;
+    }
+
+    /* Typography stacks (offline-safe Windows 11 + macOS/iOS editorial serifs) */
+    .font-display {
+      font-family: 'Cormorant Garamond', 'Sitka Display', 'Baskerville Old Face', 'Palatino Linotype', Georgia, serif;
+    }
+    .font-scripture {
+      font-family: 'Literata', 'Sitka Text', 'Georgia', 'Palatino Linotype', serif;
+    }
+    .font-ui {
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .bw-phone {
+      width: 366px;
+      height: 740px;
+      background-color: var(--bw-canvas);
+      color: var(--bw-text);
+      border: 1px solid var(--bw-border-strong);
+      border-radius: 38px;
+      box-shadow: 0 24px 56px -18px var(--bw-shadow), 0 0 0 5px rgba(128, 120, 108, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease;
+    }
+
+    .bw-desktop-frame {
+      background-color: var(--bw-canvas);
+      color: var(--bw-text);
+      border: 1px solid var(--bw-border-strong);
+      border-radius: 24px;
+      box-shadow: 0 28px 64px -22px var(--bw-shadow);
+      overflow: hidden;
+      transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease;
+    }
+
+    .bw-greyscale .bw-phone,
+    .bw-greyscale .bw-desktop-frame {
+      filter: grayscale(100%);
+    }
+
+    .bw-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .bw-scroll::-webkit-scrollbar-thumb {
+      background: var(--bw-border-strong);
+      border-radius: 999px;
+    }
+    .bw-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .bw-dotted-part {
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-decoration-color: var(--sig-command);
+      text-decoration-thickness: 1.6px;
+      text-underline-offset: 4px;
+    }
+
+    .bw-solid-promise {
+      text-decoration: underline;
+      text-decoration-style: solid;
+      text-decoration-color: var(--sig-promise);
+      text-decoration-thickness: 1.6px;
+      text-underline-offset: 4px;
+    }
+
+    @keyframes bwBreathPulse {
+      0%, 100% { transform: scale(0.76); opacity: 0.72; }
+      45% { transform: scale(1.0); opacity: 1; }
+    }
+    .bw-breath-halo {
+      animation: bwBreathPulse 7s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    }
+
+    .bw-micro-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased font-ui m-0 p-0">
+  <div id="app-root" class="max-w-[1920px] mx-auto px-4 sm:px-6 py-4 space-y-4">
+    <!-- Whisper-Quiet Gallery Header -->
+    <header class="bg-[var(--card)] border border-[var(--border)] rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="font-display text-2xl font-semibold tracking-tight text-[var(--foreground)]">
+          Breath <span class="italic text-[var(--primary)]">&amp;</span> Word
+        </span>
+        <span class="h-4 w-px bg-[var(--border)] hidden sm:inline-block"></span>
+        <span class="text-xs text-[var(--muted-foreground)] font-medium">Editorial Mockups · v2 (Elevated from Reference)</span>
+      </div>
+
+      <!-- Primary Mode Switch -->
+      <div class="flex items-center gap-1 bg-[var(--background)] p-1 rounded-xl border border-[var(--border)]" role="tablist" aria-label="Gallery view mode">
+        <button data-board-mode="mobile5" class="board-mode-btn px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition">
+          5-Screen Mobile Board
+        </button>
+        <button data-board-mode="desktop" class="board-mode-btn px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition">
+          Desktop &amp; iPad Studio
+        </button>
+      </div>
+
+      <!-- Theme Override & A11y -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex items-center gap-1 bg-[var(--background)] p-1 rounded-lg border border-[var(--border)]" role="group" aria-label="Theme override">
+          <button data-theme-override="mix" class="theme-ov-btn px-2.5 py-1 rounded text-xs font-medium cursor-pointer">Curated Mix</button>
+          <button data-theme-override="selah" class="theme-ov-btn px-2.5 py-1 rounded text-xs font-medium cursor-pointer">All Selah</button>
+          <button data-theme-override="parchment" class="theme-ov-btn px-2.5 py-1 rounded text-xs font-medium cursor-pointer">All Parchment</button>
+          <button data-theme-override="lamplight" class="theme-ov-btn px-2.5 py-1 rounded text-xs font-medium cursor-pointer">All Lamplight</button>
+        </div>
+
+        <button id="btn-greyscale" class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-xs font-medium cursor-pointer transition">
+          Greyscale A11y
+        </button>
+      </div>
+    </header>
+
+    <!-- Context Sub-bar -->
+    <div id="sub-bar" class="bg-[var(--card)] border border-[var(--border)] rounded-xl px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--muted-foreground)]"></div>
+
+    <!-- Stage -->
+    <main id="stage"></main>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =======================================================================
+      // BESPOKE BIBLICAL INLINE SVG ICONS (Zero emojis anywhere in app frames)
+      // =======================================================================
+      function iconPromise(color, size) {
+        const s = size || 16;
+        return `<svg width="${s}" height="${s}" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="color:${color}; flex-shrink:0;">
+          <path d="M2.5 14.5a7.5 7.5 0 0 1 15 0" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+          <path d="M5.75 14.5a4.25 4.25 0 0 1 8.5 0" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+          <path d="M9 14.5a1 1 0 0 1 2 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>`;
+      }
+
+      function iconCommand(color, size) {
+        const s = size || 16;
+        return `<svg width="${s}" height="${s}" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="color:${color}; flex-shrink:0;">
+          <path d="M3.5 6.5A2.5 2.5 0 0 1 6 4h1.2a1.3 1.3 0 0 1 1.3 1.3V15.5a1 1 0 0 1-1 1H4.5a1 1 0 0 1-1-1V6.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M11.5 5.3A1.3 1.3 0 0 1 12.8 4H14a2.5 2.5 0 0 1 2.5 2.5v9a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1V5.3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <line x1="5.2" y1="8" x2="6.8" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="13.2" y1="8" x2="14.8" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>`;
+      }
+
+      function iconWarning(color, size) {
+        const s = size || 16;
+        return `<svg width="${s}" height="${s}" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="color:${color}; flex-shrink:0;">
+          <path d="M3.5 13.5c3.5 1.6 7.4 1.1 10.7-2.2 1.1-1.1 1.9-2.5 2.5-4.3l-2.4-1.5c-.6 1.5-1.4 2.8-2.4 3.8-2.4 2.4-5.2 2.9-8 1.9l-.4 2.3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M14.3 5.5c.8.5 1.7 1.1 2.4 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>`;
+      }
+
+      function iconWisdom(color, size) {
+        const s = size || 16;
+        return `<svg width="${s}" height="${s}" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="color:${color}; flex-shrink:0;">
+          <path d="M10 3.2c.9 1.3 1.4 2.2 1.4 3a1.4 1.4 0 1 1-2.8 0c0-.8.5-1.7 1.4-3Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/>
+          <path d="M4 11h11.5l1.3-1.2-1.8-.3H5.2c-.8 0-1.4.6-1.2 1.5Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/>
+          <path d="M4.5 11.2c.6 2.5 2.6 4.1 5.5 4.1s4.9-1.6 5.5-4.1" stroke="currentColor" stroke-width="1.55" stroke-linecap="round"/>
+        </svg>`;
+      }
+
+      function iconChain(color, size) {
+        const s = size || 15;
+        return `<svg width="${s}" height="${s}" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="color:${color}; flex-shrink:0;">
+          <circle cx="7" cy="10" r="3.5" stroke="currentColor" stroke-width="1.65"/>
+          <circle cx="13" cy="10" r="3.5" stroke="currentColor" stroke-width="1.65"/>
+        </svg>`;
+      }
+
+      function iconStory(color, size) {
+        const s = size || 15;
+        return `<svg width="${s}" height="${s}" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="color:${color}; flex-shrink:0;">
+          <path d="M4 5.5c0-1.1.9-2 2-2h9.5v11.5H6a2 2 0 0 0-2 2V5.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M4 15a2 2 0 0 1 2-2h9.5" stroke="currentColor" stroke-width="1.6"/>
+          <line x1="7.5" y1="7" x2="12.5" y2="7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="7.5" y1="9.8" x2="11.5" y2="9.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>`;
+      }
+
+      function iconLock(color, size) {
+        const s = size || 13;
+        return `<svg width="${s}" height="${s}" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="color:${color}; flex-shrink:0;">
+          <rect x="4.5" y="9" width="11" height="8" rx="2" stroke="currentColor" stroke-width="1.65"/>
+          <path d="M7 9V6.8a3 3 0 0 1 6 0V9" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+        </svg>`;
+      }
+
+      function iconPin(color, size) {
+        const s = size || 14;
+        return `<svg width="${s}" height="${s}" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="color:${color}; flex-shrink:0;">
+          <path d="M10 17.2s5-4.8 5-8.7a5 5 0 1 0-10 0c0 3.9 5 8.7 5 8.7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="10" cy="8.5" r="1.6" stroke="currentColor" stroke-width="1.5"/>
+        </svg>`;
+      }
+
+      function sigIcon(cat, size) {
+        if (cat === 'PROMISE' || cat === 'PROMISE_COND') return iconPromise('var(--sig-promise)', size);
+        if (cat === 'COMMAND') return iconCommand('var(--sig-command)', size);
+        if (cat === 'WARNING') return iconWarning('var(--sig-warning)', size);
+        return iconWisdom('var(--sig-wisdom)', size);
+      }
+
+      function sigMeta(cat) {
+        if (cat === 'PROMISE_COND') return { label: 'Promise with a Condition', short: 'Promise', color: 'var(--sig-promise)', tint: 'var(--sig-promise-tint)' };
+        if (cat === 'PROMISE') return { label: 'Promise', short: 'Promise', color: 'var(--sig-promise)', tint: 'var(--sig-promise-tint)' };
+        if (cat === 'COMMAND') return { label: 'Command', short: 'Command', color: 'var(--sig-command)', tint: 'var(--sig-command-tint)' };
+        if (cat === 'WARNING') return { label: 'Warning', short: 'Warning', color: 'var(--sig-warning)', tint: 'var(--sig-warning-tint)' };
+        return { label: 'Wisdom', short: 'Wisdom', color: 'var(--sig-wisdom)', tint: 'var(--sig-wisdom-tint)' };
+      }
+
+      function esc(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      // =======================================================================
+      // AUTHENTIC EDITORIAL CONTENT
+      // =======================================================================
+      const PROVERBS_3 = [
+        {
+          v: 5,
+          ref: 'Proverbs 3:5',
+          cat: 'COMMAND',
+          part1: 'Trust in the LORD with all thine heart; and lean not unto thine own understanding.',
+          part2: null,
+          yourPart: 'Trust in the LORD with all thine heart; and lean not unto thine own understanding.',
+          hisPromise: null,
+          prayerPrefix: 'Lord, where my own understanding feels overwhelmed by ',
+          prayerMid: ', I choose to lean my full weight on You.',
+          source: "Torrey's New Topical Textbook · Trust in God",
+          breathIn: 'I lean not on my own sight',
+          breathOut: 'I trust You with all my heart',
+        },
+        {
+          v: 6,
+          ref: 'Proverbs 3:5–6',
+          cat: 'PROMISE_COND',
+          part1: 'In all thy ways acknowledge him,',
+          part2: 'and he shall direct thy paths.',
+          yourPart: 'Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him,',
+          hisPromise: 'and he shall direct thy paths.',
+          prayerPrefix: 'Lord, I choose to trust you with all my heart, not my own understanding. I acknowledge you in ',
+          prayerMid: ' today. You promised to direct my paths — direct them.',
+          source: "Clarke's Precious Bible Promises · § Guidance",
+          breathIn: 'In all my ways I acknowledge You',
+          breathOut: 'You will direct my paths',
+        },
+        {
+          v: 7,
+          ref: 'Proverbs 3:7',
+          cat: 'WARNING',
+          part1: 'Be not wise in thine own eyes: fear the LORD, and depart from evil.',
+          part2: null,
+          yourPart: 'Be not wise in thine own eyes: fear the LORD, and depart from evil.',
+          hisPromise: null,
+          prayerPrefix: 'Father, keep me humble concerning ',
+          prayerMid: '; deliver me from self-sufficiency and draw me away from every compromise.',
+          source: "Nave's Topical Bible · Humility & Reverence",
+          breathIn: 'Not wise in my own eyes',
+          breathOut: 'Teach me Your reverent fear',
+        },
+        {
+          v: 8,
+          ref: 'Proverbs 3:7–8',
+          cat: 'PROMISE',
+          part1: null,
+          part2: 'It shall be health to thy navel, and marrow to thy bones.',
+          yourPart: 'Fear the LORD, and depart from evil:',
+          hisPromise: 'It shall be health to thy navel, and marrow to thy bones.',
+          prayerPrefix: 'Lord, as I walk humbly before You in ',
+          prayerMid: ', pour deep quiet strength into my body and weary bones.',
+          source: "Clarke's Precious Bible Promises · § Health & Strength",
+          breathIn: 'I depart from anxiety and pride',
+          breathOut: 'Your peace is marrow to my bones',
+        },
+        {
+          v: 9,
+          ref: 'Proverbs 3:9',
+          cat: 'COMMAND',
+          part1: 'Honour the LORD with thy substance, and with the firstfruits of all thine increase:',
+          part2: null,
+          yourPart: 'Honour the LORD with thy substance, and with the firstfruits of all thine increase.',
+          hisPromise: null,
+          prayerPrefix: 'Generous Father, let ',
+          prayerMid: ' belong first to You — free me from clutching what You gave me to steward.',
+          source: "Torrey's New Topical Textbook · Stewardship",
+          breathIn: 'All I hold comes from Your hand',
+          breathOut: 'I honour You with the firstfruits',
+        },
+        {
+          v: 10,
+          ref: 'Proverbs 3:9–10',
+          cat: 'PROMISE',
+          part1: null,
+          part2: 'So shall thy barns be filled with plenty, and thy presses shall burst out with new wine.',
+          yourPart: 'Honour the LORD with thy substance and firstfruits:',
+          hisPromise: 'So shall thy barns be filled with plenty, and thy presses shall burst out with new wine.',
+          prayerPrefix: 'Lord, I entrust ',
+          prayerMid: ' to Your provision, knowing You never fall behind in generosity.',
+          source: "Clarke's Precious Bible Promises · § Temporal Provision",
+          breathIn: 'I release my scarcity and fear',
+          breathOut: 'Your faithful plenty overflows',
+        },
+        {
+          v: 11,
+          ref: 'Proverbs 3:11',
+          cat: 'WARNING',
+          part1: 'My son, despise not the chastening of the LORD; neither be weary of his correction:',
+          part2: null,
+          yourPart: 'Despise not the chastening of the LORD; neither be weary of his correction.',
+          hisPromise: null,
+          prayerPrefix: 'Father, when ',
+          prayerMid: ' feels stretching or corrective, keep me from growing bitter or faint.',
+          source: "Nave's Topical Bible · Chastening",
+          breathIn: 'I will not despise Your pruning',
+          breathOut: 'Receive me as a loved child',
+        },
+        {
+          v: 12,
+          ref: 'Proverbs 3:12',
+          cat: 'WISDOM',
+          part1: 'For whom the LORD loveth he correcteth; even as a father the son in whom he delighteth.',
+          part2: null,
+          yourPart: 'Remember the motive behind the discipline:',
+          hisPromise: 'Whom the LORD loveth he correcteth; even as a father the son in whom he delighteth.',
+          prayerPrefix: 'Abba Father, help me read ',
+          prayerMid: ' through the lens of Your delight, never doubting Your love.',
+          source: "Clarke's Precious Bible Promises · § Fatherly Love",
+          breathIn: 'Your correction is Your love',
+          breathOut: 'You delight in me as Your child',
+        },
+      ];
+
+      const CIRCUMSTANCE_PEEK = {
+        Afraid: { ref: 'Isaiah 41:10', pool: 'Anxiety', text: 'Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee…', source: "Clarke's Precious Bible Promises" },
+        Anxious: { ref: 'Philippians 4:6–7', pool: 'Anxiety', text: 'Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.', source: "Clarke's Precious Bible Promises" },
+        Weary: { ref: 'Matthew 11:28', pool: 'Healing', text: 'Come unto me, all ye that labour and are heavy laden, and I will give you rest.', source: "Spurgeon's Faith's Checkbook" },
+        Waiting: { ref: 'Isaiah 40:31', pool: 'Guidance', text: 'But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles…', source: "Spurgeon's Faith's Checkbook" },
+        Grieving: { ref: 'Psalm 34:18', pool: 'Healing', text: 'The LORD is nigh unto them that are of a broken heart; and saveth such as be of a contrite spirit.', source: "Clarke's Precious Bible Promises" },
+        Guidance: { ref: 'Psalm 32:8', pool: 'Guidance', text: 'I will instruct thee and teach thee in the way which thou shalt go: I will guide thee with mine eye.', source: "Spurgeon's Faith's Checkbook" },
+      };
+
+      const TRUTH_CHAINS = {
+        '1jn1_9': {
+          id: '1jn1_9',
+          tabLabel: '1 John 1:9',
+          anchorRef: '1 John 1:9',
+          relationLabel: 'Condition → Promise',
+          leftLabel: 'your part',
+          rightLabel: 'His promise',
+          anchorPart1: 'If we confess our sins,',
+          anchorPart2: 'he is faithful and just to forgive us our sins, and to cleanse us from all unrighteousness.',
+          source: "Clarke's Precious Bible Promises · § Pardon",
+          nodes: [
+            {
+              id: 'ps32_5',
+              ref: 'Psalm 32:5',
+              tag: 'Precedent',
+              text: 'I acknowledged my sin unto thee, and mine iniquity have I not hid. I said, I will confess my transgressions unto the LORD; and thou forgavest the iniquity of my sin.',
+              source: 'OpenBible · 412 votes',
+            },
+            {
+              id: 'prov28_13',
+              ref: 'Proverbs 28:13',
+              tag: 'Contrast',
+              text: 'He that covereth his sins shall not prosper: but whoso confesseth and forsaketh them shall have mercy.',
+              source: 'Treasury of Scripture Knowledge',
+            },
+            {
+              id: 'heb10_22',
+              ref: 'Hebrews 10:22',
+              tag: 'Fruit',
+              text: 'Let us draw near with a true heart in full assurance of faith, having our hearts sprinkled from an evil conscience…',
+              source: "Clarke's Precious Bible Promises",
+            },
+          ],
+        },
+        'prov3_5': {
+          id: 'prov3_5',
+          tabLabel: 'Proverbs 3:5–6',
+          anchorRef: 'Proverbs 3:5–6',
+          relationLabel: 'Trust → Guidance',
+          leftLabel: 'your part',
+          rightLabel: 'His promise',
+          anchorPart1: 'In all thy ways acknowledge him,',
+          anchorPart2: 'and he shall direct thy paths.',
+          source: "Clarke's Precious Bible Promises · § Guidance",
+          nodes: [
+            {
+              id: 'ps37_5',
+              ref: 'Psalm 37:5',
+              tag: 'Parallel',
+              text: 'Commit thy way unto the LORD; trust also in him; and he shall bring it to pass.',
+              source: 'Treasury of Scripture Knowledge',
+            },
+            {
+              id: 'isa30_21',
+              ref: 'Isaiah 30:21',
+              tag: 'Voice Behind',
+              text: 'And thine ears shall hear a word behind thee, saying, This is the way, walk ye in it, when ye turn to the right hand, and when ye turn to the left.',
+              source: 'OpenBible · 318 votes',
+            },
+            {
+              id: 'jas1_5',
+              ref: 'James 1:5',
+              tag: 'Wisdom Given',
+              text: 'If any of you lack wisdom, let him ask of God, that giveth to all men liberally, and upbraideth not; and it shall be given him.',
+              source: "Spurgeon's Faith's Checkbook",
+            },
+          ],
+        },
+        'isa53_5': {
+          id: 'isa53_5',
+          tabLabel: 'Isaiah 53:5',
+          anchorRef: 'Isaiah 53:5',
+          relationLabel: 'Prophecy → Fulfillment',
+          leftLabel: 'prophecy',
+          rightLabel: 'fulfillment',
+          anchorPart1: 'But he was wounded for our transgressions, he was bruised for our iniquities:',
+          anchorPart2: 'the chastisement of our peace was upon him; and with his stripes we are healed.',
+          source: 'Treasury of Scripture Knowledge · Messianic',
+          nodes: [
+            {
+              id: 'matt8_17',
+              ref: 'Matthew 8:17',
+              tag: 'Gospel Witness',
+              text: 'That it might be fulfilled which was spoken by Esaias the prophet, saying, Himself took our infirmities, and bare our sicknesses.',
+              source: 'OpenBible · 524 votes',
+            },
+            {
+              id: '1pet2_24',
+              ref: '1 Peter 2:24',
+              tag: 'Cross Echo',
+              text: 'Who his own self bare our sins in his own body on the tree, that we, being dead to sins, should live unto righteousness: by whose stripes ye were healed.',
+              source: 'Treasury of Scripture Knowledge',
+            },
+            {
+              id: 'rev5_9',
+              ref: 'Revelation 5:9',
+              tag: 'Consummation',
+              text: 'Thou art worthy to take the book, and to open the seals thereof: for thou wast slain, and hast redeemed us to God by thy blood…',
+              source: "Nave's Topical Bible",
+            },
+          ],
+        },
+      };
+
+      const STORY_MOMENTS = {
+        adullam: {
+          id: 'adullam',
+          eraShort: '~1012 BC · Adullam',
+          eraName: 'United Kingdom · ~1012 BC',
+          eraIndex: 2,
+          title: 'Cave of Adullam',
+          subtitle: '1 SAMUEL 22 · PSALM 142 · PSALM 57',
+          location: 'Adullam, Judah (31.65°N, 35.00°E)',
+          figures: ['David', 'Saul', 'Prophet Gad'],
+          canonicalCode: '09022001 · 1 Samuel 22',
+          summary: 'Interleaves the fugitive chronicle of 1 Samuel 22 with the two Psalms David composed inside the cave — turning military flight into an intimate prayer journal.',
+          blocks: [
+            {
+              type: 'prose',
+              verses: [
+                { v: 1, text: 'David therefore departed thence, and escaped to the cave Adullam: and when his brethren and all his father’s house heard it, they went down thither to him.' },
+                { v: 2, text: 'And every one that was in distress, and every one that was in debt, and every one that was discontented, gathered themselves unto him; and he became a captain over them.' },
+              ],
+            },
+            { type: 'divider', text: 'Written inside this cave · Psalm 142' },
+            {
+              type: 'poetry',
+              verses: [
+                { v: 1, text: 'I cried unto the LORD with my voice;\nwith my voice unto the LORD did I make my supplication.' },
+                { v: 2, text: 'I poured out my complaint before him;\nI shewed before him my trouble.' },
+                { v: 3, text: 'When my spirit was overwhelmed within me,\nthen thou knewest my path.', sig: 'PROMISE' },
+              ],
+            },
+            { type: 'divider', text: 'Also from the cave · Psalm 57' },
+            {
+              type: 'poetry',
+              verses: [
+                { v: 1, text: 'Be merciful unto me, O God, be merciful unto me:\nfor my soul trusteth in thee:\nyea, in the shadow of thy wings will I make my refuge,\nuntil these calamities be overpast.', sig: 'PROMISE' },
+              ],
+            },
+            { type: 'divider', text: 'The story continues · 1 Samuel 22:5' },
+            {
+              type: 'prose',
+              verses: [
+                { v: 5, text: 'And the prophet Gad said unto David, Abide not in the hold; depart, and get thee into the land of Judah. Then David departed, and came into the forest of Hareth.', sig: 'COMMAND' },
+              ],
+            },
+          ],
+        },
+        hezekiah: {
+          id: 'hezekiah',
+          eraShort: '~701 BC · Jerusalem',
+          eraName: 'Divided Kingdom · ~701 BC',
+          eraIndex: 3,
+          title: 'Siege of Jerusalem',
+          subtitle: '2 CHRONICLES 32 · ISAIAH 37 · PSALM 46',
+          location: 'Jerusalem, Judah (31.78°N, 35.24°E)',
+          figures: ['King Hezekiah', 'Prophet Isaiah', 'Sennacherib'],
+          canonicalCode: '14032007 · 2 Chronicles 32',
+          summary: 'Places Hezekiah’s encouragement on the city walls alongside Isaiah’s temple prayer and the hymn of Zion’s deliverance.',
+          blocks: [
+            {
+              type: 'prose',
+              verses: [
+                { v: 7, text: 'Be strong and courageous, be not afraid nor dismayed for the king of Assyria, nor for all the multitude that is with him: for there be more with us than with him:', sig: 'COMMAND' },
+                { v: 8, text: 'With him is an arm of flesh; but with us is the LORD our God to help us, and to fight our battles.', sig: 'PROMISE' },
+              ],
+            },
+            { type: 'divider', text: 'Inside the Temple · Isaiah 37:14' },
+            {
+              type: 'prose',
+              verses: [
+                { v: 14, text: 'And Hezekiah received the letter from the hand of the messengers, and read it: and Hezekiah went up unto the house of the LORD, and spread it before the LORD.' },
+              ],
+            },
+            { type: 'divider', text: 'Hymn of Deliverance · Psalm 46' },
+            {
+              type: 'poetry',
+              verses: [
+                { v: 1, text: 'God is our refuge and strength,\na very present help in trouble.', sig: 'PROMISE' },
+                { v: 5, text: 'God is in the midst of her; she shall not be moved:\nGod shall help her, and that right early.', sig: 'PROMISE' },
+              ],
+            },
+          ],
+        },
+        rome: {
+          id: 'rome',
+          eraShort: '~61 AD · Rome',
+          eraName: 'Early Church · ~61 AD',
+          eraIndex: 5,
+          title: 'Ambassador in Chains',
+          subtitle: 'ACTS 28 · PHILIPPIANS 1 · EPHESIANS 6',
+          location: 'Rome, Italy (41.89°N, 12.49°E)',
+          figures: ['Paul', 'Luke', 'Epaphroditus'],
+          canonicalCode: '44028030 · Acts 28',
+          summary: 'Reads Luke’s final chapter of Acts together with the Prison Epistles written from that very rented house in Rome.',
+          blocks: [
+            {
+              type: 'prose',
+              verses: [
+                { v: 30, text: 'And Paul dwelt two whole years in his own hired house, and received all that came in unto him,' },
+                { v: 31, text: 'Preaching the kingdom of God, and teaching those things which concern the Lord Jesus Christ, with all confidence, no man forbidding him.' },
+              ],
+            },
+            { type: 'divider', text: 'Written from that house · Philippians 1:12–13' },
+            {
+              type: 'prose',
+              verses: [
+                { v: 12, text: 'But I would ye should understand, brethren, that the things which happened unto me have fallen out rather unto the furtherance of the gospel;', sig: 'WISDOM' },
+              ],
+            },
+            { type: 'divider', text: 'Written from the same chain · Ephesians 6:19–20' },
+            {
+              type: 'prose',
+              verses: [
+                { v: 20, text: 'For which I am an ambassador in bonds: that therein I may speak boldly, as I ought to speak.', sig: 'COMMAND' },
+              ],
+            },
+          ],
+        },
+      };
+
+      const BLANK_PRESETS = ['this decision', 'my family', 'my work', 'my anxiety'];
+
+      // =======================================================================
+      // INTERACTIVE STATE
+      // =======================================================================
+      const state = {
+        boardMode: 'mobile5', // 'mobile5' | 'desktop'
+        themeOverride: 'mix', // 'mix' | 'selah' | 'parchment' | 'lamplight'
+        greyscale: false,
+
+        // Desktop Studio tab
+        desktopTab: 'signals', // 'signals' | 'truth' | 'story'
+
+        // Signals Reader (Screen 1) & Sheet (Screen 2)
+        readerMode: 'quiet', // 'quiet' | 'cards'
+        signalsOn: true,
+        signalFilter: 'ALL', // 'ALL' | 'PROMISE' | 'COMMAND' | 'WARNING' | 'WISDOM'
+        selectedVerseNum: 6, // 5..12, default v.6 (Proverbs 3:5-6)
+
+        // Screen 2 interactive prayer & sanctuary
+        blankIndex: 0,
+        customBlank: '',
+        editingBlank: false,
+        breathSanctuaryOpen: false,
+        poolOpen: false,
+        keptInPool: '',
+
+        // Screen 3 Today's Promise & Kept
+        todayKept: false,
+        circumstance: 'Afraid',
+        circumstanceKept: '',
+        showTestimony: false,
+
+        // Screen 4 Truth Chain
+        chainId: '1jn1_9',
+        chainNodePreviewId: null,
+        chainPulse: false,
+
+        // Screen 5 Unfolding Story
+        storyId: 'adullam',
+        storySignalsOn: true,
+        storyDrawerOpen: false,
+      };
+
+      function themeForScreen(defaultTheme) {
+        return state.themeOverride === 'mix' ? defaultTheme : state.themeOverride;
+      }
+
+      function floatingPill(activeLabel) {
+        const tabs = ['Read', 'Pray', 'Journal', 'Library'];
+        return `
+          <div class="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center z-20">
+            <div class="pointer-events-auto inline-flex items-center gap-0.5 px-1.5 py-1.5 rounded-full shadow-lg border" style="background: var(--bw-nav-bg); border-color: rgba(255,255,255,0.08);">
+              ${tabs
+                .map((t) => {
+                  const act = t === activeLabel;
+                  return `<span class="px-3.5 py-1.5 rounded-full text-[12px] font-medium transition" style="${
+                    act
+                      ? 'background: var(--bw-nav-active); color: var(--bw-nav-active-text);'
+                      : 'color: var(--bw-nav-icon);'
+                  }">${t}</span>`;
+                })
+                .join('')}
+            </div>
+          </div>`;
+      }
+
+      // =======================================================================
+      // SCREEN 1: SCRIPTURE SIGNALS — READER (Proverbs 3 · KJV)
+      // =======================================================================
+      function renderScreen1(phoneTheme) {
+        const counts = { PROMISE: 3, COMMAND: 2, WARNING: 2, WISDOM: 1 };
+        const visibleVerses = PROVERBS_3.filter((item) => {
+          if (!state.signalsOn || state.signalFilter === 'ALL') return true;
+          if (state.signalFilter === 'PROMISE') return item.cat === 'PROMISE' || item.cat === 'PROMISE_COND';
+          return item.cat === state.signalFilter;
+        });
+
+        const versesHtml = visibleVerses
+          .map((item) => {
+            const isSel = item.v === state.selectedVerseNum;
+            const meta = sigMeta(item.cat);
+
+            if (state.readerMode === 'cards') {
+              const cardBorder = isSel ? `border: 1.5px solid ${meta.color};` : `border: 1px solid var(--bw-border);`;
+              return `
+                <button data-act="sel-v" data-v="${item.v}" class="w-full text-left rounded-[16px] px-3.5 py-3 transition cursor-pointer" style="background: ${meta.tint}; ${cardBorder}">
+                  <div class="flex items-center gap-1.5 mb-1.5">
+                    ${sigIcon(item.cat, 14)}
+                    <span class="bw-micro-label" style="color: ${meta.color};">${meta.label}</span>
+                  </div>
+                  ${
+                    item.cat === 'PROMISE_COND'
+                      ? `<div class="grid grid-cols-[68px_1fr] gap-x-2 gap-y-1.5 items-baseline">
+                          <span class="bw-micro-label" style="color: var(--sig-command); font-size: 10px;">
+                            <sup style="color: var(--bw-verse); font-size:10px; margin-right:2px;">${item.v}</sup>Your Part
+                          </span>
+                          <span class="font-scripture text-[15px] leading-relaxed" style="color: var(--bw-text);">${esc(item.part1)}</span>
+                          <span class="bw-micro-label" style="color: var(--sig-promise); font-size: 10px;">His Promise</span>
+                          <span class="font-scripture text-[15px] leading-relaxed" style="color: var(--bw-text);">${esc(item.part2)}</span>
+                        </div>`
+                      : `<div class="font-scripture text-[15px] leading-relaxed" style="color: var(--bw-text);">
+                          <sup class="font-ui font-semibold mr-1" style="color: var(--bw-verse); font-size: 10.5px;">${item.v}</sup>${esc(item.part1 || item.part2)}
+                        </div>`
+                  }
+                </button>`;
+            }
+
+            // Quiet Page mode (elevates Image 2)
+            let bodySpan = '';
+            if (state.signalsOn) {
+              if (item.cat === 'PROMISE_COND') {
+                bodySpan = `<span class="bw-dotted-part">${esc(item.part1)}</span> <span class="bw-solid-promise">${esc(item.part2)}</span>`;
+              } else if (item.cat === 'PROMISE') {
+                bodySpan = `<span class="bw-solid-promise">${esc(item.part2)}</span>`;
+              } else {
+                bodySpan = esc(item.part1);
+              }
+            } else {
+              bodySpan = esc((item.part1 || '') + (item.part1 && item.part2 ? ' ' : '') + (item.part2 || ''));
+            }
+
+            return `
+              <button data-act="sel-v" data-v="${item.v}" class="w-full text-left flex items-start gap-2.5 rounded-xl px-2 py-1.5 transition cursor-pointer" style="${
+                isSel ? 'background: var(--bw-surface); box-shadow: inset 0 0 0 1.2px var(--bw-border-strong);' : ''
+              }">
+                <span class="w-5 pt-1.5 flex justify-center shrink-0">
+                  ${state.signalsOn ? sigIcon(item.cat, 15) : ''}
+                </span>
+                <span class="flex-1 font-scripture text-[16px]" style="line-height: var(--bw-lh); color: var(--bw-text);">
+                  <sup class="font-ui font-medium mr-1" style="color: var(--bw-verse); font-size: 11px;">${item.v}</sup>${bodySpan}
+                </span>
+              </button>`;
+          })
+          .join('');
+
+        return `
+          <div class="bw-phone bw-${phoneTheme}">
+            <!-- Top Bar -->
+            <div class="px-4 pt-4 pb-2 flex items-center justify-between gap-2 shrink-0">
+              <div class="px-3.5 py-1.5 rounded-full text-[12.5px] font-medium border flex items-center gap-1.5" style="background: var(--bw-elevated); border-color: var(--bw-border); color: var(--bw-text);">
+                <span>Proverbs 3 · KJV</span>
+                <span style="color: var(--bw-secondary);">▾</span>
+              </div>
+              <button data-act="toggle-signals" class="px-3.5 py-1.5 rounded-full text-[12.5px] font-medium flex items-center gap-1.5 cursor-pointer transition" style="${
+                state.signalsOn
+                  ? 'background: var(--bw-accent); color: var(--bw-on-accent);'
+                  : 'background: var(--bw-elevated); color: var(--bw-secondary); border: 1px solid var(--bw-border);'
+              }">
+                ${iconPromise(state.signalsOn ? 'var(--bw-on-accent)' : 'var(--bw-secondary)', 14)}
+                <span>${state.signalsOn ? 'Signals on' : 'Signals off'}</span>
+              </button>
+            </div>
+
+            <!-- Quiet Page vs Study Cards toggle -->
+            <div class="px-4 pb-2 flex items-center justify-between gap-2 shrink-0">
+              <div class="inline-flex p-0.5 rounded-full border text-[11.5px]" style="background: var(--bw-sunken); border-color: var(--bw-border);">
+                <button data-act="reader-mode" data-val="quiet" class="px-2.5 py-1 rounded-full font-medium cursor-pointer" style="${
+                  state.readerMode === 'quiet' ? 'background: var(--bw-surface); color: var(--bw-text); box-shadow: 0 1px 2px var(--bw-shadow);' : 'color: var(--bw-secondary);'
+                }">Quiet Page</button>
+                <button data-act="reader-mode" data-val="cards" class="px-2.5 py-1 rounded-full font-medium cursor-pointer" style="${
+                  state.readerMode === 'cards' ? 'background: var(--bw-surface); color: var(--bw-text); box-shadow: 0 1px 2px var(--bw-shadow);' : 'color: var(--bw-secondary);'
+                }">Study Cards</button>
+              </div>
+              <span class="text-[11px]" style="color: var(--bw-secondary);">Tap verse → inspect</span>
+            </div>
+
+            <!-- Scrollable Reader Body -->
+            <div class="flex-1 overflow-y-auto bw-scroll px-4 pb-20 space-y-3">
+              <!-- Chapter Header -->
+              <div class="flex items-baseline gap-3 pt-1">
+                <span class="font-display text-[48px] leading-none font-medium" style="color: var(--bw-rubric);">3</span>
+                <div class="space-y-0.5">
+                  <div class="bw-micro-label" style="color: var(--bw-secondary); letter-spacing: 0.1em;">Trust in the Lord</div>
+                  ${
+                    state.signalsOn && state.readerMode === 'quiet'
+                      ? `<div class="text-[11px] flex items-center gap-2.5" style="color: var(--bw-secondary);">
+                          <span><span class="bw-dotted-part">your part</span></span>
+                          <span>·</span>
+                          <span><span class="bw-solid-promise">His promise</span></span>
+                        </div>`
+                      : ''
+                  }
+                </div>
+              </div>
+
+              <!-- Whisper-Quiet Category Count Pills -->
+              ${
+                state.signalsOn
+                  ? `<div class="flex items-center gap-1.5 overflow-x-auto bw-scroll pb-1">
+                      <button data-act="sig-filter" data-val="ALL" class="px-2.5 py-1 rounded-full text-[11.5px] font-medium border shrink-0 cursor-pointer" style="${
+                        state.signalFilter === 'ALL'
+                          ? 'background: var(--bw-text); color: var(--bw-surface); border-color: var(--bw-text);'
+                          : 'background: var(--bw-surface); color: var(--bw-secondary); border-color: var(--bw-border);'
+                      }">All · 8</button>
+                      ${['PROMISE', 'COMMAND', 'WARNING', 'WISDOM']
+                        .map((cat) => {
+                          const act = state.signalFilter === cat;
+                          const meta = sigMeta(cat);
+                          return `<button data-act="sig-filter" data-val="${cat}" class="px-2 py-1 rounded-full text-[11.5px] font-medium border flex items-center gap-1 shrink-0 cursor-pointer" style="${
+                            act
+                              ? `background: ${meta.tint}; border-color: ${meta.color}; color: var(--bw-text);`
+                              : 'background: var(--bw-surface); border-color: var(--bw-border); color: var(--bw-secondary);'
+                          }">
+                            ${sigIcon(cat, 12)}
+                            <span>${counts[cat]}</span>
+                          </button>`;
+                        })
+                        .join('')}
+                    </div>`
+                  : ''
+              }
+
+              <div class="${state.readerMode === 'cards' ? 'space-y-2.5' : 'space-y-1'}">
+                ${versesHtml}
+              </div>
+            </div>
+
+            <!-- Soft Bottom Fade above Pill -->
+            <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20" style="background: linear-gradient(to top, var(--bw-canvas) 45%, transparent);"></div>
+            ${floatingPill('Read')}
+          </div>`;
+      }
+
+      // =======================================================================
+      // SCREEN 2: PROMISE CONDITION & PRAYER SHEET (Lamplight Sanctuary)
+      // =======================================================================
+      function renderScreen2(phoneTheme) {
+        const verse = PROVERBS_3.find((x) => x.v === state.selectedVerseNum) || PROVERBS_3[1];
+        const meta = sigMeta(verse.cat);
+        const blankValue = state.customBlank.trim() || BLANK_PRESETS[state.blankIndex];
+
+        return `
+          <div class="bw-phone bw-${phoneTheme}">
+            <!-- Dimmed Scripture Context Behind Sheet -->
+            <div class="px-5 pt-5 pb-3 opacity-30 select-none shrink-0">
+              <p class="font-scripture text-[15px] leading-relaxed" style="color: var(--bw-text);">
+                <sup class="font-ui text-[10px] mr-1" style="color: var(--bw-verse);">3</sup>Let not mercy and truth forsake thee: bind them about thy neck; write them upon the table of thine heart:
+              </p>
+            </div>
+
+            <!-- Sanctuary Sheet -->
+            <div class="flex-1 rounded-t-[28px] border-t px-5 pt-3 pb-5 flex flex-col justify-between overflow-y-auto bw-scroll" style="background: var(--bw-surface); border-color: var(--bw-border-strong); box-shadow: 0 -12px 32px var(--bw-shadow);">
+              <div class="space-y-3.5">
+                <div class="w-10 h-1 rounded-full mx-auto opacity-40" style="background: var(--bw-secondary);"></div>
+
+                <!-- Header -->
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-1.5">
+                    ${sigIcon(verse.cat, 15)}
+                    <span class="bw-micro-label" style="color: ${meta.color};">${meta.label}</span>
+                  </div>
+                  <span class="text-[12.5px] font-medium" style="color: var(--bw-secondary);">${esc(verse.ref)}</span>
+                </div>
+
+                ${
+                  state.breathSanctuaryOpen
+                    ? `<!-- Live Breath Prayer Mode -->
+                      <div class="py-4 px-3 rounded-2xl border text-center space-y-4" style="background: var(--bw-sanctum); border-color: var(--bw-sanctum-border);">
+                        <div class="bw-micro-label" style="color: var(--bw-accent);">Breath Prayer · 120Hz</div>
+                        <div class="relative w-32 h-32 mx-auto flex items-center justify-center">
+                          <div class="bw-breath-halo absolute inset-0 rounded-full border-2" style="background: var(--bw-wash); border-color: var(--bw-accent);"></div>
+                          <div class="relative text-center px-3">
+                            <div class="text-[11px] uppercase tracking-wider font-semibold" style="color: var(--bw-accent);">Breathe Slowly</div>
+                            <div class="font-display text-lg font-medium mt-0.5" style="color: var(--bw-text);">4s in · 6s out</div>
+                          </div>
+                        </div>
+                        <div class="space-y-1.5 font-scripture text-[15px]" style="color: var(--bw-text);">
+                          <div><span class="bw-micro-label mr-1.5" style="color: var(--bw-secondary); font-size:10px;">Inhale</span> “${esc(verse.breathIn)}”</div>
+                          <div><span class="bw-micro-label mr-1.5" style="color: var(--bw-accent); font-size:10px;">Exhale</span> “${esc(verse.breathOut)}”</div>
+                        </div>
+                        <button data-act="toggle-breath" class="px-4 py-1.5 rounded-full text-[12px] font-medium border cursor-pointer" style="background: var(--bw-surface); border-color: var(--bw-border-strong); color: var(--bw-text);">
+                          ← Back to prayer card
+                        </button>
+                      </div>`
+                    : `<!-- Your Part -->
+                      <div class="space-y-1">
+                        <div class="bw-micro-label" style="color: var(--sig-command);">Your Part</div>
+                        <p class="font-scripture text-[16px] leading-relaxed" style="color: var(--bw-text);">
+                          ${esc(verse.yourPart)}
+                        </p>
+                      </div>
+
+                      <!-- His Promise Warm Sanctum Card -->
+                      ${
+                        verse.hisPromise
+                          ? `<div class="p-4 rounded-2xl border space-y-1.5" style="background: var(--bw-sanctum); border-color: var(--bw-sanctum-border);">
+                              <div class="bw-micro-label" style="color: var(--sig-promise);">His Promise</div>
+                              <div class="font-display text-[25px] leading-snug font-medium" style="color: var(--bw-text);">
+                                ${esc(verse.hisPromise)}
+                              </div>
+                            </div>`
+                          : ''
+                      }
+
+                      <!-- Interactive A Prayer to Begin -->
+                      <div class="p-3.5 rounded-2xl border space-y-1.5" style="background: var(--bw-sunken); border-color: var(--bw-border);">
+                        <div class="bw-micro-label" style="color: var(--bw-secondary);">A Prayer to Begin</div>
+                        <p class="font-scripture italic text-[14.5px] leading-relaxed" style="color: var(--bw-text);">
+                          ${esc(verse.prayerPrefix)}${
+                            state.editingBlank
+                              ? `<input id="prayer-blank-input" type="text" value="${esc(blankValue)}" class="inline-block w-32 px-2 py-0.5 rounded-md border not-italic font-ui text-[12.5px] outline-none" style="background: var(--bw-surface); border-color: var(--bw-accent); color: var(--bw-text);" />`
+                              : `<button data-act="cycle-blank" class="inline-flex items-center gap-1 px-2 py-0.5 mx-0.5 rounded-md border not-italic font-ui text-[12.5px] font-medium cursor-pointer" style="background: var(--bw-wash); border-color: var(--bw-accent); color: var(--bw-on-wash);" title="Tap to change circumstance">${esc(blankValue)} ✎</button>`
+                          }${esc(verse.prayerMid)}
+                        </p>
+                        <div class="flex items-center justify-between text-[11px] pt-0.5" style="color: var(--bw-secondary);">
+                          <span>Tap the highlighted blank to personalize</span>
+                          <button data-act="toggle-edit-blank" class="underline cursor-pointer" style="color: var(--bw-accent);">${
+                            state.editingBlank ? 'Done' : 'Type own'
+                          }</button>
+                        </div>
+                      </div>`
+                }
+              </div>
+
+              <!-- Action Area -->
+              <div class="pt-3 space-y-2.5">
+                <button data-act="toggle-breath" class="w-full py-3 rounded-full text-[14px] font-semibold cursor-pointer transition" style="background: var(--bw-accent); color: var(--bw-on-accent);">
+                  ${state.breathSanctuaryOpen ? 'Pause breath prayer' : 'Pray this promise'}
+                </button>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <button data-act="toggle-pool" class="py-2.5 px-3 rounded-full text-[12.5px] font-medium border cursor-pointer" style="background: var(--bw-elevated); border-color: var(--bw-border); color: var(--bw-text);">
+                    ${state.keptInPool ? `Kept · ${esc(state.keptInPool)}` : 'Keep in a pool'}
+                  </button>
+                  <button data-act="jump-chain" class="py-2.5 px-3 rounded-full text-[12.5px] font-medium border flex items-center justify-center gap-1.5 cursor-pointer" style="background: var(--bw-elevated); border-color: var(--bw-border); color: var(--bw-text);">
+                    ${iconChain('var(--bw-accent)', 13)}
+                    <span>Linked passages</span>
+                  </button>
+                </div>
+
+                ${
+                  state.poolOpen
+                    ? `<div class="flex flex-wrap gap-1.5 pt-1">
+                        ${['Anxiety', 'Guidance', 'Healing', 'Thanksgiving']
+                          .map(
+                            (p) => `<button data-act="pick-pool" data-pool="${p}" class="px-2.5 py-1 rounded-full text-[11.5px] border cursor-pointer" style="background: var(--bw-surface); border-color: var(--bw-accent); color: var(--bw-text);">${p}</button>`
+                          )
+                          .join('')}
+                      </div>`
+                    : ''
+                }
+
+                <div class="text-center text-[11.5px] pt-0.5" style="color: var(--bw-secondary);">
+                  From ${esc(verse.source)}
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      // =======================================================================
+      // SCREEN 3: TODAY'S PROMISE & KEPT PROMISES (Parchment)
+      // =======================================================================
+      function renderScreen3(phoneTheme) {
+        const peek = CIRCUMSTANCE_PEEK[state.circumstance];
+        return `
+          <div class="bw-phone bw-${phoneTheme}">
+            <div class="flex-1 overflow-y-auto bw-scroll px-5 pt-5 pb-20 space-y-4">
+              <!-- Date & Display Title -->
+              <div class="space-y-0.5">
+                <div class="text-[12.5px]" style="color: var(--bw-secondary);">Saturday, 28 November</div>
+                <h2 class="font-display text-[34px] leading-tight font-normal" style="color: var(--bw-text);">Today’s promise</h2>
+              </div>
+
+              <!-- Hero Daily Promise Card -->
+              <div class="p-5 rounded-[24px] border space-y-3.5" style="background: var(--bw-surface); border-color: var(--bw-border);">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5">
+                    ${iconPromise('var(--sig-promise)', 15)}
+                    <span class="bw-micro-label" style="color: var(--sig-promise);">Psalm 23:1</span>
+                  </div>
+                  <span class="text-[11px]" style="color: var(--bw-secondary);">Day 332 · Faith’s Checkbook</span>
+                </div>
+
+                <div class="font-display text-[27px] leading-[1.22] font-normal" style="color: var(--bw-text);">
+                  The LORD is my shepherd; I shall not want.
+                </div>
+
+                <p class="font-scripture text-[13px] leading-relaxed" style="color: var(--bw-secondary);">
+                  Because the Lord Himself takes the shepherd’s staff, nothing truly needful for body or soul can ever be lacking today.
+                </p>
+
+                <div class="flex items-center gap-2 pt-0.5">
+                  <button data-act="toggle-breath" class="flex-1 py-2.5 px-4 rounded-full text-[13px] font-semibold cursor-pointer" style="background: var(--bw-accent); color: var(--bw-on-accent);">
+                    Pray this promise
+                  </button>
+                  <button data-act="toggle-today-keep" class="py-2.5 px-4 rounded-full text-[13px] font-medium border cursor-pointer" style="${
+                    state.todayKept
+                      ? 'background: var(--bw-wash); border-color: var(--bw-accent); color: var(--bw-on-wash);'
+                      : 'background: var(--bw-elevated); border-color: var(--bw-border); color: var(--bw-text);'
+                  }">
+                    ${state.todayKept ? 'Kept ✓' : 'Keep'}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Gentle Circumstance Strip (FR-503) -->
+              <div class="space-y-2">
+                <div class="bw-micro-label" style="color: var(--bw-secondary);">For How Your Heart Feels Today</div>
+                <div class="flex items-center gap-1.5 overflow-x-auto bw-scroll pb-1">
+                  ${Object.keys(CIRCUMSTANCE_PEEK)
+                    .map((c) => {
+                      const act = c === state.circumstance;
+                      return `<button data-act="pick-circ" data-circ="${esc(c)}" class="px-3 py-1 rounded-full text-[12px] font-medium border shrink-0 cursor-pointer" style="${
+                        act
+                          ? 'background: var(--bw-accent); color: var(--bw-on-accent); border-color: var(--bw-accent);'
+                          : 'background: var(--bw-surface); color: var(--bw-secondary); border-color: var(--bw-border);'
+                      }">${esc(c)}</button>`;
+                    })
+                    .join('')}
+                </div>
+                <div class="p-3 rounded-2xl border space-y-1.5" style="background: var(--bw-sanctum); border-color: var(--bw-sanctum-border);">
+                  <div class="flex items-center justify-between text-[12px]">
+                    <span class="font-semibold" style="color: var(--sig-promise);">${esc(peek.ref)}</span>
+                    <button data-act="keep-circ" data-ref="${esc(peek.ref)}" class="px-2.5 py-0.5 rounded-full text-[11.5px] font-medium cursor-pointer" style="background: var(--bw-wash); color: var(--bw-on-wash);">
+                      ${state.circumstanceKept === peek.ref ? `Kept in ${peek.pool}` : `+ Keep (${peek.pool})`}
+                    </button>
+                  </div>
+                  <p class="font-scripture text-[13px] leading-snug" style="color: var(--bw-text);">“${esc(peek.text)}”</p>
+                </div>
+              </div>
+
+              <!-- Promises You Kept -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="bw-micro-label" style="color: var(--bw-secondary);">Promises You Kept</span>
+                  <span class="text-[12.5px] font-medium" style="color: var(--bw-accent);">See all</span>
+                </div>
+
+                <!-- Kept Item 1 (Answered + Tap for E2EE Testimony) -->
+                <button data-act="toggle-testimony" class="w-full text-left p-3.5 rounded-2xl border space-y-1.5 cursor-pointer" style="background: var(--bw-surface); border-color: var(--bw-border);">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-semibold text-[13.5px]" style="color: var(--bw-text);">Isaiah 41:10</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[11.5px] font-medium" style="background: var(--bw-wash); color: var(--bw-on-wash);">Answered</span>
+                  </div>
+                  <div class="font-scripture text-[13px]" style="color: var(--bw-secondary);">Fear thou not; for I am with thee…</div>
+                  ${
+                    state.showTestimony
+                      ? `<div class="pt-1.5 mt-1 border-t border-dashed flex items-start gap-1.5 text-[11.5px]" style="border-color: var(--bw-border-strong); color: var(--bw-on-wash);">
+                          ${iconLock('var(--bw-accent)', 12)}
+                          <span>Testimony (e2ee:v1): “Cleared the medical scan with peace.”</span>
+                        </div>`
+                      : ''
+                  }
+                </button>
+
+                <div class="p-3.5 rounded-2xl border flex items-center justify-between gap-2" style="background: var(--bw-surface); border-color: var(--bw-border);">
+                  <div class="min-w-0">
+                    <div class="font-semibold text-[13.5px]" style="color: var(--bw-text);">Psalm 56:3</div>
+                    <div class="font-scripture text-[13px] truncate" style="color: var(--bw-secondary);">What time I am afraid, I will trust…</div>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full text-[11.5px] font-medium shrink-0" style="background: var(--bw-elevated); color: var(--bw-secondary);">Prayed 3×</span>
+                </div>
+
+                <div class="p-3.5 rounded-2xl border flex items-center justify-between gap-2" style="background: var(--bw-surface); border-color: var(--bw-border);">
+                  <div class="min-w-0">
+                    <div class="font-semibold text-[13.5px]" style="color: var(--bw-text);">Proverbs 3:6</div>
+                    <div class="font-scripture text-[13px] truncate" style="color: var(--bw-secondary);">In all thy ways acknowledge…</div>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full text-[11.5px] font-medium shrink-0" style="background: var(--bw-elevated); color: var(--bw-secondary);">Kept yesterday</span>
+                </div>
+              </div>
+
+              <button class="w-full py-3 rounded-full text-[13.5px] font-medium border cursor-pointer" style="background: transparent; border-color: var(--bw-accent); color: var(--bw-accent);">
+                Pray through my promises · 5 min
+              </button>
+            </div>
+
+            <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20" style="background: linear-gradient(to top, var(--bw-canvas) 45%, transparent);"></div>
+            ${floatingPill('Pray')}
+          </div>`;
+      }
+
+      // =======================================================================
+      // SCREEN 4: TRUTH CHAIN — ILLUMINATED THREAD (FR-507)
+      // =======================================================================
+      function renderScreen4(phoneTheme) {
+        const chain = TRUTH_CHAINS[state.chainId];
+        const previewNode = chain.nodes.find((n) => n.id === state.chainNodePreviewId) || null;
+
+        return `
+          <div class="bw-phone bw-${phoneTheme}">
+            <!-- Top Navigation -->
+            <div class="px-4 pt-4 pb-2 flex items-center justify-between gap-2 shrink-0">
+              <div class="flex items-center gap-1.5 text-[12px] font-medium" style="color: var(--bw-secondary);">
+                ${iconChain('var(--bw-accent)', 15)}
+                <span>Truth Chain</span>
+              </div>
+              <div class="flex items-center gap-1 overflow-x-auto bw-scroll">
+                ${Object.values(TRUTH_CHAINS)
+                  .map(
+                    (c) => `<button data-act="pick-chain" data-id="${c.id}" class="px-2.5 py-1 rounded-full text-[11.5px] font-medium border shrink-0 cursor-pointer" style="${
+                      c.id === chain.id
+                        ? 'background: var(--bw-accent); color: var(--bw-on-accent); border-color: var(--bw-accent);'
+                        : 'background: var(--bw-elevated); color: var(--bw-secondary); border-color: var(--bw-border);'
+                    }">${esc(c.tabLabel)}</button>`
+                  )
+                  .join('')}
+              </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto bw-scroll px-4 pb-20 space-y-3">
+              ${
+                previewNode
+                  ? `<!-- Navigated Passage Preview (FR-507 navigate & back) -->
+                    <div class="p-4 rounded-[22px] border space-y-3" style="background: var(--bw-surface); border-color: var(--bw-accent);">
+                      <div class="flex items-center justify-between">
+                        <button data-act="chain-back" class="px-3 py-1 rounded-full text-[12px] font-semibold cursor-pointer" style="background: var(--bw-accent); color: var(--bw-on-accent);">
+                          ← Return to ${esc(chain.anchorRef)}
+                        </button>
+                        <span class="bw-micro-label" style="color: var(--bw-secondary);">${esc(previewNode.tag)}</span>
+                      </div>
+                      <div class="font-display text-2xl font-medium" style="color: var(--bw-text);">${esc(previewNode.ref)}</div>
+                      <p class="font-scripture text-[16px] leading-relaxed" style="color: var(--bw-text);">
+                        ${esc(previewNode.text)}
+                      </p>
+                      <div class="text-[11.5px] pt-1 border-t" style="border-color: var(--bw-border); color: var(--bw-secondary);">
+                        Linked from ${esc(chain.anchorRef)} · ${esc(previewNode.source)}
+                      </div>
+                    </div>`
+                  : `<!-- Anchor Illuminated Card -->
+                    <div class="p-4 rounded-[22px] border space-y-2.5" style="background: var(--bw-surface); border-color: var(--bw-border-strong);">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5">
+                          ${iconChain('var(--sig-promise)', 14)}
+                          <span class="bw-micro-label" style="color: var(--sig-promise);">${esc(chain.relationLabel)}</span>
+                        </div>
+                        <span class="text-[12px] font-medium" style="color: var(--bw-secondary);">${esc(chain.anchorRef)}</span>
+                      </div>
+                      <p class="font-scripture text-[16px]" style="line-height: var(--bw-lh); color: var(--bw-text);">
+                        <span class="bw-dotted-part">${esc(chain.anchorPart1)}</span>
+                        <span> </span>
+                        <span class="bw-solid-promise">${esc(chain.anchorPart2)}</span>
+                      </p>
+                      <div class="flex items-center justify-between text-[11px]" style="color: var(--bw-secondary);">
+                        <span><span class="bw-dotted-part">${esc(chain.leftLabel)}</span> · <span class="bw-solid-promise">${esc(chain.rightLabel)}</span></span>
+                        <span>${esc(chain.source.split('·')[0].trim())}</span>
+                      </div>
+                    </div>
+
+                    <!-- Vertical Illuminated Thread Spine -->
+                    <div class="relative pl-6 ml-3 space-y-2.5" style="border-left: 1.5px solid var(--sig-promise);">
+                      ${chain.nodes
+                        .map(
+                          (nd) => `<button data-act="chain-node" data-id="${nd.id}" class="relative w-full text-left p-3.5 rounded-2xl border cursor-pointer transition" style="background: var(--bw-surface); border-color: var(--bw-border);">
+                            <span class="absolute -left-[31px] top-4 w-3 h-3 rounded-full border-2" style="background: var(--bw-canvas); border-color: var(--sig-promise);"></span>
+                            <div class="flex items-center justify-between gap-2 mb-1">
+                              <span class="font-semibold text-[13px]" style="color: var(--bw-text);">${esc(nd.ref)}</span>
+                              <span class="px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: var(--sig-promise-tint); color: var(--sig-promise);">${esc(nd.tag)}</span>
+                            </div>
+                            <p class="font-scripture text-[13.5px] leading-relaxed" style="color: var(--bw-secondary);">“${esc(nd.text)}”</p>
+                            <div class="mt-1.5 flex items-center justify-between text-[11px]" style="color: var(--bw-secondary);">
+                              <span>${esc(nd.source)}</span>
+                              <span style="color: var(--bw-accent);">Read in context →</span>
+                            </div>
+                          </button>`
+                        )
+                        .join('')}
+                    </div>`
+              }
+
+              <button data-act="toggle-chain-pulse" class="w-full py-2.5 rounded-full text-[13px] font-medium border cursor-pointer" style="${
+                state.chainPulse
+                  ? 'background: var(--bw-accent); color: var(--bw-on-accent); border-color: var(--bw-accent);'
+                  : 'background: transparent; border-color: var(--bw-accent); color: var(--bw-accent);'
+              }">
+                ${state.chainPulse ? 'Prayer seeded from this chain ✓' : 'Pray through this chain'}
+              </button>
+            </div>
+
+            <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20" style="background: linear-gradient(to top, var(--bw-canvas) 45%, transparent);"></div>
+            ${floatingPill('Read')}
+          </div>`;
+      }
+
+      // =======================================================================
+      // SCREEN 5: UNFOLDING STORY — CHRONOLOGICAL MONOGRAPH
+      // =======================================================================
+      function renderScreen5(phoneTheme) {
+        const m = STORY_MOMENTS[state.storyId];
+        const ticks = ['Gen', 'Exod', 'David', 'Kings', 'Exile', 'Acts'];
+
+        const blocksHtml = m.blocks
+          .map((blk) => {
+            if (blk.type === 'divider') {
+              return `
+                <div class="flex items-center gap-2.5 py-2">
+                  <span class="h-px flex-1" style="background: var(--bw-border-strong);"></span>
+                  <span class="font-scripture italic text-[12px] shrink-0" style="color: var(--bw-rubric);">${esc(blk.text)}</span>
+                  <span class="h-px flex-1" style="background: var(--bw-border-strong);"></span>
+                </div>`;
+            }
+
+            if (blk.type === 'poetry') {
+              return `
+                <div class="pl-3.5 space-y-2" style="border-left: 2px solid var(--sig-promise);">
+                  ${blk.verses
+                    .map((vs) => {
+                      const hasSig = state.storySignalsOn && vs.sig;
+                      const formatted = esc(vs.text).replace(/\n/g, '<br/>');
+                      return `<div class="flex items-start gap-2">
+                        <span class="w-4 pt-1 shrink-0">${hasSig ? sigIcon(vs.sig, 14) : ''}</span>
+                        <p class="font-scripture italic text-[15px] flex-1" style="line-height: 1.72; color: var(--bw-text);">
+                          <sup class="font-ui not-italic mr-1" style="color: var(--bw-verse); font-size: 10.5px;">${vs.v}</sup><span class="${
+                        hasSig && vs.sig === 'PROMISE' ? 'bw-solid-promise' : ''
+                      }">${formatted}</span>
+                        </p>
+                      </div>`;
+                    })
+                    .join('')}
+                </div>`;
+            }
+
+            return `
+              <div class="space-y-1.5">
+                ${blk.verses
+                  .map((vs) => {
+                    const hasSig = state.storySignalsOn && vs.sig;
+                    return `<div class="flex items-start gap-2">
+                      <span class="w-4 pt-1 shrink-0">${hasSig ? sigIcon(vs.sig, 14) : ''}</span>
+                      <p class="font-scripture text-[15.5px] flex-1" style="line-height: var(--bw-lh); color: var(--bw-text);">
+                        <sup class="font-ui mr-1" style="color: var(--bw-verse); font-size: 10.5px;">${vs.v}</sup><span class="${
+                      hasSig && vs.sig === 'PROMISE' ? 'bw-solid-promise' : ''
+                    }">${esc(vs.text)}</span>
+                      </p>
+                    </div>`;
+                  })
+                  .join('')}
+              </div>`;
+          })
+          .join('');
+
+        return `
+          <div class="bw-phone bw-${phoneTheme}">
+            <!-- Top Bar -->
+            <div class="px-4 pt-4 pb-2 flex items-center justify-between gap-2 shrink-0">
+              <button data-act="cycle-story" class="px-3 py-1.5 rounded-full text-[12px] font-medium border flex items-center gap-1.5 cursor-pointer" style="background: var(--bw-elevated); border-color: var(--bw-border); color: var(--bw-text);" title="Tap to switch chronological moment">
+                ${iconStory('var(--bw-accent)', 13)}
+                <span>${esc(m.eraShort)}</span>
+                <span style="color: var(--bw-secondary);">▾</span>
+              </button>
+              <button data-act="toggle-story-sig" class="px-3 py-1.5 rounded-full text-[12px] font-medium flex items-center gap-1 cursor-pointer" style="${
+                state.storySignalsOn
+                  ? 'background: var(--bw-accent); color: var(--bw-on-accent);'
+                  : 'background: var(--bw-elevated); color: var(--bw-secondary); border: 1px solid var(--bw-border);'
+              }">
+                ${iconPromise(state.storySignalsOn ? 'var(--bw-on-accent)' : 'var(--bw-secondary)', 13)}
+                <span>Signals</span>
+              </button>
+            </div>
+
+            <!-- Minimalist Hairline Story Arc -->
+            <div class="px-5 py-1.5 shrink-0">
+              <div class="relative flex items-center justify-between text-[10.5px]" style="color: var(--bw-secondary);">
+                <span class="absolute left-2 right-2 top-1.5 h-px" style="background: var(--bw-border-strong);"></span>
+                ${ticks
+                  .map((tk, idx) => {
+                    const act = idx === m.eraIndex;
+                    return `<div class="relative flex flex-col items-center gap-0.5 z-10">
+                      <span class="w-2.5 h-2.5 rounded-full border" style="${
+                        act
+                          ? 'background: var(--bw-accent); border-color: var(--bw-accent); transform: scale(1.15);'
+                          : 'background: var(--bw-canvas); border-color: var(--bw-border-strong);'
+                      }"></span>
+                      <span class="${act ? 'font-semibold' : ''}" style="${act ? 'color: var(--bw-accent);' : ''}">${tk}</span>
+                    </div>`;
+                  })
+                  .join('')}
+              </div>
+            </div>
+
+            <!-- Monograph Scroll Body -->
+            <div class="flex-1 overflow-y-auto bw-scroll px-5 pb-24 space-y-3">
+              <div class="pt-1 space-y-0.5">
+                <div class="bw-micro-label" style="color: var(--bw-secondary); letter-spacing: 0.09em;">${esc(m.subtitle)}</div>
+                <h2 class="font-display text-[30px] leading-tight font-normal" style="color: var(--bw-text);">${esc(m.title)}</h2>
+              </div>
+
+              ${blocksHtml}
+            </div>
+
+            <!-- Compact Expandable Historical Footnote Bar -->
+            <div class="absolute inset-x-3 bottom-16 z-20">
+              ${
+                state.storyDrawerOpen
+                  ? `<div class="p-3.5 rounded-2xl border shadow-xl space-y-2" style="background: var(--bw-surface); border-color: var(--bw-border-strong);">
+                      <div class="flex items-center justify-between">
+                        <span class="bw-micro-label flex items-center gap-1" style="color: var(--bw-accent);">
+                          ${iconPin('var(--bw-accent)', 12)} ${esc(m.location)}
+                        </span>
+                        <button data-act="toggle-story-drawer" class="text-[11.5px] font-medium cursor-pointer" style="color: var(--bw-secondary);">Close ✕</button>
+                      </div>
+                      <p class="text-[12px] leading-relaxed" style="color: var(--bw-secondary);">${esc(m.summary)}</p>
+                      <div class="flex flex-wrap gap-1.5">
+                        ${m.figures
+                          .map((f) => `<span class="px-2 py-0.5 rounded-full text-[11px] border" style="background: var(--bw-elevated); border-color: var(--bw-border); color: var(--bw-text);">${esc(f)}</span>`)
+                          .join('')}
+                      </div>
+                      <div class="text-[11px] pt-1 border-t flex items-center justify-between" style="border-color: var(--bw-border); color: var(--bw-accent);">
+                        <span>Open in canonical reader</span>
+                        <span class="font-mono">${esc(m.canonicalCode)}</span>
+                      </div>
+                    </div>`
+                  : `<button data-act="toggle-story-drawer" class="w-full px-3.5 py-2 rounded-full border flex items-center justify-between text-[11.5px] cursor-pointer shadow-sm" style="background: var(--bw-surface); border-color: var(--bw-border-strong); color: var(--bw-secondary);">
+                      <span class="flex items-center gap-1.5 truncate">${iconPin('var(--bw-accent)', 12)} ${esc(m.location)}</span>
+                      <span class="font-medium shrink-0 ml-2" style="color: var(--bw-accent);">Context ↑</span>
+                    </button>`
+              }
+            </div>
+
+            <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20" style="background: linear-gradient(to top, var(--bw-canvas) 45%, transparent);"></div>
+            ${floatingPill('Read')}
+          </div>`;
+      }
+
+      // =======================================================================
+      // MODE 2: DESKTOP & IPAD STUDIO SPREAD
+      // =======================================================================
+      function renderDesktopStudio() {
+        const theme = state.themeOverride === 'mix' ? 'selah' : state.themeOverride;
+        const navItems = [
+          { id: 'signals', label: 'Scripture Signals' },
+          { id: 'truth', label: 'Truth Chain' },
+          { id: 'story', label: 'Unfolding Story' },
+        ];
+
+        const sidebar = `
+          <aside class="w-56 shrink-0 border-r p-4 flex flex-col justify-between" style="background: var(--bw-surface); border-color: var(--bw-border);">
+            <div class="space-y-6">
+              <div class="flex items-center justify-between">
+                <span class="font-display text-2xl font-semibold tracking-tight" style="color: var(--bw-text);">
+                  Breath <span class="italic" style="color: var(--bw-rubric);">&amp;</span> Word
+                </span>
+              </div>
+              <div class="space-y-1 text-[13px]">
+                <div class="bw-micro-label px-2.5 pb-1" style="color: var(--bw-secondary);">Study &amp; Prayer</div>
+                ${['Reader', 'Compare', 'Search'].map((r) => `<div class="px-2.5 py-1.5 rounded-lg" style="color: var(--bw-secondary);">${r}</div>`).join('')}
+                ${navItems
+                  .map((n) => {
+                    const act = state.desktopTab === n.id;
+                    return `<button data-act="desktop-tab" data-id="${n.id}" class="w-full text-left px-2.5 py-1.5 rounded-lg cursor-pointer transition" style="${
+                      act
+                        ? 'background: var(--bw-wash); color: var(--bw-on-wash); font-weight: 600;'
+                        : 'color: var(--bw-secondary);'
+                    }">${n.label}</button>`;
+                  })
+                  .join('')}
+                ${['Prayer Pools', 'Library'].map((r) => `<div class="px-2.5 py-1.5 rounded-lg" style="color: var(--bw-secondary);">${r}</div>`).join('')}
+              </div>
+            </div>
+            <div class="pt-3 border-t text-[12px] flex items-center justify-between" style="border-color: var(--bw-border); color: var(--bw-secondary);">
+              <span class="flex items-center gap-1.5">${iconLock('var(--bw-accent)', 13)} Vault Unlocked</span>
+              <span>Offline</span>
+            </div>
+          </aside>`;
+
+        let centerHtml = '';
+        let rightHtml = '';
+
+        if (state.desktopTab === 'signals') {
+          const verse = PROVERBS_3.find((x) => x.v === state.selectedVerseNum) || PROVERBS_3[1];
+          const meta = sigMeta(verse.cat);
+          const blankValue = state.customBlank.trim() || BLANK_PRESETS[state.blankIndex];
+
+          centerHtml = `
+            <div class="max-w-[60ch] mx-auto space-y-5">
+              <div class="flex items-center justify-between">
+                <div class="px-3.5 py-1.5 rounded-full text-[13px] font-medium border" style="background: var(--bw-elevated); border-color: var(--bw-border);">
+                  Proverbs 3 · KJV ▾
+                </div>
+                <div class="inline-flex p-0.5 rounded-full border text-[12px]" style="background: var(--bw-sunken); border-color: var(--bw-border);">
+                  <button data-act="reader-mode" data-val="quiet" class="px-3 py-1 rounded-full cursor-pointer" style="${
+                    state.readerMode === 'quiet' ? 'background: var(--bw-surface); color: var(--bw-text);' : 'color: var(--bw-secondary);'
+                  }">Quiet Page</button>
+                  <button data-act="reader-mode" data-val="cards" class="px-3 py-1 rounded-full cursor-pointer" style="${
+                    state.readerMode === 'cards' ? 'background: var(--bw-surface); color: var(--bw-text);' : 'color: var(--bw-secondary);'
+                  }">Study Cards</button>
+                </div>
+              </div>
+              <div class="flex items-baseline gap-4">
+                <span class="font-display text-[56px] leading-none font-medium" style="color: var(--bw-rubric);">3</span>
+                <div>
+                  <div class="bw-micro-label" style="color: var(--bw-secondary); letter-spacing: 0.1em;">Trust in the Lord</div>
+                  <div class="text-[12px] mt-0.5" style="color: var(--bw-secondary);"><span class="bw-dotted-part">your part</span> · <span class="bw-solid-promise">His promise</span></div>
+                </div>
+              </div>
+              <div class="space-y-2">
+                ${PROVERBS_3.map((item) => {
+                  const isSel = item.v === state.selectedVerseNum;
+                  const im = sigMeta(item.cat);
+                  return `<button data-act="sel-v" data-v="${item.v}" class="w-full text-left flex items-start gap-3 rounded-2xl px-3 py-2 cursor-pointer transition" style="${
+                    state.readerMode === 'cards'
+                      ? `background: ${im.tint}; border: 1px solid ${isSel ? im.color : 'var(--bw-border)'};`
+                      : isSel
+                      ? 'background: var(--bw-surface); box-shadow: inset 0 0 0 1.2px var(--bw-border-strong);'
+                      : ''
+                  }">
+                    <span class="w-5 pt-1.5 flex justify-center shrink-0">${sigIcon(item.cat, 16)}</span>
+                    <span class="font-scripture text-[18.5px]" style="line-height: var(--bw-lh); color: var(--bw-text);">
+                      <sup class="font-ui mr-1.5" style="color: var(--bw-verse); font-size: 11.5px;">${item.v}</sup>${
+                    item.cat === 'PROMISE_COND'
+                      ? `<span class="bw-dotted-part">${esc(item.part1)}</span> <span class="bw-solid-promise">${esc(item.part2)}</span>`
+                      : item.cat === 'PROMISE'
+                      ? `<span class="bw-solid-promise">${esc(item.part2)}</span>`
+                      : esc(item.part1)
+                  }
+                    </span>
+                  </button>`;
+                }).join('')}
+              </div>
+            </div>`;
+
+          rightHtml = `
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-1.5 bw-micro-label" style="color: ${meta.color};">${sigIcon(verse.cat, 15)} ${meta.label}</span>
+                <span class="text-[12.5px]" style="color: var(--bw-secondary);">${esc(verse.ref)}</span>
+              </div>
+              <div class="space-y-1">
+                <div class="bw-micro-label" style="color: var(--sig-command);">Your Part</div>
+                <p class="font-scripture text-[16px] leading-relaxed">${esc(verse.yourPart)}</p>
+              </div>
+              ${
+                verse.hisPromise
+                  ? `<div class="p-4 rounded-2xl border space-y-1" style="background: var(--bw-sanctum); border-color: var(--bw-sanctum-border);">
+                      <div class="bw-micro-label" style="color: var(--sig-promise);">His Promise</div>
+                      <div class="font-display text-2xl leading-snug">${esc(verse.hisPromise)}</div>
+                    </div>`
+                  : ''
+              }
+              <div class="p-3.5 rounded-2xl border space-y-1.5" style="background: var(--bw-sunken); border-color: var(--bw-border);">
+                <div class="bw-micro-label" style="color: var(--bw-secondary);">A Prayer to Begin</div>
+                <p class="font-scripture italic text-[14.5px] leading-relaxed">
+                  ${esc(verse.prayerPrefix)}<button data-act="cycle-blank" class="px-2 py-0.5 rounded border not-italic font-ui text-[12px] font-medium cursor-pointer" style="background: var(--bw-wash); border-color: var(--bw-accent); color: var(--bw-on-wash);">${esc(blankValue)} ✎</button>${esc(verse.prayerMid)}
+                </p>
+              </div>
+              <button data-act="toggle-breath" class="w-full py-2.5 rounded-full text-[13.5px] font-semibold cursor-pointer" style="background: var(--bw-accent); color: var(--bw-on-accent);">
+                Pray this promise
+              </button>
+              <div class="text-[11.5px]" style="color: var(--bw-secondary);">Source: ${esc(verse.source)}</div>
+            </div>`;
+        } else if (state.desktopTab === 'truth') {
+          const chain = TRUTH_CHAINS[state.chainId];
+          const prev = chain.nodes.find((n) => n.id === state.chainNodePreviewId) || null;
+          centerHtml = `
+            <div class="max-w-[60ch] mx-auto space-y-5">
+              <div class="flex items-center gap-2">
+                ${Object.values(TRUTH_CHAINS)
+                  .map(
+                    (c) => `<button data-act="pick-chain" data-id="${c.id}" class="px-3 py-1 rounded-full text-[12.5px] border cursor-pointer" style="${
+                      c.id === chain.id
+                        ? 'background: var(--bw-accent); color: var(--bw-on-accent); border-color: var(--bw-accent);'
+                        : 'background: var(--bw-elevated); border-color: var(--bw-border); color: var(--bw-secondary);'
+                    }">${esc(c.tabLabel)}</button>`
+                  )
+                  .join('')}
+              </div>
+              ${
+                prev
+                  ? `<div class="space-y-4">
+                      <button data-act="chain-back" class="px-3.5 py-1.5 rounded-full text-[12.5px] font-semibold cursor-pointer" style="background: var(--bw-accent); color: var(--bw-on-accent);">← Return to ${esc(chain.anchorRef)}</button>
+                      <h2 class="font-display text-3xl">${esc(prev.ref)}</h2>
+                      <p class="font-scripture text-[19px]" style="line-height: var(--bw-lh);">${esc(prev.text)}</p>
+                    </div>`
+                  : `<div class="space-y-4">
+                      <h2 class="font-display text-3xl">${esc(chain.anchorRef)}</h2>
+                      <div class="p-5 rounded-2xl border" style="background: var(--bw-surface); border-color: var(--bw-border-strong);">
+                        <p class="font-scripture text-[20px]" style="line-height: var(--bw-lh);">
+                          <span class="bw-dotted-part">${esc(chain.anchorPart1)}</span> <span class="bw-solid-promise">${esc(chain.anchorPart2)}</span>
+                        </p>
+                      </div>
+                      <div class="text-[12.5px]" style="color: var(--bw-secondary);">${esc(chain.source)}</div>
+                    </div>`
+              }
+            </div>`;
+          rightHtml = `
+            <div class="space-y-3">
+              <div class="bw-micro-label" style="color: var(--sig-promise);">Illuminated Truth Thread</div>
+              <div class="relative pl-5 ml-2 space-y-3" style="border-left: 1.5px solid var(--sig-promise);">
+                ${chain.nodes
+                  .map(
+                    (nd) => `<button data-act="chain-node" data-id="${nd.id}" class="relative w-full text-left p-3 rounded-2xl border cursor-pointer" style="background: var(--bw-canvas); border-color: var(--bw-border);">
+                      <span class="absolute -left-[27px] top-4 w-2.5 h-2.5 rounded-full border-2" style="background: var(--bw-surface); border-color: var(--sig-promise);"></span>
+                      <div class="flex items-center justify-between text-[12.5px] font-semibold mb-1">
+                        <span>${esc(nd.ref)}</span>
+                        <span style="color: var(--sig-promise);">${esc(nd.tag)}</span>
+                      </div>
+                      <p class="font-scripture text-[13px]" style="color: var(--bw-secondary);">“${esc(nd.text)}”</p>
+                    </button>`
+                  )
+                  .join('')}
+              </div>
+            </div>`;
+        } else {
+          const m = STORY_MOMENTS[state.storyId];
+          centerHtml = `
+            <div class="max-w-[60ch] mx-auto space-y-4">
+              <div class="flex items-center gap-2">
+                ${Object.values(STORY_MOMENTS)
+                  .map(
+                    (sm) => `<button data-act="pick-story" data-id="${sm.id}" class="px-3 py-1 rounded-full text-[12.5px] border cursor-pointer" style="${
+                      sm.id === m.id
+                        ? 'background: var(--bw-accent); color: var(--bw-on-accent); border-color: var(--bw-accent);'
+                        : 'background: var(--bw-elevated); border-color: var(--bw-border); color: var(--bw-secondary);'
+                    }">${esc(sm.eraShort)}</button>`
+                  )
+                  .join('')}
+              </div>
+              <div class="bw-micro-label" style="color: var(--bw-secondary);">${esc(m.subtitle)}</div>
+              <h2 class="font-display text-4xl">${esc(m.title)}</h2>
+              ${m.blocks
+                .map((blk) => {
+                  if (blk.type === 'divider') {
+                    return `<div class="flex items-center gap-3 py-2"><span class="h-px flex-1" style="background: var(--bw-border-strong);"></span><span class="font-scripture italic text-[13px]" style="color: var(--bw-rubric);">${esc(blk.text)}</span><span class="h-px flex-1" style="background: var(--bw-border-strong);"></span></div>`;
+                  }
+                  if (blk.type === 'poetry') {
+                    return `<div class="pl-4 space-y-2" style="border-left: 2px solid var(--sig-promise);">${blk.verses
+                      .map((vs) => `<p class="font-scripture italic text-[17.5px]" style="line-height: 1.74;"><sup class="font-ui not-italic mr-1.5" style="color: var(--bw-verse); font-size: 11px;">${vs.v}</sup>${esc(vs.text).replace(/\n/g, '<br/>')}</p>`)
+                      .join('')}</div>`;
+                  }
+                  return `<div class="space-y-2">${blk.verses
+                    .map((vs) => `<p class="font-scripture text-[18px]" style="line-height: var(--bw-lh);"><sup class="font-ui mr-1.5" style="color: var(--bw-verse); font-size: 11px;">${vs.v}</sup>${esc(vs.text)}</p>`)
+                    .join('')}</div>`;
+                })
+                .join('')}
+            </div>`;
+          rightHtml = `
+            <div class="space-y-4 text-[13px]">
+              <div class="bw-micro-label" style="color: var(--bw-accent);">${esc(m.eraName)}</div>
+              <p class="leading-relaxed" style="color: var(--bw-secondary);">${esc(m.summary)}</p>
+              <div class="p-3 rounded-2xl border space-y-1.5" style="background: var(--bw-canvas); border-color: var(--bw-border);">
+                <div class="font-semibold flex items-center gap-1.5">${iconPin('var(--bw-accent)', 14)} ${esc(m.location)}</div>
+                <div class="text-[12px]" style="color: var(--bw-secondary);">Figures: ${m.figures.map(esc).join(', ')}</div>
+              </div>
+              <div class="text-[12px] font-mono" style="color: var(--bw-accent);">Canonical: ${esc(m.canonicalCode)}</div>
+            </div>`;
+        }
+
+        return `
+          <div class="bw-desktop-frame bw-${theme} max-w-[1260px] mx-auto flex h-[690px]">
+            ${sidebar}
+            <div class="flex-1 overflow-y-auto bw-scroll px-10 py-8">${centerHtml}</div>
+            <aside class="w-96 shrink-0 border-l p-6 overflow-y-auto bw-scroll" style="background: var(--bw-surface); border-color: var(--bw-border);">
+              ${rightHtml}
+            </aside>
+          </div>`;
+      }
+
+      // =======================================================================
+      // MASTER RENDER & EVENT DISPATCH
+      // =======================================================================
+      function render() {
+        const root = document.getElementById('app-root');
+        root.classList.toggle('bw-greyscale', state.greyscale);
+
+        document.querySelectorAll('.board-mode-btn').forEach((b) => {
+          const act = b.getAttribute('data-board-mode') === state.boardMode;
+          b.className = `board-mode-btn px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition ${
+            act ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+          }`;
+        });
+
+        document.querySelectorAll('.theme-ov-btn').forEach((b) => {
+          const act = b.getAttribute('data-theme-override') === state.themeOverride;
+          b.className = `theme-ov-btn px-2.5 py-1 rounded text-xs font-medium cursor-pointer ${
+            act ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'text-[var(--muted-foreground)]'
+          }`;
+        });
+
+        const greyBtn = document.getElementById('btn-greyscale');
+        greyBtn.className = `px-2.5 py-1.5 rounded-lg border text-xs font-medium cursor-pointer transition ${
+          state.greyscale ? 'bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]' : 'border-[var(--border)] text-[var(--muted-foreground)]'
+        }`;
+
+        const subBar = document.getElementById('sub-bar');
+        const stage = document.getElementById('stage');
+
+        if (state.boardMode === 'mobile5') {
+          subBar.innerHTML = `
+            <div>
+              <strong class="text-[var(--foreground)]">5-Screen Design Board:</strong>
+              Tap any verse in <strong>Screen 1</strong> to update the live Prayer Sheet in <strong>Screen 2</strong>, tap the underlined blank to personalize the prayer, tap any node in <strong>Truth Chain</strong>, or cycle eras in <strong>Unfolding Story</strong>.
+            </div>
+            <div class="font-mono">Screens 1–5 · Synchronized Interactive Prototype</div>`;
+
+          const screens = [
+            { title: '1 · Signals Reader', sub: 'Quiet Page ↔ Study Cards', html: renderScreen1(themeForScreen('selah')) },
+            { title: '2 · Promise & Prayer Sheet', sub: 'Lamplight Sanctuary · Live Blank', html: renderScreen2(themeForScreen('lamplight')) },
+            { title: '3 · Today’s Promise & Kept', sub: 'Spurgeon + Circumstances', html: renderScreen3(themeForScreen('parchment')) },
+            { title: '4 · Truth Chain', sub: 'Illuminated Thread (FR-507)', html: renderScreen4(themeForScreen('parchment')) },
+            { title: '5 · Unfolding Story', sub: 'Chronological Monograph', html: renderScreen5(themeForScreen('selah')) },
+          ];
+
+          stage.innerHTML = `
+            <div class="flex flex-wrap justify-center gap-6 pb-6">
+              ${screens
+                .map(
+                  (sc) => `<div class="space-y-2">
+                    <div class="px-2 flex items-baseline justify-between">
+                      <span class="text-xs font-semibold text-[var(--foreground)]">${sc.title}</span>
+                      <span class="text-[11px] text-[var(--muted-foreground)]">${sc.sub}</span>
+                    </div>
+                    ${sc.html}
+                  </div>`
+                )
+                .join('')}
+            </div>`;
+        } else {
+          subBar.innerHTML = `
+            <div>
+              <strong class="text-[var(--foreground)]">Desktop &amp; iPad Studio:</strong>
+              Switch between Scripture Signals, Truth Chain, and Unfolding Story using the left editorial rail.
+            </div>
+            <div class="font-mono">Theme: ${state.themeOverride === 'mix' ? 'selah' : state.themeOverride}</div>`;
+          stage.innerHTML = renderDesktopStudio();
+        }
+      }
+
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+
+        if (btn.dataset.boardMode) {
+          state.boardMode = btn.dataset.boardMode;
+          render();
+          return;
+        }
+        if (btn.dataset.themeOverride) {
+          state.themeOverride = btn.dataset.themeOverride;
+          render();
+          return;
+        }
+        if (btn.id === 'btn-greyscale') {
+          state.greyscale = !state.greyscale;
+          render();
+          return;
+        }
+
+        const act = btn.dataset.act;
+        if (!act) return;
+
+        if (act === 'toggle-signals') {
+          state.signalsOn = !state.signalsOn;
+        } else if (act === 'reader-mode') {
+          state.readerMode = btn.dataset.val;
+        } else if (act === 'sig-filter') {
+          state.signalFilter = btn.dataset.val;
+        } else if (act === 'sel-v') {
+          state.selectedVerseNum = Number(btn.dataset.v);
+          state.breathSanctuaryOpen = false;
+          state.poolOpen = false;
+        } else if (act === 'cycle-blank') {
+          state.customBlank = '';
+          state.blankIndex = (state.blankIndex + 1) % BLANK_PRESETS.length;
+        } else if (act === 'toggle-edit-blank') {
+          if (state.editingBlank) {
+            const inp = document.getElementById('prayer-blank-input');
+            if (inp) state.customBlank = inp.value;
+          }
+          state.editingBlank = !state.editingBlank;
+        } else if (act === 'toggle-breath') {
+          state.breathSanctuaryOpen = !state.breathSanctuaryOpen;
+        } else if (act === 'toggle-pool') {
+          state.poolOpen = !state.poolOpen;
+        } else if (act === 'pick-pool') {
+          state.keptInPool = btn.dataset.pool;
+          state.poolOpen = false;
+        } else if (act === 'jump-chain') {
+          state.chainId = 'prov3_5';
+          state.chainNodePreviewId = null;
+          state.desktopTab = 'truth';
+        } else if (act === 'toggle-today-keep') {
+          state.todayKept = !state.todayKept;
+        } else if (act === 'pick-circ') {
+          state.circumstance = btn.dataset.circ;
+          state.circumstanceKept = '';
+        } else if (act === 'keep-circ') {
+          state.circumstanceKept = btn.dataset.ref;
+        } else if (act === 'toggle-testimony') {
+          state.showTestimony = !state.showTestimony;
+        } else if (act === 'pick-chain') {
+          state.chainId = btn.dataset.id;
+          state.chainNodePreviewId = null;
+        } else if (act === 'chain-node') {
+          state.chainNodePreviewId = btn.dataset.id;
+        } else if (act === 'chain-back') {
+          state.chainNodePreviewId = null;
+        } else if (act === 'toggle-chain-pulse') {
+          state.chainPulse = !state.chainPulse;
+        } else if (act === 'cycle-story') {
+          const order = ['adullam', 'hezekiah', 'rome'];
+          state.storyId = order[(order.indexOf(state.storyId) + 1) % order.length];
+          state.storyDrawerOpen = false;
+        } else if (act === 'pick-story') {
+          state.storyId = btn.dataset.id;
+          state.storyDrawerOpen = false;
+        } else if (act === 'toggle-story-sig') {
+          state.storySignalsOn = !state.storySignalsOn;
+        } else if (act === 'toggle-story-drawer') {
+          state.storyDrawerOpen = !state.storyDrawerOpen;
+        } else if (act === 'desktop-tab') {
+          state.desktopTab = btn.dataset.id;
+        }
+
+        render();
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

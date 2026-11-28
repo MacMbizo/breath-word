@@ -1,7 +1,7 @@
 # A3: Scope, Phasing & Non-Goals
 
 **Document ID:** `A3`  
-**Version:** `1.1.1`  
+**Version:** `1.1.2`  
 **Status:** `Approved`  
 **Owner:** Founder  
 **Last Updated:** `2026-11-28`  
@@ -24,7 +24,7 @@ Founder and AI coding partner. Consult before adding any library, table, or UI f
 | **Phase 1** | **Core Local Reader MVP** | `FR-101`, `FR-102`, `FR-103`, `FR-104`, `FR-105` + `tools/pack-builder` (`core_bsb`, `trans_web`, `trans_kjv`) | Android, iPadOS, Desktop (basic) | 48h spike passed; BSB pack built & verified; offline reader + parallel compare + FTS5 + Focus Mode usable daily by founder. |
 | **Phase 2** | **Scripture Prayer & E2EE Sync** | `FR-201`, `FR-202`, `FR-203`, `FR-204` (offline templates), `FR-205` (all 4 prayer engines), `FR-206`, `FR-107` | Android, iPadOS, Desktop | Offline edits sync via PowerSync across Android + iPad + Desktop; E2EE vault + Recovery Key passes crypto test suite; Shared Church Pool tested with ≥2 accounts. |
 | **Phase 3** | **Exegesis, Inductive, Ink & Audio** | `FR-301`, `FR-302`, `FR-303`, `FR-304`, `FR-305`, `FR-106` + ETL for `exegesis_step` & `study_refs` packs | Android, iPadOS, Desktop | Tap-to-Strong's, BDB/Thayer lexicon, TSK Passage Guide, Theographic Factbook, Inductive 5-step + Skia Ink, and synchronized BSB audio + ambient mixer ship cleanly. |
-| **Phase 4** | **Scripture Signals & Promise Prayer** | `FR-501`–`FR-507` + ETL for the `study_signals` pack from attributed public-domain compilations | Android, iPadOS, Desktop | Signals overlay, pills and named collections, circumstance index, "Pray this promise", daily promise and personal signals work offline on Android + iPad + Desktop; every curated mark names its source; personal signals sync E2EE. |
+| **Phase 4** | **Scripture Signals & Promise Prayer** | `FR-501`–`FR-508` + ETL for the `study_signals` pack and a sourced chronology from attributed public-domain compilations | Android, iPadOS, Desktop | Signals overlay, pills and named collections, circumstance index, "Pray this promise", daily promise, personal signals and Unfolding Story work offline on Android + iPad + Desktop; every curated mark names its source; personal signals sync E2EE. |
 | **Phase 5** | **Grounded AI & Studio Polish** | `FR-401`, `FR-204` (AI mode), `FR-402`, `FR-403` + `commentary_pd` pack | Android, iPadOS, Desktop, Web | RAG Smart Synopsis passes hallucination/citation test suite; Desktop `dockview` + shortcuts + Web Companion live for small church group. |
 | **v1.1+** | **Post-v1 Roadmap** | Syntactical Clause Diagrams (Clear-Bible Macula treebanks), Collaborative Church Prayer Requests/Comments, USFM/OSIS BYO local pack importer, iOS/Android Home Screen Widgets, UI i18n. | All | Scheduled only after Phase 5 stability & real church usage feedback. |
 
@@ -55,6 +55,7 @@ Founder and AI coding partner. Consult before adding any library, table, or UI f
 - `1.0.0` | `2026-11-24` | Athena | Locked Phase 1–4 boundaries, v1.1 deferrals (Syntax Trees, BYO importer, Widgets), and Non-Goals.
 - `1.1.0` | `2026-11-28` | Claude | Owner decision: new Phase 4 **Scripture Signals & Promise Prayer** (`FR-501`–`FR-507`); former Phase 4 (Grounded AI & Studio Polish) becomes Phase 5. Phase 4 starts after the Phase 3 exit gate.
 - `1.1.1` | `2026-11-28` | Claude | Owner waived the Phase 3 exit gate for starting Phase 4; Phase 3 device clauses still gate Phase 5.
+- `1.1.2` | `2026-11-28` | Claude | `FR-508` Unfolding Story added to Phase 4.
 
 ## Traceability
 

@@ -2,7 +2,7 @@
 
 > **Read this first** when resuming work in a fresh session or on a new machine. It is a concise
 > orientation, **not** a replacement for the specs. Authoritative specs live in `docs/` — start at
-> `docs/G1-index.md`. The living changelog is `docs/G3-changelog.md` (currently `v1.0.50`); the
+> `docs/G1-index.md`. The living changelog is `docs/G3-changelog.md` (currently `v1.0.51`); the
 > requirements register is `docs/G5-requirements-register.md` (currently `1.1.0`).
 
 ---
@@ -85,6 +85,8 @@ apps; English Bible versions catalogued.** Everything up to `b3590c0` is pushed 
   *Faith's Checkbook*, Maimonides' 613, Nave's/Torrey's, Beatitudes, Ten Commandments …) → read-only `study_signals`
   pack. `B4` schema for that pack is still to write.
 - **Gate waived:** Phase 4 is the active build; finish the Phase 3 device clauses alongside it (`A3` 1.1.1).
+- **Visual reference:** `docs/design/mockups/breath-and-word-editorial-mockups-v2.html` (`D1` §4.8) — read its
+  "not adopted" list first. `FR-508` Unfolding Story is also in Phase 4.
 - **Design chosen** (`D1` §4.7, canvas https://claude.ai/artifact/UjW6NYcCWGryuyZAeWkkdR): quiet margin signs →
   labelled card with "Pray this promise" → focus pills; Signals style setting Quiet · Labelled · Off.
 - **Build order:** source research + `B4` `study_signals` schema → pack-builder ETL (one compilation first) → core
