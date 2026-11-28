@@ -25,5 +25,5 @@ All authoritative specs live in `docs/` (start with `docs/G1-index.md`).
    - Run 120Hz animations (Breath Prayer ring, Swipe Deck) on UI thread / Reanimated worklets and ALWAYS implement Reduced Motion fallbacks.
    - Wrap all Hebrew/Aramaic inline tokens in `dir="rtl"` + `unicode-bidi: isolate`.
 7. **Scope Guardrail (`A3`):**
-   - Build strictly for the active Phase (Phase 1 -> 2 -> 3 -> 4). Do NOT implement v1.1 features (Syntax Trees / Macula, USFM on-device importer, Widgets) prematurely.
+   - Build strictly for the active Phase (Phase 1 -> 2 -> 3 -> 4 -> 5). Do NOT implement v1.1 features (Syntax Trees / Macula, USFM on-device importer, Widgets) prematurely.
    - Every error thrown must be a canonical `AppError` from `C3`. Every PR must pass `pnpm turbo lint typecheck test`.

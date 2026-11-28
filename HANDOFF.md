@@ -2,8 +2,8 @@
 
 > **Read this first** when resuming work in a fresh session or on a new machine. It is a concise
 > orientation, **not** a replacement for the specs. Authoritative specs live in `docs/` — start at
-> `docs/G1-index.md`. The living changelog is `docs/G3-changelog.md` (currently `v1.0.48`); the
-> requirements register is `docs/G5-requirements-register.md` (currently `1.0.5`).
+> `docs/G1-index.md`. The living changelog is `docs/G3-changelog.md` (currently `v1.0.49`); the
+> requirements register is `docs/G5-requirements-register.md` (currently `1.1.0`).
 
 ---
 
@@ -76,6 +76,14 @@ apps; English Bible versions catalogued.** Everything up to `b3590c0` is pushed 
   Library first. Release-build recipe for the flaky DNS on this PC is in paperRock (`breath-word-android-release-build-flaky-dns`).
 - **iPad:** not yet. It needs an EAS cloud build plus a paid Apple Developer account (`apps/mobile/eas.json` has
   development / preview / production profiles). Waiting on the owner.
+
+### New Phase 4 — Scripture Signals & Promise Prayer (owner decision 2026-11-28)
+- **This is the heart of the app.** Help believers see the promises, commands and warnings already in Scripture,
+  keep those that speak to their circumstances, pray them and recall them. Make it spectacular, not minimal.
+- `A2` §4.5 `FR-501`–`FR-507`; `A3` 1.1.0 (old Phase 4 Grounded AI & Studio is now Phase 5).
+- **No AI classification.** Curated, attributed compilations only (Clarke's *Precious Bible Promises*, Spurgeon's
+  *Faith's Checkbook*, Maimonides' 613, Nave's/Torrey's, Beatitudes, Ten Commandments …) → read-only `study_signals`
+  pack. `B4` schema for that pack is still to write. Mockups first (owner picks the visual direction).
 
 ### English versions (`EXTRAS-ENG`, `EXTRAS-SEL`, 2026-11-28)
 - 105 English versions catalogued with per-source licences in `tools/pack-builder/data/english-bible-versions.json`;

@@ -143,7 +143,7 @@ X-BYOK-Model: <optional_model_override>         # e.g. gemini-2.5-flash, claude-
 
 ## Assumptions
 
-- `[ASSUMPTION]` Default shared server model in Phase 4 is a fast, low-cost JSON-structured model (e.g., Gemini Flash tier) to maintain the `$0–$5/mo` guardrail (`B7`).
+- `[ASSUMPTION]` Default shared server model in Phase 5 (formerly Phase 4; `A3` 1.1.0) is a fast, low-cost JSON-structured model (e.g., Gemini Flash tier) to maintain the `$0–$5/mo` guardrail (`B7`).
 
 ## Change Log
 

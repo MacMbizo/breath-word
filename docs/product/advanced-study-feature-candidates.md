@@ -1,9 +1,9 @@
 # Advanced Study Feature Candidates (Research Backlog)
 
 **Document ID:** `EXTRAS-FEAT`  
-**Version:** `0.2.1`  
+**Version:** `0.3.0`  
 **Status:** `Draft — Research / Pre-Approval`  
-**Last Updated:** `2026-11-27`  
+**Last Updated:** `2026-11-28`  
 **Related Docs:** `A2`, `A3`, `B4`, `B5`, `B6`, `D1`, `G1`, source: `extras.md` (root)
 
 ## Purpose & Scope
@@ -22,6 +22,8 @@ added to `A2`/`G5` and scheduled per `A3`.
 Founder, AI coding partner, and anyone scoping post-MVP study features.
 
 ## Body
+
+> **Promoted 2026-11-28 (owner decision):** §1, §2, §7 and §8 are now approved scope as `A2` §4.5 `FR-501`–`FR-507`, Phase 4 *Scripture Signals & Promise Prayer* (`A3` 1.1.0). Classification comes from established, attributed compilations (Clarke, Spurgeon, Maimonides, Nave's / Torrey's, the Beatitudes, the Ten Commandments…), **not** from an LLM: the app highlights what is already known. The LLM approaches in §1.2 are superseded; at most a tool to help a human check coverage. §3–§6 remain research candidates.
 
 ### 1. Theological Structure Classification Engine
 
@@ -193,6 +195,7 @@ a Command unlocking its Promise, or the Condition behind a blessing.
 ## Change Log
 
 - `0.1.0` | `2026-11-27` | Devin | Initial feature-candidate catalog distilled from `extras.md`, mapped to `A2`/`A3` phases.
+- `0.3.0` | `2026-11-28` | Claude | §1, §2, §7, §8 promoted to `A2` `FR-501`–`FR-507` (Phase 4); curated sources replace LLM classification.
 - `0.2.0` | `2026-11-27` | Devin | Added Unfolding Story (chronological narrative mode), Scripture Signals (thematic highlight overlays + filterable category index), and Truth Chain (structural passage mapping) as candidates §6–§8; renumbered evaluation order to §9.
 
 ## Traceability

@@ -185,7 +185,7 @@ Before writing Phase 1 application screens, execute and verify these **4 micro-s
 
 ## Open Questions
 
-- `[OPEN]` Confirm whether `apps/desktop` will also compile as a pure SPA (`VITE_TARGET=web`) via conditional adapter swap (`WebContentApiAdapter` vs `TauriRusqliteAdapter`) in Phase 4.
+- `[OPEN]` Confirm whether `apps/desktop` will also compile as a pure SPA (`VITE_TARGET=web`) via conditional adapter swap (`WebContentApiAdapter` vs `TauriRusqliteAdapter`) in Phase 5 (formerly Phase 4; `A3` 1.1.0).
 
 ## Assumptions
 
