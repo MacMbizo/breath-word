@@ -1,7 +1,7 @@
 # D1: Design System & Motion Tokens (`packages/tokens`)
 
 **Document ID:** `D1`  
-**Version:** `1.1.0`  
+**Version:** `1.2.0`  
 **Status:** `Approved`  
 **Owner:** Founder / Design  
 **Last Updated:** `2026-11-28`  
@@ -98,6 +98,34 @@ export const BREATH_EASING = {
 
 `VerseBlock`, `ParallelColumnSync`, `FloatingCaptureBar`, `PrayerPoolCard`, `SwipePrayerDeck`, `BreathRingCanvas`, `MorphologyInspector`, `InductiveToolbar`, `SkiaInkCanvas`, `AmbientAudioMiniPlayer`, `VaultUnlockSheet`, `GroundedCitationPill`.
 
+### 4.7 Scripture Signals (`FR-501`–`FR-507`) — design round 2026-11-28
+
+Canvas: https://claude.ai/artifact/UjW6NYcCWGryuyZAeWkkdR (boards A–F). The owner liked all three on-page treatments, so
+they ship as **three depths of one system**, all drawn from the same `study_signals` data:
+
+1. **Read — quiet margin signs (board A, default).** A small sign in the verse gutter. A promise with a condition gets
+   a dotted underline under the condition ("your part") and a solid underline under the promise.
+2. **Look closer — labelled card (boards B + D).** Tapping a signed verse opens its card: category label, "Your part" /
+   "His promise" split, "A prayer to begin", **Pray this promise** (primary), Keep in a pool, Linked passages, and the
+   source compilation's name.
+3. **Search — focus pills (board C).** The Signals button reveals pills with chapter counts (Promises · Commands ·
+   Warnings · Wisdom) plus named collections; choosing one lights that category and dims the rest of the chapter.
+
+Reading settings gain **Signals style: Quiet (A) · Labelled (B: every signed verse in its soft wash) · Off**.
+Prayer surfaces: "Promises for when I'm…" (board E) and Today's promise + promises you kept (board F).
+
+| Category | Sign (meaningful, not generic) | Selah | Parchment | Lamplight |
+| --- | --- | --- | --- | --- |
+| Promise | Rainbow arc — the covenant sign | `#8A5D0C` | `#80560A` | `#E8B96A` |
+| Command | Two stone tablets | `#3E6B5E` | `#3E6B5E` | `#8CC5B0` |
+| Warning | Shofar — the watchman's horn | `#9A3B2E` | `#8C2B20` | `#EE9580` |
+| Wisdom | Oil lamp | `#4B5A8A` | `#45527F` | `#AEB9E8` |
+
+Rules: meaning is never colour alone (sign + label); washes are the category colour at 9–10 % (light) / 13–14 % (dark);
+the dimmed text in focus mode must still pass 4.5:1; focus-mode dimming respects Reduced Motion (no fade, instant);
+the curated layer can be hidden and personal signals (`FR-506`) are styled distinctly. Colours above are mockup values —
+add them to `packages/tokens` as `signal.*` roles and extend the contrast test before use.
+
 ## Acceptance / Done Criteria
 
 - All text/background and highlight/text pairings pass WCAG 2.2 AA contrast (`≥4.5:1` normal text, `≥3:1` large text/icons) across all 3 themes (enforced by `packages/tokens/test/contrast.test.ts`).
@@ -114,6 +142,7 @@ export const BREATH_EASING = {
 
 ## Change Log
 
+- `1.2.0` | `2026-11-28` | Claude | §4.7 Scripture Signals: quiet margin signs, labelled card and focus pills as three depths of one system; Signals style setting; category signs and mockup colours.
 - `1.1.0` | `2026-11-28` | Claude | Design round 2026-11-28: three themes (Parchment · Selah · Lamplight) with shared colour roles (accent = interactive, rubric = chapter numeral and "&", wash = tapped word, nav = pill), contrast test, Cormorant display face, Noto Serif Hebrew replaces SBL Hebrew, fonts bundled, layout principles (pill nav, floating study card, collapsible panels).
 - `1.0.0` | `2026-11-24` | Athena | Complete Sacred Editorial Calm design system, 4 themes, inductive highlight palette, Hebrew/Greek typography, and shared spring/breath motion tokens.
 

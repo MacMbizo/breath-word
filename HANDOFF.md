@@ -2,7 +2,7 @@
 
 > **Read this first** when resuming work in a fresh session or on a new machine. It is a concise
 > orientation, **not** a replacement for the specs. Authoritative specs live in `docs/` — start at
-> `docs/G1-index.md`. The living changelog is `docs/G3-changelog.md` (currently `v1.0.49`); the
+> `docs/G1-index.md`. The living changelog is `docs/G3-changelog.md` (currently `v1.0.50`); the
 > requirements register is `docs/G5-requirements-register.md` (currently `1.1.0`).
 
 ---
@@ -83,7 +83,12 @@ apps; English Bible versions catalogued.** Everything up to `b3590c0` is pushed 
 - `A2` §4.5 `FR-501`–`FR-507`; `A3` 1.1.0 (old Phase 4 Grounded AI & Studio is now Phase 5).
 - **No AI classification.** Curated, attributed compilations only (Clarke's *Precious Bible Promises*, Spurgeon's
   *Faith's Checkbook*, Maimonides' 613, Nave's/Torrey's, Beatitudes, Ten Commandments …) → read-only `study_signals`
-  pack. `B4` schema for that pack is still to write. Mockups first (owner picks the visual direction).
+  pack. `B4` schema for that pack is still to write.
+- **Gate waived:** Phase 4 is the active build; finish the Phase 3 device clauses alongside it (`A3` 1.1.1).
+- **Design chosen** (`D1` §4.7, canvas https://claude.ai/artifact/UjW6NYcCWGryuyZAeWkkdR): quiet margin signs →
+  labelled card with "Pray this promise" → focus pills; Signals style setting Quiet · Labelled · Off.
+- **Build order:** source research + `B4` `study_signals` schema → pack-builder ETL (one compilation first) → core
+  repository → `signal.*` tokens + contrast test → reader marks + card (mobile, desktop) → pills → prayer flows.
 
 ### English versions (`EXTRAS-ENG`, `EXTRAS-SEL`, 2026-11-28)
 - 105 English versions catalogued with per-source licences in `tools/pack-builder/data/english-bible-versions.json`;

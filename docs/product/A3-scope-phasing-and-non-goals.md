@@ -1,7 +1,7 @@
 # A3: Scope, Phasing & Non-Goals
 
 **Document ID:** `A3`  
-**Version:** `1.1.0`  
+**Version:** `1.1.1`  
 **Status:** `Approved`  
 **Owner:** Founder  
 **Last Updated:** `2026-11-28`  
@@ -40,6 +40,7 @@ Founder and AI coding partner. Consult before adding any library, table, or UI f
 ## Acceptance / Done Criteria
 
 - No Phase 2–5 tasks are started until the preceding Phase Exit Gate passes all acceptance checks.
+- **Waiver (owner, 2026-11-28):** Phase 4 (Scripture Signals & Promise Prayer) may start before the Phase 3 exit gate closes. The open Phase 3 device clauses (mobile study screens, iPad ink parity, cross-device sync of highlights/notes/ink) are finished alongside Phase 4 and still gate Phase 5.
 
 ## Open Questions
 
@@ -53,6 +54,7 @@ Founder and AI coding partner. Consult before adding any library, table, or UI f
 
 - `1.0.0` | `2026-11-24` | Athena | Locked Phase 1–4 boundaries, v1.1 deferrals (Syntax Trees, BYO importer, Widgets), and Non-Goals.
 - `1.1.0` | `2026-11-28` | Claude | Owner decision: new Phase 4 **Scripture Signals & Promise Prayer** (`FR-501`–`FR-507`); former Phase 4 (Grounded AI & Studio Polish) becomes Phase 5. Phase 4 starts after the Phase 3 exit gate.
+- `1.1.1` | `2026-11-28` | Claude | Owner waived the Phase 3 exit gate for starting Phase 4; Phase 3 device clauses still gate Phase 5.
 
 ## Traceability
 
