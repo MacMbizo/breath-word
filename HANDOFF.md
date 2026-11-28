@@ -2,7 +2,7 @@
 
 > **Read this first** when resuming work in a fresh session or on a new machine. It is a concise
 > orientation, **not** a replacement for the specs. Authoritative specs live in `docs/` — start at
-> `docs/G1-index.md`. The living changelog is `docs/G3-changelog.md` (currently `v1.0.46`); the
+> `docs/G1-index.md`. The living changelog is `docs/G3-changelog.md` (currently `v1.0.48`); the
 > requirements register is `docs/G5-requirements-register.md` (currently `1.0.5`).
 
 ---
@@ -68,8 +68,23 @@ breath-word/
 ## 5. Status snapshot (as of 2026-11-28)
 
 **Phases 1–3 built; FR-301 tap-any-English-word done; design round 1 (Parchment · Selah · Lamplight) built on both
-apps.** Latest commits are local on `main` (not pushed): `558db37`, `50fb7e2` (word alignments), `c1b8912`, `e940f82`,
-`3e053ed` (design) + docs.
+apps; English Bible versions catalogued.** Everything up to `b3590c0` is pushed to `origin/main`.
+
+### Running on real devices (2026-11-28)
+- **Android phone (S25 Ultra):** the release APK runs there, installed over **wireless debugging** (`adb pair` then
+  `adb connect`; the phone's USB port only charges). It is a fresh install, so a Bible must be downloaded from the
+  Library first. Release-build recipe for the flaky DNS on this PC is in paperRock (`breath-word-android-release-build-flaky-dns`).
+- **iPad:** not yet. It needs an EAS cloud build plus a paid Apple Developer account (`apps/mobile/eas.json` has
+  development / preview / production profiles). Waiting on the owner.
+
+### English versions (`EXTRAS-ENG`, `EXTRAS-SEL`, 2026-11-28)
+- 105 English versions catalogued with per-source licences in `tools/pack-builder/data/english-bible-versions.json`;
+  the 70 public-domain/open texts are stored (git-ignored) in `tools/pack-builder/sources/english/` with a SHA-256
+  manifest. Re-fetch: `node tools/pack-builder/scripts/fetch-english-bibles.mjs`.
+- `EXTRAS-SEL` proposes building only ~11 English packs: shipped BSB/KJV/WEB, plus ASV, YLT or LSV, BBE, DRA,
+  JPS 1917, Geneva 1599, Darby and Brenton. **Waiting on owner sign-off** before any `B5` row or build.
+- `docs/integrations/english-bible-versions.md` is generated from the JSON by a Python script that still lives in
+  the session scratchpad; move it into `tools/pack-builder/scripts/` before the catalog is regenerated.
 
 ### Design round 2026-11-28 (`D1` 1.1.0, canvas https://claude.ai/artifact/GmWvY58mTdAuEXh2wGxRJx rows D/E)
 - **Themes:** Parchment (warm day), **Selah** (calm, default), Lamplight (night; follows OS dark mode). Colour *roles*
@@ -129,6 +144,8 @@ apps.** Latest commits are local on `main` (not pushed): `558db37`, `50fb7e2` (w
    habits, account, compare, search) — they are themed but still use the older layouts.
 3. Merge the audio bar into the mobile pill while audio plays (design note); narration timestamps (FR-106, Aeneas).
 4. Full STEPBible exegesis build; decide which research candidates (§7) enter `A2`/`G5`.
+5. After owner sign-off on `EXTRAS-SEL`: add `B5` rows for the chosen versions, confirm an eBible USFM source for
+   each, extend book lists and `versification_maps` for the Catholic canon (DRA) and LXX (Brenton), build the packs.
 
 ## 6. How to run
 

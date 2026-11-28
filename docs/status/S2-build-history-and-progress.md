@@ -1,9 +1,9 @@
 # S2: Build History & Progress
 
 **Document ID:** `S2`
-**Version:** `1.0.0`
+**Version:** `1.1.0`
 **Status:** `Living`
-**Last Updated:** `2026-11-27`
+**Last Updated:** `2026-11-28`
 **Related Docs:** `S1`, `S3`, `S4`, `G3` (changelog), `G5` (register), `F1`, `AGENTS.md`
 
 > Living record of **everything built so far**. Authoritative chronological changes live in
@@ -157,30 +157,41 @@ and recorded in `G3` `v1.0.42`. Built as six workstreams (WS1–WS6), units `P2-
 
 ---
 
-## 5. Current gate health
+## 5. Current gate health (2026-11-28)
 
 ```
-pnpm turbo lint typecheck test  →  12 successful / 12 total
-  @breath-and-word/core          →  240 tests / 22 files
-  tools/pack-builder             →  37 tests
+pnpm turbo lint typecheck test  ->  13 successful / 13 total
+  @breath-and-word/core          ->  294 tests
+  tools/pack-builder             ->  90 tests
+  @breath-and-word/tokens        ->  47 tests (incl. WCAG AA contrast)
 ```
 
 ---
 
 ## 6. What is done vs. what remains
 
-**Done (device-verified):**
-- Phase 1 — all five FRs device-verified; all three packs built (incl. real WEB ETL).
-- Phase 2 — all seven FRs implemented with tests; hosted Supabase + PowerSync provisioned;
-  two-device pool sync and shared-pool join-by-code verified on real devices (`G3 v1.0.42`).
+**Done:**
+- Phase 1: all five FRs device-verified; `core_bsb`, `trans_kjv`, `trans_web` built (real USFM ETL).
+- Phase 2: all seven FRs implemented; two-device PowerSync sync and shared-pool join verified on devices (`G3 v1.0.42`).
+- Phase 3: built and desktop-verified (`G3 v1.0.44`): `exegesis_step` + `study_refs` packs, word study, Passage Guide,
+  Factbook, inductive tools, ink, two-stream audio with sleep fade. `FR-301` tap-any-English-word via
+  `verse_word_alignments` in KJV/WEB 1.1.0 (`G3 v1.0.45`).
+- Design round `D1` 1.1.0: three themes, bundled fonts, pill navigation, new reader (`G3 v1.0.46`); desktop visually
+  verified in all themes; theme and ambience fixes (`G3 v1.0.47`).
+- Release APK running on a physical Android phone (S25 Ultra, wireless debugging).
+- Research: 105 English versions catalogued, 70 redistributable texts stored (`EXTRAS-ENG`); selection proposal
+  (`EXTRAS-SEL`, `G3 v1.0.48`).
 
-**Next active phase — Phase 3 (Exegesis, Inductive, Ink & Audio):**
-- `FR-301` Clickable Strong's, Interlinear & Morphology (`exegesis_step` pack)
-- `FR-302` Lexicon & Word Frequency Suite (`exegesis_step` pack)
-- `FR-303` Automated Passage Guide & Factbook (`study_refs` pack)
-- `FR-304` Inductive Bible Study Suite (`highlights` + `study_notes` + checkup reminders)
-- `FR-305` Cross-Platform Stylus Ink Canvas (`ink_canvases`, `ADR-003`)
-- `FR-106` Synchronized Audio & Ambient Mixer (`audio_*` tables + two-stream mixer + LRU cache)
+**Remaining:**
+- Phase 3 partials: `FR-106` (no narration edition with verse timestamps; Aeneas), `FR-304` (no OS notification
+  for checkups). Mobile narration library (`react-native-track-player` 4.1.2) does not load on RN 0.88 New
+  Architecture and must be upgraded or replaced.
+- Phase 3 device exit gate: mobile study screens, ink parity and cross-device sync of highlights/notes/ink.
+- Data: full STEPBible build (only Gen–Deu + Mat–Jhn so far); Factbook map geography.
+- Desktop: install KJV 1.1.0 and verify word taps; restyle the secondary screens to the new design.
+- iPad build (EAS + Apple Developer account).
+- Owner decisions: `EXTRAS-SEL` shortlist; which research candidates enter `A2`/`G5`.
+- Phase 4 not started: `FR-401` Smart Synopsis, `FR-402` desktop docking, `FR-403` church web companion.
 
 See [`S4-backend-setup-supabase-and-powersync.md`](S4-backend-setup-supabase-and-powersync.md)
 for the backend topology and
