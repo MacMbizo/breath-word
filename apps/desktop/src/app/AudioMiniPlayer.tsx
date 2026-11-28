@@ -63,6 +63,15 @@ export function AudioMiniPlayer({ packId, translationCode, bookNumber, chapter, 
   const canPlay = hasNarration || audio.ambientTrack !== 'none';
   const toggle = () => void (isPlaying ? stores.audio.getState().pause() : stores.audio.getState().play());
 
+  // Choosing an ambience is itself the "play" gesture: start it straight away, and stop when the
+  // reader picks "No ambience" with nothing else playing.
+  async function chooseAmbience(track: AmbientTrackId) {
+    const store = stores.audio.getState();
+    await store.setAmbientTrack(track);
+    if (track !== 'none' && !store.isPlaying) await stores.audio.getState().play();
+    if (track === 'none' && !hasNarration && stores.audio.getState().isPlaying) await stores.audio.getState().pause();
+  }
+
   return (
     <section
       className="flex flex-wrap items-center gap-sm rounded-md border border-hairline bg-surface px-md py-sm"
@@ -130,7 +139,7 @@ export function AudioMiniPlayer({ packId, translationCode, bookNumber, chapter, 
         <select
           className={SELECT}
           value={audio.ambientTrack}
-          onChange={(e) => void stores.audio.getState().setAmbientTrack(e.target.value as AmbientTrackId)}
+          onChange={(e) => void chooseAmbience(e.target.value as AmbientTrackId)}
         >
           {AMBIENT.map((track) => (
             <option key={track.id} value={track.id}>

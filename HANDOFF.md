@@ -118,6 +118,12 @@ apps.** Latest commits are local on `main` (not pushed): `558db37`, `50fb7e2` (w
 - **Data:** full STEPBible build from all TAGNT/TAHOT files; Factbook map is a grid + dot (no coastline source yet).
 
 ### Next up
+0. **Mobile narration library:** `react-native-track-player@4.1.2` cannot load on RN 0.88's New Architecture
+   (importing it aborts the JS runtime). Since 2026-11-28 the mobile audio adapter only loads it when a narration
+   chapter opens, so ambience, sleep timer and volume never touch it — but no pack has narration yet, so narration
+   itself is unverified on mobile. Upgrade to a New-Architecture build of TrackPlayer (or move narration to
+   `expo-audio`) before FR-106 narration ships. In dev builds the ambient WAVs stream from Metro and can time out on a
+   slow emulator (`SocketTimeoutException`); release builds bundle them.
 1. Install the KJV 1.1.0 pack on desktop and verify word taps, quick look and the study card there.
 2. Restyle the remaining secondary screens to the new design language (prayer session, guided prayer, pools, vault,
    habits, account, compare, search) — they are themed but still use the older layouts.

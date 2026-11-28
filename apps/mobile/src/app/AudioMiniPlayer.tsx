@@ -89,6 +89,14 @@ export function AudioMiniPlayer({ packId, translationCode, bookNumber, chapter, 
   const hasNarration = audio.activeChapter !== null;
   const canPlay = hasNarration || audio.ambientTrack !== 'none';
   const audioStore = stores.audio.getState();
+  // Choosing an ambience is itself the "play" gesture: start it straight away, and stop when the
+  // reader picks "No ambience" with nothing else playing.
+  const chooseAmbience = async (track: AmbientTrackId) => {
+    await stores.audio.getState().setAmbientTrack(track);
+    const now = stores.audio.getState();
+    if (track !== 'none' && !now.isPlaying) await now.play();
+    if (track === 'none' && !hasNarration && now.isPlaying) await now.pause();
+  };
 
   return (
     <View
@@ -149,7 +157,7 @@ export function AudioMiniPlayer({ packId, translationCode, bookNumber, chapter, 
             {AMBIENT.map((track) => (
               <Pressable
                 key={track.id}
-                onPress={() => void audioStore.setAmbientTrack(track.id)}
+                onPress={() => void chooseAmbience(track.id)}
                 accessibilityRole="button"
                 accessibilityState={{ selected: audio.ambientTrack === track.id }}
                 accessibilityLabel={`Ambience ${track.label}`}

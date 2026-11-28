@@ -17,6 +17,11 @@ export function ReadingSettingsSheet({ visible, onClose, onFocusMode }: { visibl
   const styles = useStyles();
   const theme = useTheme();
   const { prefs, update, chosen, scriptureSize, colors } = theme;
+  // "Lamplight when my device is dark" overrides the pick while the device is dark; picking another
+  // theme then means "show me this now", so the override is switched off rather than ignoring the tap.
+  const overridden = theme.name !== chosen;
+  const pick = (name: ThemeName) =>
+    update(overridden && name !== theme.name ? { theme: name, followSystemDark: false } : { theme: name });
 
   return (
     <Sheet visible={visible} title="Reading" onClose={onClose}>
@@ -25,11 +30,11 @@ export function ReadingSettingsSheet({ visible, onClose, onFocusMode }: { visibl
         <View style={styles.themes} accessibilityRole="radiogroup">
           {THEME_NAMES.map((name) => {
             const swatch = COLORS[name];
-            const selected = chosen === name;
+            const selected = theme.name === name;
             return (
               <Pressable
                 key={name}
-                onPress={() => update({ theme: name })}
+                onPress={() => pick(name)}
                 accessibilityRole="radio"
                 accessibilityState={{ checked: selected }}
                 accessibilityLabel={`${THEME_LABELS[name]} theme, ${THEME_NOTES[name]}`}

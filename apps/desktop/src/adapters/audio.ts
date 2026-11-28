@@ -29,13 +29,18 @@ function clamp01(volume: number): number {
 /** Autoplay may be blocked until the user interacts; never let that reject the adapter call. */
 function ignorePlaybackRejection(playback: Promise<void> | undefined): void {
   if (playback === undefined) return;
-  void playback.catch(() => undefined);
+  void playback.catch((cause: unknown) => {
+    // Non-critical, but say why in development so silent audio is diagnosable.
+    if (import.meta.env.DEV) console.warn('[audio] playback rejected', cause);
+  });
 }
 
 export function createAudioAdapter(): AudioEngineAdapter {
   let narration: HTMLAudioElement | null = null;
   let ambient: HTMLAudioElement | null = null;
   let sleepFade: ReturnType<typeof setInterval> | null = null;
+  /** True between play() and pause(): the ambient bed follows this, with or without narration. */
+  let playing = false;
   /** User-chosen levels; the element volume is `level × fade gain`. */
   let narrationLevel = 1;
   let ambientLevel = 0;
@@ -76,11 +81,13 @@ export function createAudioAdapter(): AudioEngineAdapter {
     },
 
     async play(): Promise<void> {
+      playing = true;
       ignorePlaybackRejection(narration?.play());
       ignorePlaybackRejection(ambient?.play());
     },
 
     async pause(): Promise<void> {
+      playing = false;
       narration?.pause();
       ambient?.pause();
     },
@@ -108,12 +115,15 @@ export function createAudioAdapter(): AudioEngineAdapter {
         ambient?.pause();
         ambient = new Audio(source);
         ambient.loop = true;
+        ambient.preload = 'auto';
+        if (import.meta.env.DEV) {
+          const element = ambient;
+          element.addEventListener('error', () => console.warn('[audio] ambient failed to load', source, element.error));
+        }
       }
       ambientLevel = clamp01(volume);
       applyVolumes();
-      if (narration !== null && !narration.paused) {
-        ignorePlaybackRejection(ambient.play());
-      }
+      if (playing) ignorePlaybackRejection(ambient.play());
     },
 
     async setNarrationVolume(volume): Promise<void> {
@@ -133,6 +143,7 @@ export function createAudioAdapter(): AudioEngineAdapter {
         fadeGain = sleepFadeGain(elapsed, timerMs);
         applyVolumes();
         if (elapsed >= timerMs) {
+          playing = false;
           narration?.pause();
           ambient?.pause();
           clearSleepFade();

@@ -225,14 +225,18 @@ export function SidePanel({ tab, onSelect, onFocus, theme }: SidePanelProps) {
         <div className="grid grid-cols-3 gap-xs px-xs" role="radiogroup" aria-label="Theme">
           {THEME_NAMES.map((name) => {
             const swatch = COLORS[name];
-            const selected = theme.chosen === name;
+            const selected = theme.name === name;
             return (
               <button
                 key={name}
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                onClick={() => theme.update({ theme: name })}
+                onClick={() =>
+                  // While "Lamplight when my device is dark" overrides the pick, choosing another theme
+                  // means "show me this now", so the override is switched off rather than ignoring the click.
+                  theme.update(theme.name !== theme.chosen && name !== theme.name ? { theme: name, followSystemDark: false } : { theme: name })
+                }
                 className={`flex flex-col items-center gap-xxs rounded-md border p-xs font-ui text-[11px] transition ${
                   selected ? 'border-accent font-semibold text-accent' : 'border-hairline text-ink-secondary hover:text-ink-primary'
                 }`}
