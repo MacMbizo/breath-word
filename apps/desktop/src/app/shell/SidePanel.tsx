@@ -71,7 +71,7 @@ const GROUPS: readonly NavGroup[] = [
   },
 ];
 
-const ROW = 'flex h-11 w-full items-center gap-md rounded-pill px-md text-left font-ui text-uiSm transition';
+const ROW = 'flex h-9 w-full items-center gap-md rounded-pill px-md text-left font-ui text-uiSm transition';
 const ROW_IDLE = 'text-ink-secondary hover:bg-sunken hover:text-ink-primary';
 const ROW_ACTIVE = 'bg-sunken font-semibold text-accent';
 const RAIL_BUTTON = 'flex h-11 w-12 items-center justify-center rounded-pill transition';
@@ -154,8 +154,8 @@ export function SidePanel({ tab, onSelect, onFocus, theme }: SidePanelProps) {
 
   return (
     <nav aria-label="Main" className="flex w-[248px] shrink-0 flex-col gap-lg overflow-y-auto border-r border-hairline px-md py-lg">
-      <div className="flex items-center justify-between pl-sm">
-        <span className="font-display text-[27px] font-semibold leading-tight text-ink-primary">
+      <div className="flex items-center justify-between gap-xs pl-sm">
+        <span className="whitespace-nowrap font-display text-[25px] font-semibold leading-tight text-ink-primary">
           Breath <span className="text-accent-rubric">&amp;</span> Word
         </span>
         <button
@@ -163,7 +163,7 @@ export function SidePanel({ tab, onSelect, onFocus, theme }: SidePanelProps) {
           onClick={() => theme.update({ leftPanelOpen: false })}
           aria-label="Collapse side panel"
           aria-expanded
-          className={`${RAIL_BUTTON} text-ink-secondary hover:text-ink-primary`}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-pill text-ink-secondary transition hover:bg-sunken hover:text-ink-primary"
         >
           <Icon name="panelLeftClose" />
         </button>
@@ -171,9 +171,9 @@ export function SidePanel({ tab, onSelect, onFocus, theme }: SidePanelProps) {
 
       <div className="flex flex-col gap-md">
         {GROUPS.map((group) => (
-          <div key={group.id} className="flex flex-col gap-xxs">
-            <span className={SECTION}>{group.label}</span>
-            {group.items.map((item, index) => {
+          <div key={group.id} className="flex flex-col gap-[2px]">
+            <span className={`${SECTION} mb-xxs`}>{group.label}</span>
+            {group.items.map((item) => {
               const active = item.tab === tab;
               return (
                 <button
@@ -183,7 +183,6 @@ export function SidePanel({ tab, onSelect, onFocus, theme }: SidePanelProps) {
                   aria-current={active ? 'page' : undefined}
                   className={`${ROW} ${active ? ROW_ACTIVE : ROW_IDLE}`}
                 >
-                  <span className="flex w-5 justify-center">{index === 0 ? <Icon name={group.icon} size={18} /> : null}</span>
                   {item.label}
                 </button>
               );

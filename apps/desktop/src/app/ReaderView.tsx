@@ -429,7 +429,7 @@ export function ReaderView({ focusMode = false, onExitFocus }: ReaderViewProps =
         </div>
 
         {chapter !== null && verseForStudy !== null && (
-          <div className={`flex shrink-0 py-lg pr-lg ${studyOpen ? 'w-[440px]' : 'w-auto'}`}>
+          <div className={`flex shrink-0 py-lg pr-lg ${studyOpen ? 'w-[440px]' : 'w-auto items-start'}`}>
             {studyOpen ? (
               <StudyPanel
                 key={studyTab}

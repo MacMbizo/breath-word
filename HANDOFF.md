@@ -80,9 +80,10 @@ apps.** Latest commits are local on `main` (not pushed): `558db37`, `50fb7e2` (w
 - **Mobile:** `ThemeProvider` + `makeStyles` everywhere; Expo Router `(tabs)` = Read · Pray · Journal · Library behind
   `FloatingNav` (pill); reader with passage pill, word card (Card/Interlinear), passage + reading-settings sheets.
   Device-verified on the Android emulator.
-- **Desktop:** collapsible `SidePanel`, floating `StudyPanel` ↔ `StudyRail`, inline `QuickLook`. **Not visually
-  verified yet** — a stale `breath-and-word-desktop.exe` (no window, started 2026-11-27 20:05) holds the WebView2
-  profile so a second instance can't start; close it, then `pnpm --filter @breath-and-word/desktop tauri dev`.
+- **Desktop:** collapsible `SidePanel`, floating `StudyPanel` ↔ `StudyRail`, inline `QuickLook`. Visually verified
+  2026-11-28 in all three themes, open and collapsed (only the dev fixture pack is installed on desktop, so word
+  taps are not yet exercised there — install `trans_kjv` 1.1.0 to try them). Screenshot helper: `PrintWindow` with
+  `SetProcessDPIAware` (display is scaled 125%); drive the WebView via Windows UI Automation by accessible name.
 - **Device-local preferences:** `workspace_state.appearance` (theme, followSystemDark, wordView, scriptureSize,
   leftPanelOpen, studyPanelOpen, lastPassage).
 
@@ -117,7 +118,7 @@ apps.** Latest commits are local on `main` (not pushed): `558db37`, `50fb7e2` (w
 - **Data:** full STEPBible build from all TAGNT/TAHOT files; Factbook map is a grid + dot (no coastline source yet).
 
 ### Next up
-1. Visually verify the desktop redesign (close the stale desktop process first) and fix what the screenshots show.
+1. Install the KJV 1.1.0 pack on desktop and verify word taps, quick look and the study card there.
 2. Restyle the remaining secondary screens to the new design language (prayer session, guided prayer, pools, vault,
    habits, account, compare, search) — they are themed but still use the older layouts.
 3. Merge the audio bar into the mobile pill while audio plays (design note); narration timestamps (FR-106, Aeneas).
